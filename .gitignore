@@ -1,0 +1,62 @@
+#================= GITIGNORE FILE V 1.1 =================#
+# Revision History
+# V 1.O         -   Initial
+# V 1.1         -   Added fstab
+#========================================================#
+
+#======= FILE TYPES
+*~                          # tmp file
+*.7z                        # 7zip file
+* alias                     # macOS alias
+*.bak                       # Backup file
+*.cab                       # MS Windows installer file
+[Dd]esktop.ini              # MS Windows config file
+ehthumbsdb                  #
+*.dmg                       # macOS installer file
+*.fseventsd                 #
+*.gz                        # gzip file
+*.icns                      # Icons
+Icon?                       # icon         
+*.iso                       # iso file
+*.jar                       #
+*.lnk                       # MS Windows shortcuts
+*.log                       # log file
+*.msi                       # MS Windows installer file
+*.msix                      # MS Windows installer file
+*.msm                       # MS Windows installer file
+*.msp                       # MS Windows installer file
+*.rar                       # rar file
+*.stackdump                 # Dump file
+*.tar                       # tar file
+Thumbs.AppleDB              # macOS Thumbnails
+Thumbs.db                   # MS Windows thumbnails
+*.tmp                       # Temp file
+*.Trashes                   # Trash can
+*.vscode                    # vscode file
+*.zip                       # zip file
+
+#=== File(s) that might appear at the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+#=== Specific Files
+fstab/fstab
+etc/.docker-creds
+
+
+#======= DIRECTORY TYPES
+.AppleDouble                 # macOS
+.DS_Store*                   # Synology Cloud Station / Drive storage config 
+file
+.localized                   # macOS
+.LSOverride                  # macOS
+.AppleDB                     # Potentially created on remote AFP share
+.AppleDesktop                # Potentially created on remote AFP share
+.apdisk                      # Potentially created on remote AFP share
+Network Trash Folder         # Potentially created on remote AFP share
+Temporary Items              # Potentially created on remote AFP share
