@@ -1,0 +1,41 @@
+version: "3.7"
+services:
+  diagrams-net:
+    image: jgraph/drawio
+    configs:
+      - source: drawio.preconfig.js
+        target: /usr/local/tomcat/webapps/draw/js/PreConfig.js
+      - source: drawio.postconfig.js
+        target: /usr/local/tomcat/webapps/draw/js/PostConfig.js
+    ports:
+      - "58080:8080"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.role == worker"
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause
+        monitor: 5s
+        max_failure_ratio: 0
+        order: stop-first
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://domain:58080 || exit 1"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+configs:
+  drawio.preconfig.js:
+    external: true
+  drawio.postconfig.js:
+    external: true
