@@ -1,0 +1,22 @@
+version: "3.7"
+services:
+  DBeaver:
+    image: dbeaver/cloudbeaver
+    volumes:
+      - type: volume
+        source: dbeaver_config
+        target: /opt/cloudbeaver/workspace
+        volume:
+          nocopy: true
+    ports:
+      - "61978:8978"
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+
+volumes:
+  dbeaver_config:
