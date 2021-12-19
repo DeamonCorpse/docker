@@ -1,0 +1,8 @@
+sudo docker run -d \
+	–name docker-compose-ui \
+	–restart unless-stopped \
+	-c 256 \
+	-m 128m \
+	-p 5000:5000 \
+	-v /var/run/docker.sock:/var/run/docker.sock \
+	francescou/docker-compose-ui
