@@ -1,0 +1,69 @@
+version: "3.7"
+services:
+  handbrake:
+    image: jlesage/handbrake:latest
+    environment:
+      - USER_ID=UID
+      - GROUP_ID=PID
+      - TZ=TZ
+      - CLEAN_TMP_DIR=1
+      - APP_NICENESS=0
+      - DISPLAY_WIDTH=1280
+      - DISPLAY_HEIGHT=768
+      - AUTOMATED_CONVERSION_SOURCE_MIN_DURATION=30
+    ports:
+      - "60800:5800"
+    volumes:
+      - type: volume
+        source: handbrake_config
+        target: /config
+        read_only: false
+      - type: volume
+        source: handbrake_storage
+        target: /storage
+        read_only: true
+      - type: volume
+        source: handbrake_output
+        target: /output
+        read_only: false
+      - type: volume
+        source: handbrake_watch
+        target: /watch
+        read_only: false
+    secrets:
+      - UID
+      - PID
+      - TZ
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+
+volumes:
+  handbrake_config:
+  handbrake_storage:
+  handbrake_output:
+  handbrake_watch:
+
+secrets:
+  UID:
+    external: true
+  PID:
+    external: true
+  TZ:
+    external: true

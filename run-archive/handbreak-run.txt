@@ -1,0 +1,18 @@
+sudo docker run -d \
+  --name=handbrake \
+  --restart=unless-stopped \
+  -p 60800:5800 \
+  -e USER_ID=1000 \
+  -e GROUP_ID=1000 \
+  -e TZ="America/Toronto" \
+  -e CLEAN_TMP_DIR=1 \
+  -e APP_NICENESS=0 \
+  -e DISPLAY_WIDTH=1280 \
+  -e DISPLAY_HEIGHT=768 \
+  -e AUTOMATED_CONVERSION_SOURCE_MIN_DURATION=30 \
+  -v /home/docker/persistent-storage/handbreak/config:/config:rw \
+  -v /home/docker/persistent-storage/handbreak/storage:/storage:ro \
+  -v /home/docker/persistent-storage/handbreak/watch:/watch:rw \
+  -v /home/docker/persistent-storage/handbreak/output:/output:rw \
+  --device /dev/sr0 \
+  jlesage/handbrake
