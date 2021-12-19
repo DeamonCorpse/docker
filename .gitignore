@@ -1,10 +1,10 @@
-#================= GITIGNORE FILE V 1.1 =================#
+#----------------- GITIGNORE FILE V 1.1 -----------------#
 # Revision History
 # V 1.O         -   Initial
 # V 1.1         -   Added fstab
-#========================================================#
+#--------------------------------------------------------#
 
-#======= FILE TYPES
+#---------- FILE TYPES
 *~                          # tmp file
 *.7z                        # 7zip file
 * alias                     # macOS alias
@@ -35,7 +35,7 @@ Thumbs.db                   # MS Windows thumbnails
 *.vscode                    # vscode file
 *.zip                       # zip file
 
-#=== File(s) that might appear at the root of a volume
+#=----- File(s) that might appear at the root of a volume
 .DocumentRevisions-V100
 .fseventsd
 .Spotlight-V100
@@ -49,7 +49,7 @@ fstab/fstab
 etc/.docker-creds
 
 
-#======= DIRECTORY TYPES
+#---------- DIRECTORY TYPES
 .AppleDouble                 # macOS
 .DS_Store*                   # Synology Cloud Station / Drive storage config 
 file
