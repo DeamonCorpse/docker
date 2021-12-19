@@ -1,0 +1,38 @@
+version: "2"
+services:
+  chevereto:
+    image: nmtan/chevereto
+    container_name: chevereto
+    restart: unless-stopped
+    networks:
+      - private
+    environment:
+      - CHEVERETO_DB_HOST=chevereto_db
+      - CHEVERETO_DB_USERNAME=chevereto
+      - CHEVERETO_DB_PASSWORD=-Chev3retoer
+      - CHEVERETO_DB_NAME=chevereto
+      - CHEVERETO_DB_PREFIX=chv_
+    volumes:
+      - /home/docker/persistent-storage/chevereto/media:/var/www/html/images:rw
+      - /home/docker/persistent-storage/chevereto/php.ini:/usr/local/etc/php/php.ini:ro
+    ports:
+      - 60883:80
+    depends_on:
+      - chevereto_db
+
+  chevereto_db:
+    image: mariadb
+    container_name: chevereto_db
+    restart: unless-stopped
+    volumes:
+      - /home/docker/persistent-storage/chevereto/data:/var/lib/mysql:rw
+    networks:
+      - private
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+      - MYSQL_ROOT_PASSWORD=r00t_ch3ver3t-0
+      - MYSQL_DATABASE=chevereto
+      - MYSQL_USER=chevereto
+      - MYSQL_PASSWORD=-Chev3retoer

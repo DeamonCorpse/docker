@@ -1,0 +1,84 @@
+version: "3.7"
+services:
+  chevereto:
+    image: nmtan/chevereto
+    networks:
+      - chev
+    environment:
+      - CHEVERETO_DB_HOST=chevereto_db
+      - CHEVERETO_DB_USERNAME=Chev-DB_USERNAME
+      - CHEVERETO_DB_PASSWORD=Chev-DB_PASSWORD
+      - CHEVERETO_DB_NAME=chevereto
+      - CHEVERETO_DB_PREFIX=chv_
+      - CHEVERETO_DEFAULT_TIMEZONE=TZ
+    volumes:
+      - type: bind
+        source: /home/swarm-admin/swarm-persistent-data/chevereto
+        target: /var/www/html/images
+        read_only: false
+    ports:
+      - "60883:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+    configs:
+      - chev-php.ini
+    secrets:
+      - Chev-DB_USERNAME
+      - Chev-DB_PASSWORD
+      - TZ
+
+  chevereto_db:
+    image: mariadb:10.5.6
+    volumes:
+      - type: bind
+        source: /home/swarm-admin/swarm-persistent-data/chevereto-db
+        target: /var/lib/mysql
+        read_only: false
+    networks:
+      - chev
+    environment:
+      - PUID=UID
+      - PGID=GID
+      - TZ=TZ
+      - MYSQL_ROOT_PASSWORD=Chev-MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE=chevereto
+      - MYSQL_USER=Chev-MYSQL_USER
+      - MYSQL_PASSWORD=Chev-MYSQL_PASSWORD
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+    configs:
+      - chev-DB_my.cnf
+    secrets:
+      - UID
+      - PID
+      - TZ
+      - Chev-MYSQL_ROOT_PASSWORD
+      - Chev-MYSQL_USER
+      - Chev-MYSQL_PASSWORD
+
+networks:
+  chev:
+
+secrets:
+  Chev-DB_USERNAME:
+  Chev-DB_PASSWORD:
+  Chev-MYSQL_ROOT_PASSWORD:
+  Chev-MYSQL_USER:
+  Chev-MYSQL_PASSWORD:
+  UID:
+  PID:
+  TZ:
+
+configs:
+  chev-php.ini:
+  chev-DB_my.cnf:
