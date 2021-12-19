@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+  monitorr:
+    image: monitorr/monitorr
+    environment:
+      - PUID=UID
+      - PGID=PID
+      - TZ=TZ
+    volumes:
+      - type: volume
+        source: monitorr_data
+        target: /app
+        read_only: false
+    ports:
+      - "60884:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.role==worker"
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+    secrets:
+      - UID
+      - PID
+      - TZ
+
+volumes:
+  monitorr_data:
+
+secrets:
+  UID:
+    external: true
+  PID:
+    external: true
+  TZ:
+    external: true
