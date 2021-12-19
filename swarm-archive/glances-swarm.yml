@@ -1,0 +1,36 @@
+version: "3.7"
+services:
+  glances:
+    image: docker.registry.local:55443/glances-local
+    pid: "host"
+    environment:
+      - GLANCES_OPT=-w
+    ports:
+      - "61208-61209:61208-61209"
+    networks:
+      - host
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        read_only: true
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+
+networks:
+  host:
+
+configs:
+  glances_config:
+    file: /home/swarm-admin/swarm-persistent-data/glances/glances.conf
+    external: true

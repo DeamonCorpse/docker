@@ -1,0 +1,8 @@
+sudo docker run -d \
+  --name=Glances \
+  --restart=unless-stopped \
+  --pid host \
+  -p 61208-61209:61208-61209 \
+  -e GLANCES_OPT="-w" \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  docker.io/nicolargo/glances:latest-full
