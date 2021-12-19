@@ -1,0 +1,8 @@
+sudo docker run -d \
+  --name Grafana \
+  --restart unless-stopped \
+  --user 1000 \
+  -p 3000:3000 \
+  -v /home/grafana/grafana:/var/lib/grafana \
+  #-e "GF_INSTALL_PLUGINS=grafana-googlesheets-datasource,mtanda-google-calendar-datasource,agenty-flowcharting-panel,marcusolsson-calendar-panel,mxswat-separator-panel,flant-statusmap-panel,vonage-status-panel,grafana-clock-panel" \
+  grafana/grafana
