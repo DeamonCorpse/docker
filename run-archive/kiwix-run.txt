@@ -1,0 +1,6 @@
+sudo docker run -d \
+  --name kiwix \
+  --restart unless-stopped \
+  -p 60180:80 \
+  -v /home/docker/persistent-storage/Docker_Common/Downloads/zim_Files:/data \
+  kiwix/kiwix-serve *.zim
