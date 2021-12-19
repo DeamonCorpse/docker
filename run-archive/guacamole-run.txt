@@ -1,0 +1,6 @@
+sudo docker run -d \
+  --name Guacamole \
+  --restart unless-stopped \
+  -p 60441:8080 \
+  -v /home/ubuntu/guacamole:/config \
+  oznu/guacamole

@@ -1,0 +1,38 @@
+version: "3.7"
+services:
+  guacamole:
+    image: oznu/guacamole
+    environment:
+      - EXTENSIONS=auth-totp
+    volumes:
+      - type: volume
+        source: guacamole_config
+        target: /config
+        read_only: false
+    ports:
+      - "60880:8080"
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      rollback_config:
+        parallelism: 2
+        delay: 0s
+        failure_action: pause
+        monitor: 5s
+        max_failure_ratio: 0
+        order: start-first
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause
+        monitor: 5s
+        max_failure_ratio: 0
+        order: start-first
+
+volumes:
+  guacamole_config:

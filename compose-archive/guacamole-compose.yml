@@ -1,0 +1,13 @@
+version: "2"
+services:
+  guacamole:
+    image: oznu/guacamole
+    container_name: Guacamole
+    restart: unless-stopped
+    mem_limit: 512m
+    mem_reservation: 256m
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/ubuntu/guacamole:/config
+    ports:
+      - 60441:8080
