@@ -1,0 +1,9 @@
+sudo docker run -d \
+  --name Ciao \
+  --restart unless-stopped \
+  -e TIME_ZONE="America/Toronto" \
+  #-e BASIC_AUTH_USERNAME="DeamonAdmin" \
+  #-e BASIC_AUTH_PASSWORD="BURNISH-legacy-retinal" \
+  -p 8090:3000 \
+  -v /opt/ciao/data:/app/db/sqlite/ \
+  brotandgames/ciao
