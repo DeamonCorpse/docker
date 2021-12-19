@@ -1,0 +1,101 @@
+version: "3.7"
+
+services:
+  bookstack:
+    image: ghcr.io/linuxserver/bookstack
+    environment:
+      - PUID=UID
+      - PGID=PID
+      - DB_CONNECTION=mysql
+      - DB_HOST=bookstack_db
+      - DB_PORT=3306
+      - DB_USER=bookstack
+      - DB_PASS=BSDB-Pass
+      - DB_DATABASE=bookstackapp
+      - APP_LANG=en
+      - APP_AUTO_LANG_PUBLIC=true
+      - APP_TIMEZONE=TZ
+      - APP_URL=http://192.168.1.17:6875
+    volumes:
+      - type: volume
+        source: bookstack_config
+        target: /config
+        read_only: false
+    ports:
+      - "6875:80"
+    configs:
+      - source: bookstack_env
+        target: /config/www/.env
+    secrets:
+      - UID
+      - PID
+      - TZ
+      - BSDB-Pass
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 5s
+        order: start-first
+      restart_policy:
+        condition: none
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  bookstack_db:
+    image: mariadb:10.5.8
+    environment:
+      - PUID=UID
+      - PGID=PID
+      - TZ=TZ
+      - MYSQL_ROOT_PASSWORD=BSDB-rpass
+      - MYSQL_DATABASE=bookstackapp
+      - MYSQL_USER=bookstack
+      - MYSQL_PASSWORD=BSDB-Pass
+    volumes:
+      - type: volume
+        source: bookstack-db_config
+        target: /config
+        read_only: false
+    ports:
+      - "3306:3306"
+    secrets:
+      - UID
+      - PID
+      - TZ
+      - BSDB-Pass
+      - BSDB-rpass
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+configs:
+  bookstack_env:
+    external: true
+
+volumes:
+  bookstack_config:
+  bookstack-db_config:
+
+secrets:
+  UID:
+    external: true
+  PID:
+    external: true
+  TZ:
+    external: true
+  BSDB-Pass:
+    external: true
+  BSDB-rpass:
+    external: true
