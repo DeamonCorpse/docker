@@ -1,0 +1,22 @@
+version "2"
+
+services:
+  influxdb2:
+    image: influxdb:2.0
+    container_name: Monitoring_DB
+    restart: unless-stopped
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=monitor
+      - DOCKER_INFLUXDB_INIT_PASSWORD=m0nito3
+      - DOCKER_INFLUXDB_INIT_ORG=monitoring
+      - DOCKER_INFLUXDB_INIT_BUCKET=systems-monitoring
+      - DOCKER_INFLUXDB_INIT_RETENTION=3m
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=crit-lerd-WHIR
+      - INFLUXDB_REPORTING_DISABLED=true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/ubuntu/monitoring/influxdb/data:/var/lib/influxdb2
+      #- /home/ubuntu/monitoring/influxd/config:/etc/influxdb2
+    ports:
+      - 8088:8086
