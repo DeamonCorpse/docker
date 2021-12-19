@@ -15,16 +15,22 @@ This repository stores both my current and archived docker run, docker compose a
 ### Stacks Deployment
 
 - **stack** folder: Docker-compose **stacks** yml files
-- **stacj - archive** folder: Archive for docker-compose **stack** files
+- **stack - archive** folder: Archive for docker-compose **stack** files
 
 ### Swarm Deployment
 
 - **swarm** folder: Docker-compose **swarm** yml files
 - **swarm - archive** folder: Archive for docker-compose **swarm** files
-  <br>
+<br>
 
-Anything with **archive** is obviously not maintained but I decided to keep the files for future reference.
+*Anything with **archive** is obviously not maintained but I decided to keep the files for future reference.*
+<br>
 
-All other folders store what I am currently running in docker.
+## PRESENTLY IN USE
+- xxx
+- xxx
 
+<br>
+
+<hr>
 Feel free to use whatever helps in your docker adventures!
