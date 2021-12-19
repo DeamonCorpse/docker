@@ -9,6 +9,8 @@ This repository stores both my current and archived docker run, docker compose a
 
 - **compose** folder: Docker-compose yml files
 - **compose -archive** folder: Archive for docker-compose files
+- **run**: Docker run txt files
+- **run-archive**: Archive for docker run files
 
 ### Stacks Deployment
 
