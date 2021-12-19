@@ -1,0 +1,6 @@
+sudo docker run -d \
+  --name dashmachine \
+  --restart unless-stopped \
+  -p 5000:5000 \
+  -v /home/docker/persistent-storage/dashmachine:/dashmachine/dashmachine/user_data \
+  rmountjoy/dashmachine:latest
