@@ -1,0 +1,39 @@
+version: "3.7"
+services:
+  makemkv:
+    image: jlesage/makemkv
+    environment:
+      - USER_ID=1001
+      - GROUP_ID=1001
+      - TZ=America/Toronto
+      - CLEAN_TMP_DIR=1
+      - APP_NICENESS=0
+      - DISPLAY_WIDTH=1280
+      - DISPLAY_HEIGHT=768
+    ports:
+      - "60580:5800"
+    volumes:
+      - type: volume
+        source: makemkv_config
+        target: /config
+        read_only: false
+      - type: volume
+        source: makemkv_storage
+        target: /storage
+        read_only: true
+      - type: volume
+        source: makemkv_output
+        target: /output
+        read_only: false
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+
+volumes:
+  makemkv_config:
+  makemkv_storage:
+  makemkv_output:

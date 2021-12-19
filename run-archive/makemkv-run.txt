@@ -1,0 +1,16 @@
+sudo docker run -d \
+  --name=makemkv \
+  --restart=unless-stopped \
+  -p 60580:5800 \
+  -e USER_ID=1000 \
+  -e GROUP_ID=1000 \
+  -e TZ="America/Toronto" \
+  -e CLEAN_TMP_DIR=1 \
+  -e APP_NICENESS=0 \
+  -e DISPLAY_WIDTH=1280 \
+  -e DISPLAY_HEIGHT=768 \
+  -v /home/docker/persistent-storage/makemkv:/config:rw \
+  -v /home/docker/persistent-storage/makemkv/storage:/storage:ro \
+  -v /home/docker/persistent-storage/makemkv/output:/output:rw \
+  --device /dev/sr0 \
+  jlesage/makemkv
