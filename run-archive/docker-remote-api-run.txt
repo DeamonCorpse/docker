@@ -1,0 +1,5 @@
+sudo docker run -d \
+  -p 2375:2375 \
+  --label=com.centurylinklabs.watchtower.enable=false \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  jarkt/docker-remote-api
