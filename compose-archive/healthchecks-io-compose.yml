@@ -1,0 +1,16 @@
+version: "2.1"
+services:
+  healthchecks:
+    image: linuxserver/healthchecks
+    container_name: healthchecks
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - SUPERUSER_EMAIL=s.duf69@gmail.com
+      - SUPERUSER_PASSWORD=changeme
+    volumes:
+      - /home/docker/persistent-storage/healthchecks/config:/config
+      - /home/docker/persistent-storage/healthchecks/local_settings.py:/config/local_settings.py
+    ports:
+      - 8000:8000
+    restart: unless-stopped
