@@ -1,0 +1,14 @@
+sudo docker run -d \
+  --name=code-server \
+  --restart unless-stopped \
+  -e PUID="${PUID}" \
+  -e PGID="${PGID}" \
+  -e TZ="${TZ}" \
+  -p 60443:8443 \
+  -v /home/docker/persistent-storage/code-serv/config:/config \
+  -v "$PWD:/home/docker/persistent-storage/code-serv" \
+  -u "$(id -u):$(id -g)" \
+  --cert "${PTC}" \
+  --cert-key "${PTCK}" \
+  --env-file /home/docker/persistent-storage/files/.env.vars \
+  linuxserver/code-server

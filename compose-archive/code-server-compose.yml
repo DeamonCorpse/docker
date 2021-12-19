@@ -1,0 +1,16 @@
+version: "2.1"
+services:
+  code-server:
+    image: linuxserver/code-server
+    container_name: code-server
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+      - PASSWORD=Etf4dUZHjY8fy;ptk
+      - SUDO_PASSWORD=Etf4dUZHjY8fy;ptk
+    volumes:
+      - /home/docker/persistent-storage/code-server/config:/config
+    ports:
+      - 60843:8443
+    restart: unless-stopped
