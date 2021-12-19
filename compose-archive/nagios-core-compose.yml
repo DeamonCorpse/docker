@@ -1,0 +1,18 @@
+version: "2"
+
+services:
+  nagios:
+    image: jasonrivers/nagios:latest
+    container_name: Nagios
+    restart: unless-stopped
+    mem_limit: 2gb
+    mem_reservation: 1gb
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/ubuntu/nagios/etc:/opt/nagios/etc/
+      - /home/ubuntu/nagios/var:/opt/nagios/var/
+      - /home/ubuntu/nagios/custom-plugins:/opt/Custom-Nagios-Plugins
+      - /home/ubuntu/nagios/nagiosgraph-var:/opt/nagiosgraph/var
+      - /home/ubuntu/nagios/nagiosgraph-etc:/opt/nagiosgraph/etc
+    ports:
+      - 8086:80
