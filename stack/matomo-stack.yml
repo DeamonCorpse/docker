@@ -1,0 +1,33 @@
+version: "3"
+services:
+  matomo:
+    image: matomo
+    container_name: Matomo
+    restart: unless-stopped
+    hostname: matomo
+    environment:
+      - MATOMO_DATABASE_HOST=matomo_db
+      - MATOMO_DATABASE_TABLES_PREFIX=matomo_
+      - MATOMO_DATABASE_DBNAME=matomo
+    volumes:
+      - /home/ubuntu/matomo:/var/www/html
+    ports:
+      - 8888:80
+    depends_on:
+      - matomo_db
+
+  matomo_db:
+    image: mariadb
+    container_name: matomo_db
+    restart: unless-stopped
+    hostname: matomodb
+    volumes:
+      - /home/ubuntu/matomo-db:/var/lib/mysql:rw
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+      - MYSQL_ROOT_PASSWORD=passwd
+      - MYSQL_DATABASE=matomo
+      - MYSQL_USER=matomo
+      - MYSQL_PASSWORD=passwd
