@@ -1,0 +1,82 @@
+version: "3.7"
+services:
+  registry:
+    image: registry:2.7
+    volumes:
+      - type: volume
+        source: registry_data
+        target: /var/lib/registry
+        read_only: false
+    configs:
+      - source: registry-config
+        target: /etc/docker/registry/config.yml
+    ports:
+      - "55443:443"
+    environment:
+      - REGISTRY_HTTP_ADDR=0.0.0.0:443
+      - REGISTRY_HTTP_SECRET=/run/secrets/registry.http.secret
+      - REGISTRY_HTTP_TLS_CERTIFICATE=/run/secrets/registry.tls-certificate
+      - REGISTRY_HTTP_TLS_KEY=/run/secrets/registry.tls-key
+    secrets:
+      - registry.tls-certificate
+      - registry.tls-key
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.hostname == Docker-Registry"
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause
+        monitor: 5s
+        max_failure_ratio: 0
+        order: start-first
+
+  registry-ui:
+    image: joxit/docker-registry-ui:static
+    ports:
+      - "55444:80"
+    environment:
+      - REGISTRY_URL=https://192.168.1.13:55443
+      - REGISTRY_TITLE=Local Swarm Registry
+      - DELETE_IMAGES:true
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.hostname == Docker-Registry"
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause
+        monitor: 5s
+        max_failure_ratio: 0
+        order: start-first
+
+volumes:
+  registry_data:
+
+secrets:
+  registry.tls-certificate:
+    external: true
+  registry.tls-key:
+    external: true
+  registry.http.secret:
+    external: true
+
+configs:
+  registry-config:
+    external: true
