@@ -51,8 +51,8 @@ etc/.docker-creds
 
 #---------- DIRECTORY TYPES
 .AppleDouble                 # macOS
-.DS_Store*                   # Synology Cloud Station / Drive storage config 
-file
+.DS_Store*                   # Synology Cloud Station / Drive storage config file
+.DS_Store
 .localized                   # macOS
 .LSOverride                  # macOS
 .AppleDB                     # Potentially created on remote AFP share
