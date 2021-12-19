@@ -1,0 +1,7 @@
+sudo docker run -d \
+  --name=Homer-NodeRed \
+  --restart=unless-stopped \
+  --hostname=nodered \
+  -p 1880:1880 \
+  -v /home/ubuntu/homer/nodered:/data \
+  nodered/node-red

@@ -1,0 +1,5 @@
+sudo docker run -d \
+  --name=CORS-container \
+  --restart=unless-stopped \
+  -p 3020:3000 \
+  imjacobclark/cors-container

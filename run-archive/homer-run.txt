@@ -1,0 +1,8 @@
+sudo docker run -d \
+  --name=Homer \
+  --restart=unless-stopped \
+  -p 8070:8080 \
+  -e UID=1000 \
+  -e GID=1000 \
+  -v /home/ubuntu/homer:/www/assets \
+  b4bz/homer:latest
