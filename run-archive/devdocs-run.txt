@@ -1,0 +1,6 @@
+sudo docker run -d /
+  --name Devdocs /
+  --restart=unless-stopped /
+  -p 9292:9292 /
+  -v /home/ubuntu/devdocs:/ /
+  devdocs/devdocs
