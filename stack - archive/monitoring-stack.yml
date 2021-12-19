@@ -1,0 +1,61 @@
+version: "3"
+services:
+  Prometheus:
+    image: prom/prometheus:latest
+    container_name: Prometheus
+    restart: unless-stopped
+    hostname: prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - /home/grafana/prometheus:/etc/prometheus
+      - /home/grafana/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  Grafana:
+    image: grafana/grafana:latest
+    container_name: Grafana
+    restart: unless-stopped
+    hostname: grafana
+    ports:
+      - 3000:3000
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-googlesheets-datasource,mtanda-google-calendar-datasource,agenty-flowcharting-panel,marcusolsson-calendar-panel,mxswat-separator-panel,flant-statusmap-panel,vonage-status-panel,grafana-clock-panel
+    volumes:
+      - /home/grafana/grafana:/var/lib/grafana
+      - /home/grafana/grafana/grafana.ini:/etc/grafana/grafana.ini
+
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    restart: unless-stopped
+    command:
+      - --path.rootfs=/host
+    network_mode: host
+    pid: host
+    volumes:
+      - /:/host:ro
+      - /etc/localtime:/etc/localtime:ro
+
+  cadvisor:
+    image: google/cadvisor:latest
+    container_name: cAdvisor
+    restart: unless-stopped
+    ports:
+      - 9080:8080
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+
+  prometheus_speedtest:
+    image: jraviles/prometheus_speedtest
+    container_name: Speedtest
+    restart: unless-stopped
+    hostname: speedtest
+    ports:
+      - 9516:9516/tcp
+    depends_on:
+      - prometheus

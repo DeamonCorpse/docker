@@ -1,0 +1,122 @@
+version: "3.7"
+# DOCKER SWARM DEPLOYMENT
+services:
+  telegraf:
+    image: telegraf:1.16.2
+    ports:
+      - "8092:8092/udp"
+      - "8094:8094"
+      - "8125:8125/udp"
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        read_only: true
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+    configs:
+      - source: telegraf-config
+        target: /etc/telegraf/telegraf.conf
+
+  influxdb:
+    image: influxdb:1.8.3
+    ports:
+      - "8086:8086"
+    volumes:
+      - type: volume
+        source: influx_data
+        target: /var/lib/influxdb
+    environment:
+      - INFLUXDB_REPORTING_DISABLED=true
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+
+  chronograf:
+    image: chronograf:1.8.8
+    ports:
+      - "8889:8888"
+    volumes:
+      - type: volume
+        source: chronograf_data
+        target: /var/lib/chronograf
+    environment:
+      - INFLUXDB_URL=http://192.168.1.13:8086
+      - KAPACITOR_URL=http://192.168.1.13:9092
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+
+  kapacitor:
+    image: kapacitor:1.5.6
+    ports:
+      - "9092:9092"
+    configs:
+      - source: kapacitor-config
+        target: /etc/kapacitor/kapacitor.conf
+    environment:
+      KAPACITOR_HOSTNAME: kapacitor
+      KAPACITOR_INFLUXDB_0_URLS_0: http://192.168.1.13:8086
+    volumes:
+      - type: volume
+        source: kapacitor_data
+        target: /var/lib/kapacitor
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+
+configs:
+  telegraf-config:
+    external: true
+  kapacitor-config:
+    external: true
+    
+volumes:
+  influx_data:
+  chronograf_data
+  kapacitor_data:

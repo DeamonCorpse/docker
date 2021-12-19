@@ -1,0 +1,83 @@
+version: "3.7"
+services:
+  heimdall:
+    image: linuxserver/heimdall
+    environment:
+      - PUID=UID
+      - PGID=PID
+      - TZ=TZ
+    volumes:
+      - type: bind
+        source: /home/swarm-admin/swarm-persistent-data/heimdall
+        target: /config
+        read_only: false
+    ports:
+      - "60680:80"
+      - "60643:443"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.hostname == Docker-Master"
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause
+        monitor: 5s
+        max_failure_ratio: 0
+        order: start-first
+    secrets:
+      - UID
+      - PID
+      - TZ
+
+  h-family:
+    image: linuxserver/heimdall
+    environment:
+      - PUID=UID
+      - PGID=PID
+      - TZ=TZ
+    volumes:
+      - type: bind
+        source: /home/swarm-admin/swarm-persistent-data/heimdall-family
+        target: /config
+        read_only: false
+    ports:
+      - "60681:80"
+      - "60644:443"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.hostname == Docker-Master"
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause
+        monitor: 5s
+        max_failure_ratio: 0
+        order: start-first
+    secrets:
+      - UID
+      - PID
+      - TZ
+
+secrets:
+  UID:
+    external: true
+  PID:
+    external: true
+  TZ:
+    external: true

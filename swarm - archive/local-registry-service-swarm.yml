@@ -1,0 +1,83 @@
+version: "3.7"
+
+services:
+  [service-1]:
+    image: [image name]
+    configs:
+      - source: service1_[data/config/etc]
+        target: [path/inside/the/container.ext]
+    environment:
+      - [UID=UID]
+    secrets:
+      - UID
+    volumes:
+      - type: bind
+        source: [/path/on/host]
+        target: [path/inside/the/container]
+        read_only: [true/false]
+      - type: volume
+        source: service1_[data/config/etc]
+        target: [path/inside/the/container]
+        read_only: [true/false]
+    ports:
+      - "[Host:Container]"
+    networks:
+      - [network-1]
+    labels:
+      - "[label.name=label-value]"
+    deploy:
+      mode: [global/replicated]
+      replicas: [1]					## For replicated mode only
+      placement:					## For replicated mode only
+        max_replicas_per_node: [1]	## For replicated mode only
+        constraints:				## For replicated mode only
+          - [node.role == worker]	## For replicated mode only
+      restart_policy:
+        condition: [none/on-failure/any]
+        delay: [[5]ns/us/ms/s/m/h]	## Time to wait between each container group's restart
+        max_attempts: [3]
+        window: [120]s
+      rollback_config:
+        parallelism: [1]			## Number of containers to rollback simultaneously
+        delay: [0]s
+        failure_action: [pause/continue]
+        monitor: [5]s				## How long to monitor after the update
+        max_failure_ratio: 0		## Failure rate to tolerate during a rollback
+        order: [stop-first/start-first]
+      update_config:				## Useful for configuring rolling updates
+        parallelism: [2]
+        delay: [5]s
+        failure_action: [pause/continue]
+        monitor: [5]s				## How long to monitor after the update
+        max_failure_ratio: 0		## Failure rate to tolerate during a rollback
+        order: [stop-first/start-first]
+      resources:
+        limits:
+          cpus: '[1.0]'
+          memory: [512]M
+        reservations:
+          cpus: '[0.5]'
+          memory: [256]M      
+    healthcheck:
+      disable: [true/false]			## Disable any default healthcheck set by the image
+      test: ["CMD-SHELL", "curl -f http://localhost || exit 1"]
+      interval: [90]m
+      timeout: [10]s
+      retries: [3]
+      start_period: [40]s
+
+configs:
+  service1_[data/config/etc]:
+    external: true					## for portainer-stored configs
+    file: [path/to/config.conf]		## for config stored on the host
+
+secrets:
+  UID:
+    external: true					## for portainer-stored secrets
+    file: [path/to/secret]			## for secret stored on the host
+
+volumes:
+  service1_[data/config/etc]:
+  
+networks:
+  [network-1]

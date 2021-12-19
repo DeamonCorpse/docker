@@ -1,0 +1,203 @@
+version: "3.7"
+services:
+  handbrake:
+    image: jlesage/handbrake
+    environment:
+      - CLEAN_TMP_DIR=1
+      - APP_NICENESS=0
+      - DISPLAY_WIDTH=1280
+      - DISPLAY_HEIGHT=768
+      - AUTOMATED_CONVERSION_SOURCE_MIN_DURATION=30
+    ports:
+      - "60800:5800"
+    volumes:
+      - type: volume
+        source: handbrake_config
+        target: /config
+        read_only: false
+      - type: volume
+        source: handbrake_storage
+        target: /storage
+        read_only: true
+      - type: volume
+        source: handbrake_output
+        target: /output
+        read_only: false
+      - type: volume
+        source: handbrake_watch
+        target: /watch
+        read_only: false
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.role == worker"
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause
+        monitor: 5s
+        max_failure_ratio: 0
+        order: start-first
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+
+  makemkv:
+    image: jlesage/makemkv
+    environment:
+      - CLEAN_TMP_DIR=1
+      - APP_NICENESS=0
+      - DISPLAY_WIDTH=1280
+      - DISPLAY_HEIGHT=768
+    ports:
+      - "60580:5800"
+    volumes:
+      - type: volume
+        source: makemkv_config
+        target: /config
+        read_only: false
+      - type: volume
+        source: makemkv_storage
+        target: /storage
+        read_only: true
+      - type: volume
+        source: makemkv_output
+        target: /output
+        read_only: false
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.role == worker"
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause
+        monitor: 5s
+        max_failure_ratio: 0
+        order: start-first
+
+  qbittorrent:
+    image: linuxserver/qbittorrent
+    environment:
+      - PUID=UID
+      - PGID=PID
+      - TZ=TZ
+      - WEBUI_PORT=60881
+    volumes:
+      - type: volume
+        source: qbittorrent_config
+        target: /config
+        volume:
+          nocopy: true
+      - type: bind
+        source: /home/swarm-worker/Downloads/qBit
+        target: /downloads
+    secrets:
+      - UID
+      - PID
+      - TZ
+    ports:
+      - "64881:6881"
+      - "64881:6881/udp"
+      - "60881:60881"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.role == worker"
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause
+        monitor: 5s
+        max_failure_ratio: 0
+        order: start-first
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+
+  youtube-DL:
+    image: tzahi12345/youtubedl-material
+    environment:
+      - UID=1001
+      - PID=PID
+      - ALLOW_CONFIG_MUTATIONS=true
+    ports:
+      - "60442:17442"
+    volumes:
+      - type: volume
+        source: youtube-DL_config
+        target: /app/appdata
+      - type: bind
+        source: /home/swarm-worker/Downloads/Audio
+        target: /app/audio
+      - type: bind
+        source: /home/swarm-worker/Downloads/Video
+        target: /app/video
+    secrets:
+      - PID
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.role == worker"
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause
+        monitor: 5s
+        max_failure_ratio: 0
+        order: start-first
+
+volumes:
+  handbrake_config:
+  handbrake_storage:
+  handbrake_output:
+  handbrake_watch:
+  makemkv_config:
+  makemkv_storage:
+  makemkv_output:
+  qbittorrent_config:
+  youtube-DL_config:
+
+secrets:
+  UID:
+    external: true
+  PID:
+    external: true
+  TZ:
+    external: true

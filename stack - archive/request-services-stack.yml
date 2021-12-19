@@ -1,0 +1,70 @@
+version: "2"
+
+services:
+  ombi:
+    image: ghcr.io/linuxserver/ombi
+    container_name: Ombi
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=022
+      - DOCKER_MODS=linuxserver/mods:universal-tshoot | linuxserver/mods:universal-cron
+      - TZ=America/Toronto
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/ubuntu/mlm_stack/ombi:/config
+    ports:
+      - 5056:3579
+    networks:
+      - mlms
+
+  overseerr:
+    image: sctx/overseerr
+    container_name: Overseerr
+    restart: unless-stopped
+    environment:
+      - LOG_LEVEL=info
+      - TZ=America/Toronto
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/ubuntu/mlm_stack/overseerr:/app/config
+    ports:
+      - 5055:5055
+    networks:
+      - mlms
+
+  petio:
+    image: ghcr.io/petio-team/petio:latest
+    container_name: Petio
+    hostname: Petio
+    restart: unless-stopped
+    user: "1000:1000"
+    environment:
+      - /etc/localtime:/etc/localtime:ro
+      - TZ=America/Toronto
+    volumes:
+      - /home/ubuntu/mlm_stack/petio/app:/app/api/config
+      - /home/ubuntu/mlm_stack/petio/app/logs:/app/logs/
+    ports:
+      - 5057:7777
+    networks:
+      - petio-network
+    depends_on:
+      - petio_db
+
+  petio_db:
+    image: mongo:4.4.8
+    container_name: MongoDB
+    restart: unless-stopped
+    hostname: Mongo
+    user: "1000:1000"
+    volumes:
+      - /home/ubuntu/mlm_stack/petio/db:/data/db
+    networks:
+      - petio-network
+
+networks:
+  mlms:
+  petio-network:
+    driver: bridge

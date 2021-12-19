@@ -1,0 +1,114 @@
+version: "3.7"
+
+services:
+  resilio-sync:
+    image: linuxserver/resilio-sync
+    environment:
+      - PUID=UID
+      - PGID=PID
+      - TZ=TZ
+    volumes:
+      - type: volume
+        source: resilio_config
+        target: /config
+        read_only: false
+      - type: bind
+        source: /home/swarm-worker/Docker_Common/Swarm_Persist/resilio/sync
+        target: /sync
+        read_only: false
+      - type: bind
+        source: /home/swarm-worker/Docker_Common/Swarm_Persist/resilio/downloads
+        target: /downloads
+        read_only: false
+      - type: bind
+        source: /etc/localtime
+        target: /etc/localtime
+        read_only: true
+    ports:
+      - "8888:8888"
+      - "55555:55555"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.role == worker"
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+    secrets:
+      - UID
+      - PID
+      - TZ
+
+  healthchecks:
+    image: linuxserver/healthchecks
+    environment:
+      - PUID=UID
+      - PGID=PID
+      - SUPERUSER_EMAIL=HCSU_email
+      - SUPERUSER_PASSWORD=HCSU_password
+    volumes:
+      - type: volume
+        source: healthchecks_config
+        target: /config
+        read_only: false
+    configs:
+      - source: healthchecks_config
+        target: /config/local_settings.py
+    ports:
+      - "8000:8000"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.role == worker"
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    secrets:
+      - UID
+      - PID
+      - HCSU_email
+      - HCSU_password
+
+volumes:
+  dbs_data:
+  resilio_config:
+  healthchecks_config:
+
+secrets:
+  UID:
+    external: true
+  PID:
+    external: true
+  TZ:
+    external: true
+  HCSU_email:
+    external: true
+  HCSU_password:
+    external: true
+
+configs:
+  healthchecks_config:
+    external: true

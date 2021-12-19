@@ -1,0 +1,80 @@
+version: "3.7"
+
+services:
+  docker-bench-security:
+    image: docker/docker-bench-security
+    command: run -it --net host --pid host --userns host --cap-add audit_control
+    environment:
+      - DOCKER_CONTENT_TRUST=$DOCKER_CONTENT_TRUST
+    volumes:
+      - type: bind
+        source: /etc
+        target: /etc
+        read_only: true
+      - type: bind
+        source: /lib/systemd/system
+        target: /lib/systemd/system
+        read_only: true
+      - type: bind
+        source: /usr/lib/systemd
+        target: /usr/lib/systemd
+        read_only: true
+      - type: bind
+        source: /var/lib
+        target: /var/lib
+        read_only: true
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        read_only: true
+      - type: volume
+        source: dbs_data
+        target: /data
+    deploy:
+      mode: global
+      update_config:
+        parallelism: 1
+        delay: 5s
+        order: start-first
+      restart_policy:
+        condition: none
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.25"
+          memory: 96M
+
+  cowrie:
+    image: cowrie/cowrie:latest
+    configs:
+      - source: cowrie_cfg
+        target: /etc/cowrie.cfg
+    ports:
+      - "2222:2222/tcp"
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause
+        monitor: 5s
+        max_failure_ratio: 0
+        order: start-first
+
+volumes:
+  dbs_data:
+
+configs:
+  cowrie_cfg:
+    external: true
