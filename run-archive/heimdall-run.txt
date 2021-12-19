@@ -1,0 +1,10 @@
+sudo docker run -d \
+  --name heimdall \
+  --restart unless-stopped \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ={TZ} \
+  -p 60680:80 \
+  -p 60643:443 \
+  -v /home/docker/persistent-storage/heimdall:/config \
+  linuxserver/heimdall

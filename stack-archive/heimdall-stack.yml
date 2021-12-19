@@ -1,0 +1,79 @@
+version: "3.7"
+services:
+  heimdall:
+    image: linuxserver/heimdall
+    environment:
+      - PUID=UID
+      - PGID=PID
+      - TZ=TZ
+    volumes:
+      - type: bind
+        source: /home/swarm-admin/swarm-persistent-data/heimdall
+        target: /config
+        read_only: false
+    ports:
+      - "60680:80"
+      - "60643:443"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.role==manager"
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://192.168.1.13:60680"]
+      interval: 10m
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    secrets:
+      - UID
+      - PID
+      - TZ
+
+  heimdall-family:
+    image: linuxserver/heimdall
+    environment:
+      - PUID=UID
+      - PGID=PID
+      - TZ=TZ
+    volumes:
+      - type: bind
+        source: /home/swarm-admin/swarm-persistent-data/heimdall-family
+        target: /config
+        read_only: false
+    ports:
+      - "60681:80"
+      - "60644:443"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.role==manager"
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://192.168.1.13:60681"]
+      interval: 10m
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    secrets:
+      - UID
+      - PID
+      - TZ
+
+secrets:
+  UID:
+    external: true
+  PID:
+    external: true
+  TZ:
+    external: true
