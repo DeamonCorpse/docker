@@ -1,0 +1,7 @@
+sudo docker run -d \
+  --name Alert-Manager
+  --restart unless-stopped \
+  -hostname=alertmanager \
+  -p 9093:9093 \
+  -v /home/grafana/alertmanager/alertmanager.yml:/alertmanager.yml \
+  quay.io/prometheus/alertmanager

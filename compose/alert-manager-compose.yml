@@ -1,0 +1,11 @@
+version: "3"
+services:
+  alert-manager:
+    image: quay.io/prometheus/alertmanager
+    container_name: Alert-Manager
+    restart: unless-stopped
+    hostname: altermanager
+    ports:
+      - 9093:9093
+    volumes:
+      - /home/grafana/alertmanager/alertmanager.yml:/alertmanager.yml

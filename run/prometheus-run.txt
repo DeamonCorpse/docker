@@ -1,0 +1,8 @@
+sudo docker run -d \
+  --name Prometheus \
+  --restart unless-stopped \
+  --hostname prometheus \
+  -p 9090:9090 \
+  -v  /home/grafana/prometheus:/etc/prometheus \
+  -v /home/grafana/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml \
+  prom/prometheus
