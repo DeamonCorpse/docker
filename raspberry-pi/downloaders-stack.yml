@@ -1,0 +1,154 @@
+services:
+  deluge:
+    image: lscr.io/linuxserver/deluge:arm32v7-latest
+    container_name: Deluge
+    restart: unless-stopped
+    hostname: deluge
+    init: true
+    pids_limit: 2
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_SETGID
+      - CAP_SYS_CHROOT
+      - CAP_DAC_OVERRIDE
+      - CAP_SETUID
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.25
+    mem_limit: 24m
+    mem_reservation: 10m
+    ports:
+      - $DELUGE_PORT1:8112
+      - $DELUGE_PORT2:6881
+      - $DELUGE_PORT2:6881/udp
+    environment: 
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - DELUGE_LOG_LEVEL=error
+    volumes:
+      - $USERDIR/deluge:/config
+      - $USERDIR/downloads/torrents:/downloads/torrents
+    logging:
+      options:
+        max-size: 50m
+
+ jdownloader:
+    image: jaymoulin/jdownloader:1.4.3-armhf
+    container_name: JDownloader
+    restart: unless-stopped
+    hostname: jdownloader
+    init: true
+    pids_limit: 2
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_SETGID
+      - CAP_SYS_CHROOT
+      - CAP_DAC_OVERRIDE
+      - CAP_SETUID
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.25
+    mem_limit: 24m
+    mem_reservation: 10m
+    user: $PUID:$PGID
+    ports:
+      - $JDOWNLOADER_PORT:3129
+    environment: 
+      - MYJD_USER=$MYJD_UN
+      - MYJD_PASSWORD=$MYJD_PASSWD
+      - MYJD_DEVICE_NAME=$DEVICE_NAME
+    volumes:
+      - $USERDIR/jdownloader:/opt/JDownloader/cfg
+      - $USERDIR/dowloads/jdownloader:/opt/JDownloader/Downloads
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+
+  transmission:
+    image: haugene/transmission-openvpn:latest
+    container_name: Transmission
+    hostname: transmission
+    restart: unless-stopped
+    init: true
+    pids_limit: 2
+    cap_add:
+      - NET_ADMIN
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.5
+    mem_limit: 24m
+    mem_reservation: 10m
+    environment:
+      - TZ=$TZ
+      - PUID=$PUID
+      - PGID=$PGID
+      - TRANSMISSION_WEB_UI=flood-for-transmission
+      - TRANSMISSION_RPC_USERNAME=$TRANS_UN
+      - TRANSMISSION_RPC_PASSWORD=$TRANS_PASSWD
+      - TRANSMISSION_RPC_AUTHENTICATION_REQUIRED=true
+      - OPENVPN_PROVIDER=$VPN_PROVIDER
+      - NORDVPN_COUNTRY=$VPN_COUNTRY
+      - NORDVPN_CATEGORY=$VPN_CAT
+      - NORDVPN_PROTOCOL=$VPN_PROTOCOL
+      - OPENVPN_USERNAME=$VPN_UN
+      - OPENVPN_PASSWORD=$VPN_PASSWD
+      - LOCAL_NETWORK=$LOCAL_NET
+    volumes:
+      - $USERDIR/transmission:/config
+      - $USERDIR/downloads/torrents:/data/torrents
+    ports:
+      - $TRANS_PORT1:9091
+      - $TRANS_PORT2:51413
+    dns:
+      - $DNS1
+      - $DNS2
+    logging:
+      options:
+        max-size: 50m
+
+
+  youtubedl:
+    image: tzahi12345/youtubedl-material:latest
+    container_name: Youtube-DL
+    hostname: ytdl
+    restart: unless-stopped
+    init: true
+    pids_limit: 2
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_FOWNER
+      - CAP_SETGID
+      - CAP_SETUID
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.1
+    mem_limit: 24m
+    mem_reservation: 10m
+    environment:
+      - UID=$PUID
+      - GID=$PGID
+      - ALLOW_CONFIG_MUTATIONS=true
+    volumes:
+      - /home/pi/ytdl/data:/app/appdata:rw
+      - /home/pi/ytdl/users:/app/users:rw
+      - /home/pi/downloads/ytdl/audio:/app/audio:rw
+      - /home/pi/downloads/ytdl/video:/app/video:rw
+    ports:
+      - $YTDL_PORT:17442
+    logging:
+      options:
+        max-size: 50m
+
+#----------------- COMMON
+networks:
+  default:
+    external: true
+    name: $DOCKER_NET
