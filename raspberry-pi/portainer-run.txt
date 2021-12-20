@@ -1,0 +1,11 @@
+sudo docker run -d \
+  --name=Portainer \
+  --restart=unless-stopped \
+  --hostname=portainer \
+  --network="styx" \
+  --security-opt="no-new-privileges:true" \
+  -p 8000:8000 \
+  -p 9000:9000 \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  -v /home/pi/portainer:/data \
+  portainer/portainer-ce:linux-arm
