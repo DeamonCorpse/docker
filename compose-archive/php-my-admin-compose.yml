@@ -1,0 +1,32 @@
+services:
+  phpmyadmin:
+    image: lscr.io/linuxserver/phpmyadmin:arm32v7-latest
+    container_name: phpMyAdmin
+    hostname: phpmyadmin
+    restart: unless-stopped
+    init: true
+    pids_limit: 5
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_FOWNER
+      - CAP_DAC_OVERRIDE
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.10
+    mem_limit: 24m
+    mem_reservation: 10m
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - PMA_ARBITRARY=1
+      #- PMA_HOST=bookstack_db
+    ports:
+      - $PHP_ADMIN_PORT:80
+    volumes:
+      - $USERDIR/phpmyadmin/:/config
+    logging:
+      options:
+        max-size: 50m
