@@ -1,0 +1,22 @@
+version: "3"
+services:
+  prowlarr:
+    image: containrrr/watchtower
+    container_name: Watchtower
+    hostname: watchtower
+    restart: unless-stopped
+    mem_limit: 96m
+    mem_reservation: 48m
+    ports: -p 9010:8080
+    environment: -e WATCHTOWER_POLL_INTERVAL=86400
+      -e WATCHTOWER_INCLUDE_STOPPED=true
+      -e WATCHTOWER_CLEANUP=true
+      -e WATCHTOWER_SCHEDULE="30 1 * * *"
+      -e WATCHTOWER_HTTP_API_METRICS=true
+      -e WATCHTOWER_HTTP_API=true
+      -e WATCHTOWER_HTTP_API_TOKEN="prometheus"
+    volumes: -v /var/run/docker.sock:/var/run/docker.sock
+      -v /etc/localtime:/etc/localtime:ro
+    logging:
+      options:
+        max-size: 50m
