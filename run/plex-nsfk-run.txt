@@ -1,0 +1,21 @@
+sudo docker run -d \
+	--name Plex-NSFK \
+	--restart unless-stopped \
+	-p 32402:32400/tcp \
+	-p 3005:3005/tcp \
+	-p 8324:8324/tcp \
+	-p 32469:32469/tcp \
+	-p 2900:1900/udp \
+	-p 32415:32410/udp \
+	-p 32416:32412/udp \
+	-p 32417:32413/udp \
+	-p 32418:32414/udp \
+	-e TZ=”America/Toronto” \
+	-e PLEX_UID=”1043″ \
+	-e PLEX_GID=”100″ \
+	-e ADVERTISE_IP=”https://192.168.68.5:32402/web” \
+	-h NSFK \
+	-v /volume1/docker/Plex/NSFK/config:/config \
+	-v /volume1/docker/Plex/NSFK/transcode:/transcode \
+	-v “/volume1/Video/NSFW Movies”:/data \
+	plexinc/pms-docker

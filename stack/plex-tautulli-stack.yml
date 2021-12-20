@@ -1,0 +1,86 @@
+version: "2"
+services:
+  plex-nfsk:
+    image: plexinc/pms-docker
+    container_name: Plex-NSFK
+    restart: unless-stopped
+    hostname: nsfk
+    network_mode: bridge
+    environment:
+      - PLEX_UID=1043
+      - PLEX_GID=100
+      - TZ=America/Toronto
+      - ADVERTISE_IP=http://192.168.68.5:32402/web
+      - ALLOWED_NETWORKS=192.168.68.0/24,192.168.69.0/24
+      - CHANGE_CONFIG_DIR_OWNERSHIP=false
+    ports:
+      - 32402:32400/tcp
+      - 3005:3005/tcp
+      - 8324:8324/tcp
+      - 32469:32469/tcp
+      - 2900:1900/udp
+      - 32415:32410/udp
+      - 32416:32412/udp
+      - 32417:32413/udp
+      - 32418:32414/udp
+    volumes:
+      - /volume1/docker/plex/nsfk/config:/config
+      #- /volume1/docker/plex/nsfk/transcode:/transcode
+      - /volume1/Video/nsfw_movies:/data
+
+  tautulli-nsfk:
+    image: tautulli/tautulli
+    container_name: Tautulli-NSFK
+    restart: unless-stopped
+    environment:
+      - PGID=100
+      - PUID=1043
+      - TZ=America/Toronto
+    ports:
+      - 8182:8181
+    volumes:
+      - /volume1/docker/tautulli-nsfk:/config
+
+  #plex-multimedia:
+  #image: plexinc/pms-docker
+  #container_name: Plex-Multimedia
+  #restart: unless-stopped
+  #hostname: plex-multimedia
+  #network_mode: host
+  #devices:
+  #- /dev/dri:/dev/dri
+  #environment:
+  #- PLEX_UID=297536
+  #- PLEX_GID=297536
+  #- TZ=America/Toronto
+  #- ADVERTISE_IP=http://192.168.68.5:32400/web
+  #- ALLOWED_NETWORKS=192.168.68.0/24,192.168.69.0/24
+  #- CHANGE_CONFIG_DIR_OWNERSHIP=false
+  #ports:
+  #- 32400:32400/tcp
+  #- 3005:3005/tcp
+  #- 8324:8324/tcp
+  #- 32469:32469/tcp
+  #- 2900:1900/udp
+  #- 32410:32410/udp
+  #- 32412:32412/udp
+  #- 32413:32413/udp
+  #- 32414:32414/udp
+  #volumes:
+  #- /volume1/PlexMediaServer/AppData:/config/Library/"Application Support"
+  #- /volume1/PlexMediaServer/AppData/tmp:/transcode
+  #- /volume1/Video:/data
+  #- /volume1:/volume1
+
+  tautulli-multimedia:
+    image: tautulli/tautulli
+    container_name: Tautulli-Multimedia
+    restart: unless-stopped
+    environment:
+      - PGID=100
+      - PUID=1043
+      - TZ=America/Toronto
+    ports:
+      - 8181:8181
+    volumes:
+      - /volume1/docker/tautulli-multimedia:/config

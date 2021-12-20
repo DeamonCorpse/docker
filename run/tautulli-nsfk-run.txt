@@ -1,0 +1,10 @@
+sudo docker run -d \
+	–name=Tautulli_NSFK \
+	–restart=unless-stopped \
+	-v /volume1/docker/databases/tautulli2:/config \
+    -v /volume1/docker/Plex/NSFK/config/Library/Application\ Support/Plex\ Media\ Server/Logs:/plex_logs:ro \
+	-e PGID=100 \
+    -e PUID=1043 \
+	-e TZ=America/Toronto \
+	-p 8182:8181 \
+    tautulli/tautulli

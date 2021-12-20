@@ -1,0 +1,9 @@
+udo docker run -d \
+	--name=Tautulli_Multimedia \
+	--restart=unless-stopped \
+	-v /volume1/docker/databases/tautulli:/config \
+	-e PGID=100 \
+    -e PUID=1043 \
+	-e TZ=America/Toronto \
+	-p 8181:8181 \
+	tautulli/tautulli
