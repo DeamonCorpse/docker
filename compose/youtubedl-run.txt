@@ -1,0 +1,12 @@
+sudo docker run -d \
+  --name Youtube-DL \
+  --restart unless-stopped \
+  -e ALLOW_CONFIG_MUTATIONS=true \
+  -e UID=1000 \
+  -e GID=1000 \
+  -e 
+  -p 60442:17442 \
+  -v /home/ubuntu/mlm_stack/ytdl:/app/appdata:rw \
+  -v /home/ubuntu/data/ytdl/audio:/app/audio:rw \
+  -v /home/ubuntu/data/ytdl/video:/app/video:rw \
+  tzahi12345/youtubedl-material:latest

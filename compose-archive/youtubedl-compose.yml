@@ -1,0 +1,34 @@
+version: "2"
+services:
+    youtubedl:
+      image: tzahi12345/youtubedl-material
+      container_name: Youtube-DL
+      hostname: ytdl
+      restart: unless-stopped
+      environment:
+        - UID=1000
+        - GID=1000
+        - ALLOW_CONFIG_MUTATIONS=true
+        - ytdl_mongodb_connection_string=mongodb://ytdl-mongo-db:27017
+        - ytdl_use_local_db=false
+        - write_ytdl_config=true
+      volumes:
+        - /home/ubuntu/mlm_stack/ytdl:/app/appdata:rw
+        - /home/ubuntu/data/ytdl/audio:/app/audio:rw
+        - /home/ubuntu/data/ytdl/video:/app/video:rw
+        - /home/ubuntu/mlm_stack/ytdl/users:/app/users:rw
+      ports:
+        - 60442:17442
+        
+
+   ytdl-mongo-db:
+     image: mongo
+     container_name: YTDL_DB
+     restart: unless-stopped
+     hostname: mongo
+     ports:
+       - "27017:27017"
+     logging:
+       driver: "none"          
+     volumes:
+       - /home/ubuntu/mlm_stack/ytdl/data:/data/db

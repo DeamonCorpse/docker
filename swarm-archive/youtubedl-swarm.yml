@@ -1,0 +1,39 @@
+version: "3.7"
+services:
+  youtube-DL:
+    image: tzahi12345/youtubedl-material:latest
+    environment:
+      - UID=1001
+      - PID=1001
+      - ALLOW_CONFIG_MUTATIONS=true
+    ports:
+      - "60442:17442"
+    volumes:
+      - type: volume
+        source: youtube-DL_config
+        target: /app/appdata
+      - type: bind
+        source: /home/swarm-admin/Docker_Common/Downloads/Audio
+        target: /app/audio
+      - type: bind
+        source: /home/swarm-admin/Docker_Common/Downloads/Video
+        target: /app/video
+      - type: bind
+        source: /home/swarm-admin/Docker_Common/Downloads/Subscriptions
+        target: /app/subscriptions
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://192.168.1.13:60442"]
+      interval: 90m
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  youtube-DL_config:
