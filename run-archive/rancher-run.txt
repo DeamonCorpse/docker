@@ -1,0 +1,8 @@
+sudo docker run -d \
+	--name rancher \
+	--restart unless-stopped \
+    --privileged \
+  	-p 8280:80 \
+  	-p 8243:443 \
+  	-v /home/docker/persistent-storage/rancher:/var/lib/rancher \
+  	rancher/rancher
