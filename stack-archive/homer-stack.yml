@@ -1,35 +1,80 @@
-version: "3"
 services:
+#----------------- DASHBOARDS
   homer:
-    image: b4bz/homer
+    image: b4bz/homer:$HOMER_TAG
     container_name: Homer
-    restart: unless-stopped
     hostname: homer
-    environment:
-      - UID=1000
-      - GID=1000
-    ports:
-      - 8070:8080
-    volumes:
-      - /home/pi/homer:/www/assets
-    logging:
-      options:
-        max-size: 50m
-
-  Node-Red:
-    image: nodered/node-red
-    container_name: nodered
     restart: unless-stopped
-    hostname: nodered
+    init: true
+    read_only: true
+    pids_limit: 2
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_SETGID
+      - CAP_SETUID
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.25
+    mem_limit: 64m
+    mem_reservation: 24m
+    environment:
+     - UID=$PUID
+     - GID=$PGID
     ports:
-      - 1880:1880
+     - $HOMER_PORT:8080
+    networks:
+      - docker
+#      - backend
     volumes:
-      - /home/pi/homer/nodered:/data
+     - $USERDIR/homer:/www/assets
+     - $USERDIR/homer/icons/Icons:/www/assets/icons
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homer.rule=Host(`homer.traefik.me`)"
+      - "traefik.http.routers.homer.tls=true"
+      - "traefik.http.routers.homer-tls.tls.domains[0].main=homer.traefik.me"
+      - "traefik.http.routers.homer-tls.tls.domains[0].sans=homer-*.traefik.me"
     logging:
       options:
         max-size: 50m
 
+
+
+#----------------- DASHBOARD BACKEND
+#  Node-Red:
+#    image: nodered/node-red
+#    container_name: Node-Red
+#    hostname: nodered
+#    restart: unless-stopped
+#    init: true
+#    read_only: true
+#    pids_limit: 5
+#    cap_drop:
+#      - ALL
+#    security_opt:
+#      - no-new-privileges:true
+#    cpus: 0.15
+#    mem_limit: 128m
+#    mem_reservation: 32m
+#    ports:
+#      - $NODERED_PORT:1880
+#    networks:
+#      - backend
+#    volumes:
+#      - $USERDIR/homer/nodered:/data
+#    labels:
+#      - "traefik.enable=false"
+#    logging:
+#      options:
+#        max-size: 50m
+
+#----------------- COMMON
 networks:
-  default:
+#  backend:
+#    internal: true
+#    name: $BE_NET
+  docker:
     external: true
-    name: styx
+    name: $DOCKER_NET
