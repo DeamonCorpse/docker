@@ -1,0 +1,45 @@
+version: "3"
+services:
+  app:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy
+    restart: unless-stopped
+    hostname: nging-proxy
+    ports:
+      - 80:80
+      - 8881:81
+      - 443:443
+    environment:
+      DB_MYSQL_HOST: "db"
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: "npm"
+      DB_MYSQL_PASSWORD: "npm"
+      DB_MYSQL_NAME: "npm"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/pi/nginx/data:/data
+      - /home/pi/nginx/letsencrypt:/etc/letsencrypt
+    logging:
+      options:
+        max-size: 50m
+
+  db:
+    image: jc21/mariadb-aria
+    container_name: nginx-db
+    restart: unless-stopped
+    hostname: nginx-db
+    environment:
+      MYSQL_ROOT_PASSWORD: "npm"
+      MYSQL_DATABASE: "npm"
+      MYSQL_USER: "npm"
+      MYSQL_PASSWORD: "npm"
+    volumes:
+      - /home/pi/nginx-db:/var/lib/mysql
+    logging:
+      options:
+        max-size: 50m
+
+networks:
+  default:
+    external: true
+    name: styx
