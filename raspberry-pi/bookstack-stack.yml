@@ -1,0 +1,100 @@
+services:
+  bookstack:
+    image: linuxserver/bookstack:arm32v7-latest
+    container_name: Bookstack
+    hostname: bookstack
+    restart: unless-stopped
+    init: true
+    pids_limit: 2
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_FOWNER
+      - CAP_MKNOD
+      - CAP_SETGID
+      - CAP_SYS_CHROOT
+      - CAP_AUDIT_WRITE
+      - CAP_DAC_OVERRIDE
+      - CAP_FSETID
+      - CAP_KILL
+      - CAP_NET_RAW
+      - CAP_SETPCAP
+      - CAP_NET_BIND_SERVICE
+      - CAP_SETFCAP
+      - CAP_SETUID
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.05
+    mem_limit: 24m
+    mem_reservation: 10m
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - DB_CONNECTION=$DB_CONNECT
+      - DB_HOST=$DB_HOST
+      - DB_PORT=$DB_PORT
+      - DB_USER=$DB_USER
+      - DB_PASS=$DB_PASS
+      - DB_DATABASE=$DB_NAME
+      - APP_URL=$BS_URL
+    volumes:
+      - $USERDIR/bookstack/app:/config
+    ports:
+      - $BS_PORT:443
+    depends_on:
+      - db
+    logging:
+      options:
+        max-size: 50m
+
+  db:
+    image: linuxserver/mariadb:version-110.4.17mariabionic
+    container_name: Bookstack_DB
+    hostname: bookstack-db
+    restart: unless-stopped
+    init: true
+    pids_limit: 2
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_FOWNER
+      - CAP_MKNOD
+      - CAP_SETGID
+      - CAP_SYS_CHROOT
+      - CAP_AUDIT_WRITE
+      - CAP_DAC_OVERRIDE
+      - CAP_FSETID
+      - CAP_KILL
+      - CAP_NET_RAW
+      - CAP_SETPCAP
+      - CAP_NET_BIND_SERVICE
+      - CAP_SETFCAP
+      - CAP_SETUID
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.05
+    mem_limit: 24m
+    mem_reservation: 10m
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - MYSQL_ROOT_PASSWORD=$DB_ROOT_PASS
+      - MYSQL_DATABASE=$DB_NAME
+      - MYSQL_USER=$DB_USER
+      - MYSQL_PASSWORD=$DB_PASS
+    volumes:
+      - $USERDIR/bookstack/db:/config
+    ports:
+      - $DB_PORT:3306
+    logging:
+      options:
+        max-size: 50m
+
+#----------------- COMMON
+networks:
+  default:
+    external: true
+    name: $DOCKER_NET
