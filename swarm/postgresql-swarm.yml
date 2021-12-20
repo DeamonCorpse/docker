@@ -1,0 +1,41 @@
+version: "3.7"
+services:
+  postgresQL:
+    image: postgres:13.0
+    environment:
+      - POSTGRES_USER=/run/secrets/PG-POSTGRES_USER
+      - POSTGRES_PASSWORD=/run/secrets/PG-POSTGRES_PASSWORD
+      - POSTGRES_DB
+    volumes:
+      - type: volume
+        source: postgres_data
+        target: /var/lib/postgresql/data
+        volume:
+          read_only: false
+          nocopy: true
+    ports:
+      - "5432:5432"
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+    secrets:
+      - PG-POSTGRES_USER
+      - PG-POSTGRES_PASSWORD
+
+volumes:
+  postgres_data:
+
+networks:
+  host:
+
+secrets:
+  PG-POSTGRES_PASSWORD:
+    name: PG-POSTGRES_PASSWORD
+    external: true
+  PG-POSTGRES_USER:
+    name: PG-POSTGRES_USER
+    external: true

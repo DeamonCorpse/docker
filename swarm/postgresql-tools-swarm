@@ -1,0 +1,45 @@
+version: "3.7"
+services:
+  pgAdmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=/run/secrets/PGA-Email
+      - PGADMIN_DEFAULT_PASSWORD=/run/secrets/PGA-Password
+      - PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION=True
+      - PGADMIN_CONFIG_LOGIN_BANNER="No Password? No Play!"
+      - PGADMIN_CONFIG_CONSOLE_LOG_LEVEL=10
+    volumes:
+      - type: volume
+        source: pgadmin_data
+        target: /var/lib/pgadmin
+        volume:
+    networks:
+      - host
+    ports:
+      - "60882:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+      placement:
+        constraints: [node.role == manager]
+    secrets:
+      - PGA-Email
+      - PGA-Password
+
+volumes:
+  pgadmin_data:
+
+networks:
+  host:
+
+secrets:
+  PGA-Email:
+    name: PGA-Email
+    external: true
+  PGA-Password:
+    name: PGA-Password
+    external: true
