@@ -7,6 +7,9 @@ This repository stores both my current and archived docker run, docker compose a
 
 ## Repo breakdown
 
+### Raspberry-Pi
+Since RPi is ARM-based, and they are the only ARM devices which I run Docker on), I decided to put all the relevant docker files in there.
+
 ### Single Container Deployment
 
 - **compose** folder: Docker-compose yml files
