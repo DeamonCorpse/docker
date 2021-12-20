@@ -1,0 +1,32 @@
+services:
+  duckdns:
+    image: lscr.io/linuxserver/duckdns:arm32v7-latest
+    container_name: DuckDNS
+    hostname: duckdns
+    restart: unless-stopped
+    init: true
+    read_only: false
+    pids_limit: 3
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_SETGID
+      - CAP_SETUID
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.05
+    mem_limit: 24m
+    mem_reservation: 10m
+    environment:
+      - PUID=$PUID
+      - GUID=$DNSPGID
+      - TZ=$TZ
+      - SUBDOMAINS=$DUCKDNS_SUBDOMAINS
+      - TOKEN=$DUCKDNS_TOKEN
+      - LOG_FILE=false
+    volumes:
+      - $USERDIR/duckdns/:/config
+    logging:
+      options:
+        max-size: 50m
