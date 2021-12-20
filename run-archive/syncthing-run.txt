@@ -1,0 +1,11 @@
+docker run -d \
+  --name=syncthing \
+  --restart unless-stopped \
+  -e PUID=0 \
+  -e PGID=0 \
+  -e TZ=America/Toronto \
+  -p 8384:8384 \
+  -p 22000:22000 \
+  -p 21027:21027/udp \
+  -v /mnt/storage/syncthing/config:/config \
+  linuxserver/syncthing
