@@ -1,0 +1,18 @@
+version: "2"
+services:
+  resilio-sync:
+    image: linuxserver/resilio-sync
+    container_name: resilio-sync
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+    volumes:
+      - /home/docker/persistent-storage/resilio:/config
+      - /home/docker/persistent-storage/Docker_Common/Downloads/Resilio:/downloads
+      - /home/docker/persistent-storage:/sync
+      - /etc/localtime:/etc/localtime
+    ports:
+      - "8888:8888"
+      - "55555:55555"

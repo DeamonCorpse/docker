@@ -1,0 +1,64 @@
+version: "3.7"
+services:
+  resilio-sync:
+    image: linuxserver/resilio-sync
+    environment:
+      - PUID=UID
+      - PGID=PID
+      - TZ=TZ
+    volumes:
+      - type: volume
+        source: resilio_config
+        target: /config
+        volume:
+          nocopy: true
+      - type: bind
+        source: /home/swarm-admin/swarm-persistent-data
+        target: /sync
+        volume:
+      - type: bind
+        source: /home/swarm-admin/swarm-persistent-data/resilio/downloads
+        target: /downloads
+      - type: bind
+        source: /etc/localtime
+        target: /etc/localtime
+        read_only: true
+      - type: bind
+        source: /var/lib/docker/swarm
+        target: /swarm
+        read_only: true
+    ports:
+      - "8888:8888"
+      - "55555:55555"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - "node.hostname == Docker-Master"
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+    secrets:
+      - UID
+      - PID
+      - TZ
+
+volumes:
+  resilio_config:
+
+secrets:
+  UID:
+    external: true
+  PID:
+    external: true
+  TZ:
+    external: true
