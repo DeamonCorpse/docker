@@ -1,0 +1,183 @@
+services:
+  #----------------- AD BLOCKER
+  AdGuard:
+    image: adguard/adguardhome:latest
+    container_name: AdGuard
+    hostname: adguard
+    restart: unless-stopped
+    init: true
+    #read_only: true
+    pids_limit: 3
+    #cap_drop:
+    #- ALL
+    #cap_add:
+    #- CAP_CHOWN
+    #- CAP_SETGID
+    #- CAP_SETUID
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.10
+    mem_limit: 24m
+    mem_reservation: 10m
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+      - 80:80/tcp
+      - 443:443/tcp
+      - 3000:3000/tcp
+    volumes:
+      - $USERDIR/adguard/:/opt/adguardhome/conf
+      - $USERDIR/adguard/work:/opt/adguardhome/work
+    logging:
+      options:
+        max-size: 50m
+
+  #----------------- NETWORK SERVICES
+  ntp:
+    image: cturra/ntp:latest
+    container_name: NTP-Server
+    hostname: ntp
+    restart: unless-stopped
+    init: true
+    read_only: true
+    pids_limit: 3
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_AUDIT_WRITE
+      - CAP_CHOWN
+      - CAP_DAC_OVERRIDE
+      - CAP_FSETID
+      - CAP_FOWNER
+      - CAP_SETGID
+      - CAP_SETFCAP
+      - CAP_SETPCAP
+      - CAP_SETUID
+      - CAP_SYS_CHROOT
+      - CAP_KILL
+      - CAP_MKNOD
+      - CAP_NET_BIND_SERVICE
+      - CAP_NET_RAW
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.05
+    mem_limit: 24m
+    mem_reservation: 10m
+    ### Not Working. .conf file is re-created at restart or new image start
+    command:
+      - sed -i "s/#local stratum 10/local stratum 10/g" /etc/chrony.conf
+      - sed -i "s/#allow 192.168.68.0\/22/allow 192.168.68.0\/22/" /etc/chrony.conf
+    ports:
+      - $NTP_PORT:123/udp
+    tmpfs:
+      - /run/chrony:rw,mode=1750
+      - /var/lib/chrony:rw,mode=1750
+    environment:
+      - NTP_SERVERS="subitaneous.cpsc.ucalgary.ca,time.windows.com,time.apple.com,ntp.nasa.gov"
+      - LOG_LEVEL=0
+    volumes:
+      - $USERDIR/chrony:/etc/chrony
+    logging:
+      options:
+        max-size: 50m
+
+  #----------------- DDNS
+  cloudflare-ddns:
+    image: oznu/cloudflare-ddns:arm32v6
+    container_name: Cloudflare-DDNS
+    hostname: cloudflareddns
+    restart: unless-stopped
+    init: true
+    pids_limit: 1
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.05
+    mem_limit: 24m
+    mem_reservation: 10m
+    environment:
+      - API_KEY=$CLOUDFLARE_API
+      - ZONE=$CLOUDFLARE_ZONE
+      - SUBDOMAIN=$CLOUDFLARE_SUBDOMAIN
+      - PROXIED=true
+      - RRTYPE=$CLOUDFLARE_RRTYPE
+      - DNS_SERVER=$CLOUDFLARE_DNS
+      - CRON="@daily"
+    logging:
+      options:
+        max-size: 50m
+
+  #----------------- TRAEFIK
+  traefik:
+    image: traefik:v2.5
+    container_name: Traefik
+    hostname: traefik
+    restart: unless-stopped
+    init: true
+    read_only: true
+    pids_limit: 5
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_FOWNER
+      - CAP_MKNOD
+      - CAP_SETGID
+      - CAP_SYS_CHROOT
+      - CAP_AUDIT_WRITE
+      - CAP_DAC_OVERRIDE
+      - CAP_FSETID
+      - CAP_KILL
+      - CAP_NET_RAW
+      - CAP_SETPCAP
+      - CAP_NET_BIND_SERVICE
+      - CAP_SETFCAP
+      - CAP_SETUID
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.05
+    mem_limit: 24m
+    mem_reservation: 10m
+    ports:
+      - 80:80
+      - 443:443
+      - $TRAEFIKUI_PORT:8080
+    labels:
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+    environment:
+      - DOCKER_HOST=$DOCKER_HOST
+    volumes:
+      - $USERDIR/traefik/traefik.yml:/etc/traefik/traefik.yml
+      - $USERDIR/traefik/tls.yml:/etc/traefik/tls.yml
+      - $USERDIR/traefik-ssl-certs:/ssl-certs
+    logging:
+      options:
+        max-size: 50m
+
+  traefik-me-https-helper:
+    image: alpine:3.14.3
+    container_name: Traefik-me
+    hostname: traefik-me
+    restart: unless-stopped
+    init: true
+    pids_limit: 3
+    command: sh -c "cd /etc/ssl/traefik
+      && wget traefik.me/cert.pem -O cert.pem
+      && wget traefik.me/privkey.pem -O privkey.pem"
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.05
+    mem_limit: 10m
+    mem_reservation: 2m
+    volumes:
+      - $USERDIR/traefik-ssl-certs:/etc/ssl/traefik
+    logging:
+      options:
+        max-size: 50m
+
+#----------------- COMMON
+networks:
+  default:
+    external: true
+    name: $DOCKER_NET
