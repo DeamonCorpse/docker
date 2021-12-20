@@ -1,0 +1,172 @@
+services:
+  overseerr:
+    image: sctx/overseerr
+    container_name: Overseerr
+    hostname: overseer
+    restart: unless-stopped
+    init: true
+    read_only: false
+    pids_limit: 3
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.05
+    mem_limit: 24m
+    mem_reservation: 10m
+    environment:
+      - LOG_LEVEL=info
+    volumes:
+      - $USERDIR/overseerr:/app/config:rw
+    ports:
+      - $OV_PORT:5055
+    logging:
+      options:
+        max-size: 50m
+
+  #------------------ THE "ARRs"
+  prowlarr:
+    image: ghcr.io/linuxserver/prowlarr:develop
+    container_name: Prowlarr
+    hostname: prowlarr
+    restart: unless-stopped
+    init: true
+    read_only: false
+    pids_limit: 3
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_FOWNER
+      - CAP_SETGID
+      - CAP_DAC_OVERRIDE
+      - CAP_SETUID
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.05
+    mem_limit: 24m
+    mem_reservation: 10m
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - DOCKER_MODS=ghcr.io/gilbn/theme.park:prowlarr
+      - TP_THEME=plex
+    olumes:
+      - $USERDIR/prowlarr:/config:rw
+    ports:
+      - $PROWL_PORT:9696
+    logging:
+      options:
+        max-size: 50m
+
+  readarr:
+    image: ghcr.io/linuxserver/readarr:arm32v7-latest
+    container_name: Readarr
+    hostname: readarr
+    restart: unless-stopped
+    init: true
+    read_only: false
+    pids_limit: 5
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_FOWNER
+      - CAP_SETGID
+      - CAP_DAC_OVERRIDE
+      - CAP_SETUID
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.5
+    mem_limit: 24m
+    mem_reservation: 10m
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - DOCKER_MODS=ghcr.io/gilbn/theme.park:readarr
+      - TP_THEME=plex
+    volumes:
+      - $USERDIR/readarr:/config:rw
+      - $USERDIR/downloads/books:/downloads:rw
+    ports:
+      - $RAD_PORT:8787
+    logging:
+      options:
+        max-size: 50m
+
+  radarr:
+    image: ghcr.io/linuxserver/radarr:arm32v7-latest
+    container_name: Radarr
+    hostname: radarr
+    restart: unless-stopped
+    init: true
+    read_only: false
+    pids_limit: 5
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_FOWNER
+      - CAP_SETGID
+      - CAP_DAC_OVERRIDE
+      - CAP_SETUID
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.5
+    mem_limit: 24m
+    mem_reservation: 10m
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - DOCKER_MODS=ghcr.io/gilbn/theme.park:radarr
+      - TP_THEME=plex
+    volumes:
+      - $USERDIR/radarr:/config:rw
+      - $USERDIR/downloads:/data:rw
+    ports:
+      - $RAD_PORT:7878
+    logging:
+      options:
+        max-size: 50m
+
+  sonarr:
+    image: ghcr.io/linuxserver/sonarr:arm32v7-latest
+    container_name: Sonarr
+    hostname: sonarr
+    restart: unless-stopped
+    init: true
+    read_only: false
+    pids_limit: 5
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_FOWNER
+      - CAP_SETGID
+      - CAP_DAC_OVERRIDE
+      - CAP_SETUID
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.5
+    mem_limit: 24m
+    mem_reservation: 10m
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      #- DOCKER_MODS=ghcr.io/gilbn/theme.park:sonarr
+      #- TP_THEME=plex
+    volumes:
+      - $USERDIR/sonarr:/config:rw
+      - $USERDIR/downloads:/data:rw
+    ports:
+      - $SON_PORT:8989
+    logging:
+      options:
+        max-size: 50m
+
+#------------------ COMMON
+networks:
+  default:
+    external: true
+    name: $DOCKER_NET
