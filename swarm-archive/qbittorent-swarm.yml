@@ -1,0 +1,45 @@
+version: "3.7"
+services:
+  qbittorrent:
+    image: linuxserver/qbittorrent
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ=America/Toronto
+      - WEBUI_PORT=60881
+    volumes:
+      - type: volume
+        source: qbittorrent_config
+        target: /config
+        volume:
+          nocopy: true
+      - type: bind
+        source: /home/swarm-admin/Docker_Common/Downloads/qBit
+        target: /downloads
+    ports:
+      - "64881:6881"
+      - "64881:6881/udp"
+      - "60881:60881"
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://192.168.1.13:60881"]
+      interval: 60m
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  qbittorrent_config:

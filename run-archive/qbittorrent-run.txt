@@ -1,0 +1,14 @@
+sudo docker run -d \
+  --name=qbittorrent \
+  --restart=unless-stopped \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=${TZ} \
+  -e UMASK_SET=022 \
+  -e WEBUI_PORT=60085 \
+  -p 60881:6881 \
+  -p 60881:6881/udp \
+  -p 60085:8085 \
+  -v /home/docker/persistent-storage/qbittorrent/config:/config \
+  -v /home/docker/persistent-storage/Docker_Common/Downloads/:/downloads \
+  linuxserver/qbittorrent
