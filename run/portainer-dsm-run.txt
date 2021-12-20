@@ -1,0 +1,14 @@
+sudo docker run -d \
+ --name portainer \
+ --restart unless-stopped \
+-c 512 \
+-m 256m \
+-p 9002:9000 \
+-p 8002:8000 \
+-v /var/run/docker.sock:/var/run/docker.sock \
+-v /volume1/docker/portainer:/data \
+-v /volume1/docker/portainer/tls:/certs \
+portainer/portainer-ce \
+  --ssl \
+  --sslcert /certs/deamon-flesh.crt \
+  --sslkey /certs/deamon-flesh.key

@@ -1,0 +1,12 @@
+sudo docker run -d \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /volume1/@docker/volumes:/var/lib/docker/volumes \
+  -v /:/host \
+  -v portainer_agent_data:/data \
+  --restart unless-stopped \
+  -e EDGE=1 \
+  -e EDGE_ID=3de33f44-82c4-4aa3-9199-8eee74adbbe8 \
+  -e EDGE_KEY=aHR0cDovLzE5Mi4xNjguNzAuMTo5MDAwfDE5Mi4xNjguNzAuMTo4MDAwfGE3OjQ1OmQ2OjU3Ojc3OjFkOjRkOjAzOmNjOjdhOjgxOmEyOmM1OmQ4OjBlOjBlfDIz \
+  -e CAP_HOST_MANAGEMENT=1 \
+  --name Portainer_Edge_Agent \
+  portainer/agent
