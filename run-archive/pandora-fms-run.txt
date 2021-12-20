@@ -1,0 +1,4 @@
+sudo docker run -d \
+  --name pandorafms \
+  --restart unless-stopped \
+  pandorafms/pandorafms
