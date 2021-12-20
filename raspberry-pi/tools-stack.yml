@@ -1,0 +1,26 @@
+services:
+  snippets:
+    image: pawelmalak/snippet-box:arm
+    container_name: Snippet-Box
+    hostname: snippets
+    restart: unless-stopped
+    init: true
+    pids_limit: 3
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.05
+    mem_limit: 24m
+    mem_reservation: 10m
+    ports:
+      - $SNIP_PORT:5000
+    volumes:
+      - $USERDIR/snippets/:/app/data
+    logging:
+      options:
+        max-size: 50m
+
+#----------------- COMMON
+networks:
+  default:
+    external: true
+    name: $DOCKER_NET
