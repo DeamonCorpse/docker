@@ -1,0 +1,159 @@
+version: "3.7"
+services:
+  agent:
+    image: swarmpit/agent:2.2
+    environment:
+      DOCKER_API_VERSION: "1.40"
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        read_only: true
+    networks:
+      - net
+    logging:
+      driver: json-file
+    deploy:
+      mode: global
+      labels:
+        - swarmpit.agent = true
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause
+        monitor: 5s
+        max_failure_ratio: 0
+        order: start-first
+      resources:
+        reservations:
+          cpus: "0.05"
+          memory: 32M
+        limits:
+          cpus: "0.1"
+          memory: 64M
+
+  app:
+    image: swarmpit/swarmpit:1.9
+    environment:
+      SWARMPIT_DB: http://db:5984
+      SWARMPIT_INFLUXDB: http://influxdb:8086
+      SWARMPIT_DOCKER_API: "1.40"
+    ports:
+      - "888:8080"
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        read_only: true
+    networks:
+      - net
+    logging:
+      driver: json-file
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause
+        monitor: 5s
+        max_failure_ratio: 0
+        order: start-first
+      resources:
+        reservations:
+          cpus: "0.25"
+          memory: 512M
+        limits:
+          cpus: "0.5"
+          memory: 1024M
+
+  db:
+    image: couchdb:2.3.0
+    volumes:
+      - type: volume
+        source: db-data
+        target: /opt/couchdb/data
+        read_only: false
+    networks:
+      - net
+    logging:
+      driver: json-file
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause
+        monitor: 5s
+        max_failure_ratio: 0
+        order: start-first
+      resources:
+        reservations:
+          cpus: "0.15"
+          memory: 128M
+        limits:
+          cpus: "0.3"
+          memory: 256M
+
+  influxdb:
+    image: influxdb:1.7
+    volumes:
+      - type: volume
+        source: influx-data
+        target: /var/lib/influxdb
+        read_only: false
+    networks:
+      - net
+    logging:
+      driver: json-file
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause
+        monitor: 5s
+        max_failure_ratio: 0
+        order: start-first
+      resources:
+        reservations:
+          cpus: "0.3"
+          memory: 128M
+        limits:
+          cpus: "0.6"
+          memory: 512M
+
+networks:
+  net:
+    driver: overlay
+
+volumes:
+  db-data:
+    driver: local
+  influx-data:
+    driver: local
