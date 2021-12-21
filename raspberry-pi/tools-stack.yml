@@ -20,7 +20,7 @@ services:
         max-size: 50m
 
 #----------------- COMMON
-#networks:
-  #default:
-   # external: true
-    #name: $DOCKER_NET
+networks:
+  default:
+    external: true
+    name: $DOCKER_NET
