@@ -1,6 +1,6 @@
 services:
   snippets:
-    image: pawelmalak/snippet-box:arm
+    image: pawelmalak/snippet-box
     container_name: Snippet-Box
     hostname: snippets
     restart: unless-stopped
