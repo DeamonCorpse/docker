@@ -119,7 +119,7 @@ services:
     hostname: ytdl
     restart: unless-stopped
     init: true
-    pids_limit: 2
+    pids_limit: 5
     cap_drop:
       - ALL
     cap_add:
