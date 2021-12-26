@@ -1,6 +1,6 @@
 version: "3"
 services:
-  prowlarr:
+  watchtower:
     image: containrrr/watchtower
     container_name: Watchtower
     hostname: watchtower
