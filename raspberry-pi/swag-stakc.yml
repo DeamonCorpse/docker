@@ -1,0 +1,83 @@
+services:
+#------------- DDNS
+  duckdns:
+    image: lscr.io/linuxserver/duckdns:$DDNS_TAG
+    container_name: DuckDNS
+    hostname: duckdns
+    restart: unless-stopped
+    init: true
+    read_only: false
+    pids_limit: 3
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_SETGID
+      - CAP_SETUID
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.05
+    mem_limit: 24m
+    mem_reservation: 10m
+    environment:
+      - PUID=$PUID
+      - GUID=$PGID
+      - TZ=$TZ
+      - SUBDOMAINS=$DUCKDNS_SUBDOMAINS
+      - TOKEN=$DUCKDNS_TOKEN
+      - LOG_FILE=false
+    volumes:
+      - $USERDIR/duckdns/:/config
+    logging:
+      options:
+        max-size: 50m
+
+#------------- REVERSE PROXY
+  swag:
+    image: lscr.io/linuxserver/swag:$SWAG_TAG 
+    container_name: SWAG
+    hostname: swag
+    restart: unless-stopped
+    init: true
+    read_only: false
+    pids_limit: 2
+    privileged: false
+    cpus: 0.10
+    mem_limit: 24m
+    mem_reservation: 10m
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_ADMIN
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - URL=$DOMAIN_URL
+      - VALIDATION=$VALIDATION
+      - SUBDOMAINS=$SUB_DOMAINS
+      - DNSPLUGIN=$DNS_PLUGIN
+      - DUCKDNSTOKEN=$DUCKDNS_TOKEN
+      - EMAIL=$USER_MAIL
+      - ONLY_SUBDOMAINS=$ONLY_SUBS
+      - STAGING=$STAGING
+    ports:
+      - $SWAG_PORT1:80
+      - $SWAG_PORT2:443
+    labels:
+      - "traefik.enable=false"
+    volumes:
+      - $USERDIR/swag/:/config
+    logging:
+      options:
+        max-size: 50m
+        max-file: 10
+
+
+#------------- COMMON
+networks:
+  docker:
+    external: true
+    name: $DOCKER_NET
