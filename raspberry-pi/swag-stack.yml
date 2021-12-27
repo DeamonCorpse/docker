@@ -48,6 +48,9 @@ services:
     cap_drop:
       - ALL
     cap_add:
+      - CAP_CHOWN
+      - CAP_SETGID
+      - CAP_SETUID
       - NET_ADMIN
     security_opt:
       - no-new-privileges:true
