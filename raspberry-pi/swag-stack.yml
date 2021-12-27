@@ -28,6 +28,9 @@ services:
       - LOG_FILE=false
     volumes:
       - $USERDIR/duckdns/:/config
+    networks:
+      - default
+      - docker
     logging:
       options:
         max-size: 50m
@@ -45,12 +48,6 @@ services:
     cpus: 0.10
     mem_limit: 24m
     mem_reservation: 10m
-    cap_drop:
-      - ALL
-    cap_add:
-      - CAP_CHOWN
-      - CAP_SETGID
-      - CAP_SETUID
       - NET_ADMIN
     security_opt:
       - no-new-privileges:true
@@ -73,6 +70,9 @@ services:
       - "traefik.enable=false"
     volumes:
       - $USERDIR/swag/:/config
+    networks:
+      - default
+      - docker
     logging:
       options:
         max-size: 50m
@@ -81,6 +81,8 @@ services:
 
 #------------- COMMON
 networks:
+  default:
+    internal: true
   docker:
     external: true
     name: $DOCKER_NET
