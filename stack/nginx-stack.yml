@@ -19,7 +19,7 @@ services:
       DB_MYSQL_USER: $NPM_DB_USER
       DB_MYSQL_PASSWORD: $NPM_DB_PW
       DB_MYSQL_NAME: $NPM_DB_NAME
-      DISABLE_IPV6: $IPV6
+      DISABLE_IPV6: 'true'
     networks:
       - default
       - docker
