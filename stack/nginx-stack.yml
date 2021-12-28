@@ -28,8 +28,8 @@ services:
       - $NPM_PORT2:81
       - $NPM_PORT3:443
     volumes:
-      - $USERDIR/nginx/data:/data
-      - $USERDIR/nginx/letsencrypt:/etc/letsencrypt
+      - $USERDIR/data:/data
+      - $USERDIR/letsencrypt:/etc/letsencrypt
     depends_on:
       - db
     logging:
@@ -61,7 +61,7 @@ services:
     ports:
       - $NPM_DB_PORT:3306
     volumes:
-      - $USERDIR/nginx-db:/var/lib/mysql
+      - $USERDIR/db:/var/lib/mysql
     logging:
       options:
         max-size: 50m
