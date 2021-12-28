@@ -1,4 +1,5 @@
 services:
+#------------- NGINX
   app:
     image: jc21/nginx-proxy-manager:$NPM_TAG
     container_name: nginx
@@ -66,7 +67,73 @@ services:
       options:
         max-size: 50m
 
-#----------------- COMMON
+
+#----------------- DDNS
+#----- [domain.name]
+#  cloudflare-ddns:
+#    image: oznu/cloudflare-ddns:$CLOUDFLARE_TAG
+#    container_name: Cloudflare-DDNS
+#    hostname: cloudflareddns
+#    restart: unless-stopped
+#    init: true
+#    pids_limit: 1
+#    cap_drop:
+#      - ALL
+#    security_opt:
+#      - no-new-privileges:true
+#    cpus: 0.05
+#    mem_limit: 24m
+#    mem_reservation: 10m
+#    environment:
+#      - API_KEY=$CLOUDFLARE_API
+#      - ZONE=$CLOUDFLARE_ZONE
+#      - SUBDOMAIN=$CLOUDFLARE_SUBDOMAIN
+#      - PROXIED=true
+#      - RRTYPE=$CLOUDFLARE_RRTYPE
+#      - DNS_SERVER=$CLOUDFLARE_DNS
+#      - CRON="@daily"
+#    logging:
+#      options:
+#        max-size: 50m
+
+#----- [name].duckdns.org
+  duckdns:
+    image: lscr.io/linuxserver/duckdns:$DDNS_TAG
+    container_name: DuckDNS
+    hostname: duckdns
+    restart: unless-stopped
+    init: true
+    read_only: false
+    pids_limit: 3
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_SETGID
+      - CAP_SETUID
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.05
+    mem_limit: 24m
+    mem_reservation: 10m
+    environment:
+      - PUID=$PUID
+      - GUID=$PGID
+      - TZ=$TZ
+      - SUBDOMAINS=$DUCKDNS_SUBDOMAINS
+      - TOKEN=$DUCKDNS_TOKEN
+      - LOG_FILE=false
+    volumes:
+      - $USERDIR2/duckdns/:/config
+    networks:
+      - docker
+      - default
+    logging:
+      options:
+        max-size: 50m
+ 
+
+#----------------- NETWORK
 networks:
   docker:
     external: true
