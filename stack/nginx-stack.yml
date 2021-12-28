@@ -1,45 +1,75 @@
-version: "3"
 services:
   app:
-    image: jc21/nginx-proxy-manager:latest
-    container_name: nginx-proxy
+    image: jc21/nginx-proxy-manager:$NPM_TAG
+    container_name: nginx
+    hostname: nginx
     restart: unless-stopped
-    hostname: nging-proxy
-    ports:
-      - 80:80
-      - 8881:81
-      - 443:443
+    init: true
+	  read_only: false
+    pids_limit: 2
+	  privileged: false
+    #cpus: 0.10
+    #mem_limit: 24m
+    #mem_reservation: 10m
+    security_opt:
+      - no-new-privileges:true
     environment:
-      DB_MYSQL_HOST: "db"
-      DB_MYSQL_PORT: 3306
-      DB_MYSQL_USER: "npm"
-      DB_MYSQL_PASSWORD: "npm"
-      DB_MYSQL_NAME: "npm"
+      DB_MYSQL_HOST: $NPM_DB_HOST
+      DB_MYSQL_PORT: $NPM_DB_PORT
+      DB_MYSQL_USER: $NPM_DB_USER
+      DB_MYSQL_PASSWORD: $NPM_DB_PW
+      DB_MYSQL_NAME: $NPM_DB_NAME
+      DISABLE_IPV6: $IPV6
+    networks:
+      - default
+      - docker
+    ports:
+      - $NPM_PORT1:80
+      - $NPM_PORT2:81
+      - $NPM_PORT3:443
     volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /home/pi/nginx/data:/data
-      - /home/pi/nginx/letsencrypt:/etc/letsencrypt
+      - $USERDIR/nginx/data:/data
+      - $USERDIR/nginx/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - db
     logging:
       options:
         max-size: 50m
 
   db:
-    image: jc21/mariadb-aria
-    container_name: nginx-db
+    image: jc21/mariadb-aria:$DB_TAG
+    container_name: npm-db
+    hostname: npm-db
     restart: unless-stopped
-    hostname: nginx-db
+    init: true
+	  read_only: false
+    pids_limit: 2
+	  privileged: false
+    #cpus: 0.10
+    #mem_limit: 24m
+    #mem_reservation: 10m
+    security_opt:
+      - no-new-privileges:true
     environment:
-      MYSQL_ROOT_PASSWORD: "npm"
-      MYSQL_DATABASE: "npm"
-      MYSQL_USER: "npm"
-      MYSQL_PASSWORD: "npm"
+      MYSQL_ROOT_PASSWORD: $NPM_ROOT_PW
+      MYSQL_DATABASE: $NPM_DB_NAME
+      MYSQL_USER: $NPM_DB_USER
+      MYSQL_PASSWORD: $NPM_DB_PW
+    networks:
+      - default
+      - docker
+    ports:
+      - $NPM_DB_PORT:3306
     volumes:
-      - /home/pi/nginx-db:/var/lib/mysql
+      - $USERDIR/nginx-db:/var/lib/mysql
     logging:
       options:
         max-size: 50m
 
+#----------------- COMMON
 networks:
-  default:
+  docker:
     external: true
-    name: styx
+    name: $DOCKER_NET
+  default:
+    internal: true
