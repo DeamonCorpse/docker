@@ -1,7 +1,7 @@
 services:
   #----------------- CONTAINER MANAGEMENT
   autoheal:
-    image: willfarrell/autoheal:$AH_TAG
+    image: willfarrell/autoheal:${AH_TAG:-latest}
     container_name: Autoheal
     hostname: autoheal
     restart: unless-stopped
@@ -22,7 +22,7 @@ services:
         max-size: 50m
 
   Watchtower:
-    image: containrrr/watchtower:$WT_TAG
+    image: containrrr/watchtower:${WT_TAG:-latest}
     container_name: Watchtower
     hostname: watchtower
     restart: unless-stopped
@@ -44,7 +44,7 @@ services:
       - WATCHTOWER_HTTP_API=true
       - WATCHTOWER_HTTP_API_TOKEN=$WATCHTOWER_HTTP_API_TOKEN
     ports:
-      - $WATCHTOWER_PORT:8080
+      - ${WATCHTOWER_PORT:-8080}:8080
     volumes:
       - /etc/localtime:/etc/localtime:ro
     logging:
@@ -62,7 +62,7 @@ services:
     pids_limit: 5
     privileged: true
     ports:
-      - $DSP_PORT:2375
+      - ${DSP_PORT:-2375}:2375
     cpus: 0.10
     mem_limit: 24m
     mem_reservation: 10m
@@ -111,7 +111,7 @@ services:
 
   #----------------- CONTAINER BACKUPS
   duplicati:
-    image: lscr.io/linuxserver/duplicati:$DUP_TAG
+    image: lscr.io/linuxserver/duplicati:${DUP_TAG:-latest}
     container_name: Duplicati
     hostname: duplicati
     restart: unless-stopped
@@ -123,9 +123,9 @@ services:
     #mem_limit: 24m
     #mem_reservation: 10m
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-1000}
       - CLI_ARGS= #optional
     ports:
       - $DUP_PORT:8200
