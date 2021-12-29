@@ -53,7 +53,7 @@ services:
 
   #----------------- CONTAINER SECURITY
   socket-proxy:
-    image: tecnativa/docker-socket-proxy
+    image: tecnativa/docker-socket-proxy:${DSP_TAG:-latest}
     container_name: Docker-Socket-Proxy
     hostname: socket-proxy
     restart: unless-stopped
@@ -125,10 +125,10 @@ services:
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
-      - TZ=${TZ:-1000}
+      - TZ=${TZ:-America/Toronto}
       - CLI_ARGS= #optional
     ports:
-      - $DUP_PORT:8200
+      - ${DUP_PORT:-8200}:8200
     volumes:
       - $USERDIR/duplicati:/config
       - $USERDIR/backups:/backups
@@ -137,7 +137,7 @@ services:
       options:
         max-size: 50m
 
-#----------------- COMMON
+#----------------- NETWORKING
 networks:
   default:
     external: true
