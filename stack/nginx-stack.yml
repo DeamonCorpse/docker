@@ -1,7 +1,7 @@
 services:
 #------------- NGINX
   app:
-    image: jc21/nginx-proxy-manager:$NPM_TAG
+    image: jc21/nginx-proxy-manager:${NPM_TAG:-latest}
     container_name: nginx
     hostname: nginx
     restart: unless-stopped
@@ -25,9 +25,9 @@ services:
       - default
       - docker
     ports:
-      - $NPM_PORT1:80
-      - $NPM_PORT2:81
-      - $NPM_PORT3:443
+      - ${NPM_PORT1:-80}:80
+      - ${NPM_PORT2:-81}:81
+      - ${NPM_PORT3:-443}:443
     volumes:
       - $USERDIR/data:/data
       - $USERDIR/letsencrypt:/etc/letsencrypt
@@ -60,7 +60,7 @@ services:
       - default
       - docker
     ports:
-      - $NPM_DB_PORT:3306
+      - ${NPM_DB_PORT:-3306}:3306
     volumes:
       - $USERDIR/db:/var/lib/mysql
     logging:
@@ -69,36 +69,9 @@ services:
 
 
 #----------------- DDNS
-#----- [domain.name]
-#  cloudflare-ddns:
-#    image: oznu/cloudflare-ddns:$CLOUDFLARE_TAG
-#    container_name: Cloudflare-DDNS
-#    hostname: cloudflareddns
-#    restart: unless-stopped
-#    init: true
-#    pids_limit: 1
-#    cap_drop:
-#      - ALL
-#    security_opt:
-#      - no-new-privileges:true
-#    cpus: 0.05
-#    mem_limit: 24m
-#    mem_reservation: 10m
-#    environment:
-#      - API_KEY=$CLOUDFLARE_API
-#      - ZONE=$CLOUDFLARE_ZONE
-#      - SUBDOMAIN=$CLOUDFLARE_SUBDOMAIN
-#      - PROXIED=true
-#      - RRTYPE=$CLOUDFLARE_RRTYPE
-#      - DNS_SERVER=$CLOUDFLARE_DNS
-#      - CRON="@daily"
-#    logging:
-#      options:
-#        max-size: 50m
-
 #----- [name].duckdns.org
   duckdns:
-    image: lscr.io/linuxserver/duckdns:$DDNS_TAG
+    image: lscr.io/linuxserver/duckdns:${DDNS_TAG:-latest}
     container_name: DuckDNS
     hostname: duckdns
     restart: unless-stopped
@@ -117,9 +90,9 @@ services:
     mem_limit: 24m
     mem_reservation: 10m
     environment:
-      - PUID=$PUID
-      - GUID=$PGID
-      - TZ=$TZ
+      - PUID=${PUID:-1000}
+      - GUID=${PGID:-1000}
+      - TZ=${TZ:-America/Toronto}
       - SUBDOMAINS=$DUCKDNS_SUBDOMAINS
       - TOKEN=$DUCKDNS_TOKEN
       - LOG_FILE=false
@@ -135,8 +108,8 @@ services:
 
 #----------------- NETWORK
 networks:
+  default:
+    internal: true
   docker:
     external: true
     name: $DOCKER_NET
-  default:
-    internal: true
