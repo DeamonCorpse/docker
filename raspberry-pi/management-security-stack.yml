@@ -36,15 +36,15 @@ services:
     mem_reservation: 48m
     environment:
       - DOCKER_HOST=$DOCKER_HOST
-      - WATCHTOWER_POLL_INTERVAL=86400
-      - WATCHTOWER_INCLUDE_STOPPED=true
-      - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_SCHEDULE=30 1 * * *
-      - WATCHTOWER_HTTP_API_METRICS=true
-      - WATCHTOWER_HTTP_API=true
+      - WATCHTOWER_POLL_INTERVAL=${WT_POLL:-86400}
+      - WATCHTOWER_INCLUDE_STOPPED=${WT_INCL_STOP:-true}
+      - WATCHTOWER_CLEANUP=${WT_CLEAN:-true}
+      - WATCHTOWER_SCHEDULE=${WT_CLEAN:-30 1 * * *}
+      - WATCHTOWER_HTTP_API_METRICS=${WT_HTTP_METRICS:-true}
+      - WATCHTOWER_HTTP_API=${WT_HTTP_API:-true}
       - WATCHTOWER_HTTP_API_TOKEN=$WATCHTOWER_HTTP_API_TOKEN
     ports:
-      - ${WATCHTOWER_PORT:-8080}:8080
+      - ${WT_PORT:-8080}:8080
     volumes:
       - /etc/localtime:/etc/localtime:ro
     logging:
