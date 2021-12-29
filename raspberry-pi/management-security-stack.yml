@@ -14,7 +14,7 @@ services:
     mem_limit: 96m
     mem_reservation: 48m
     environment:
-      - AUTOHEAL_CONTAINER_LABEL=${AH_LABEL:-true}
+      - AUTOHEAL_CONTAINER_LABEL=${AH_LABEL:-all}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     logging:
