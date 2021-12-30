@@ -17,6 +17,8 @@ services:
       - AUTOHEAL_CONTAINER_LABEL=${AH_LABEL:-all}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - default
     logging:
       options:
         max-size: 50m
@@ -47,6 +49,9 @@ services:
       - ${WT_PORT:-8080}:8080
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    networks:
+      - docker
+      - default
     logging:
       options:
         max-size: 50m
@@ -102,6 +107,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     tmpfs:
       - /run
+    networks:
+      - default
     logging:
       options:
         max-size: 50m
@@ -133,6 +140,8 @@ services:
       - $USERDIR/duplicati:/config
       - $USERDIR/backups:/backups
       - $USERDIR/portainer:/source
+    networks:
+      - default
     logging:
       options:
         max-size: 50m
@@ -140,5 +149,8 @@ services:
 #----------------- NETWORKING
 networks:
   default:
-    external: true
+    name: $DEFAULT_NET
+    internal: true
+  docker:
     name: $DOCKER_NET
+    external: true
