@@ -58,7 +58,6 @@ services:
       MYSQL_PASSWORD: $NPM_DB_PW
     networks:
       - default
-      - docker
     ports:
       - ${NPM_DB_PORT:-3306}:3306
     volumes:
@@ -109,7 +108,8 @@ services:
 #----------------- NETWORK
 networks:
   default:
+    name: $DEFAULT_NET
     internal: true
   docker:
-    external: true
     name: $DOCKER_NET
+    external: true
