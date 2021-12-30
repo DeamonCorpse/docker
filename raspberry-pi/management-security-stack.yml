@@ -150,7 +150,7 @@ services:
 networks:
   default:
     name: $DEFAULT_NET
-    internal: true
+    external: true
   docker:
     name: $DOCKER_NET
     external: true
