@@ -110,7 +110,7 @@ services:
         max-size: 50m
 
   radarr-exporter:
-    image: ghcr.io/onedr0p/exportarr:${EXPORTAAR_TAG:-latest}
+    image: ghcr.io/onedr0p/exportarr:${EXPORTARR_TAG:-latest}
     container_name: Exporter-Radarr
     hostname: exporterr
     restart: unless-stopped
@@ -140,7 +140,7 @@ services:
         max-size: 50m
 
   sonarr-exporter:
-    image: ghcr.io/onedr0p/exportarr:${EXPORTAAR_TAG:-latest}
+    image: ghcr.io/onedr0p/exportarr:${EXPORTARR_TAG:-latest}
     container_name: Exporter-Sonarr
     hostname: exporters
     restart: unless-stopped
@@ -158,7 +158,7 @@ services:
     environment:
       TINI_SUBREAPER: "true"
       PORT: ${SONARR_EX_PORT:-9707}
-      URL: $SONAAR_URL
+      URL: $SONARR_URL
       APIKEY: $SONARR_API_KEY
       ENABLE_EPISODE_QUALITY_METRICS: "false"
     expose:
@@ -297,7 +297,7 @@ services:
         max-size: 50m
 
   Promtail:
-    image: grafana/promtail:${PROM_TAG:-latest}
+    image: grafana/promtail:${PROMTAIL_TAG:-latest}
     container_name: Promtail
     hostname: promtail
     restart: unless-stopped
