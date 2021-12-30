@@ -1,6 +1,7 @@
 services:
+#----------------- SERVICE MONITORING
   uptime-kuma:
-    image: louislam/uptime-kuma:debian
+    image: louislam/uptime-kuma:${KUMA_TAG:-latest}
     container_name: Uptime-Kuma
     hostname: kuma
     restart: unless-stopped
@@ -20,23 +21,19 @@ services:
     mem_limit: 24m
     mem_reservation: 10m
     ports:
-      - $KUMA_PORT:3001
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.kuma.rule=HostRegexp(`kuma.{ip:.*}.traefik.me`)"
-      - "traefik.http.routers.kuma.rule=Host(`kuma.traefik.me`)"
-      - "traefik.http.routers.kuma.tls=true"
-      - "traefik.http.routers.kuma-tls.tls.domains[0].main=kuma.traefik.me"
-      - "traefik.http.routers.kuma-tls.tls.domains[0].sans=kuma-*.traefik.me"
+      - ${KUMA_PORT:-3001}:3001
     volumes:
       - $USERDIR/uptime-kuma:/app/data
+    networks:
+      - default
+      - docker
     logging:
       options:
         max-size: 50m
 
-  #----------------- PROMETHEUS
+#----------------- PROMETHEUS
   Prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:${PROM_TAG:-latest}
     container_name: Prometheus
     hostname: prometheus
     restart: unless-stopped
@@ -51,18 +48,19 @@ services:
     mem_limit: 24m
     mem_reservation: 10m
     ports:
-      - $PROMETHEUS_PORT:9090
-    labels:
-      - "traefik.enable=false"
+      - ${PROM_PORT:-9090}:9090
     volumes:
       - $USERDIR/prometheus:/etc/prometheus
       - $USERDIR/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - default
+      - docker
     logging:
       options:
         max-size: 50m
 
   alert-manager:
-    image: quay.io/prometheus/alertmanager
+    image: quay.io/prometheus/alertmanager:${AM_TAG:-latest}
     container_name: Alert-Manager
     hostname: altermanager
     restart: unless-stopped
@@ -77,17 +75,18 @@ services:
     mem_limit: 24m
     mem_reservation: 10m
     ports:
-      - $AM_PORT:9093
-    labels:
-      - "traefik.enable=false"
+      - ${AM_PORT:-9093}:9093
     volumes:
       - $USERDIR/alertmanager/alertmanager.yml:/alertmanager.yml
+    networks:
+      - default
+      - docker
     logging:
       options:
         max-size: 50m
 
   prometheus_speedtest:
-    image: ghcr.io/miguelndecarvalho/speedtest-exporter
+    image: ghcr.io/miguelndecarvalho/speedtest-exporter:${SPEED_TAG:-latest}
     container_name: Speedtest
     hostname: speedtest
     restart: unless-stopped
@@ -102,15 +101,16 @@ services:
     mem_limit: 24m
     mem_reservation: 10m
     expose:
-      - $SPEEDTEST_PORT:9798
-    labels:
-      - "traefik.enable=false"
+      - ${SPEED_PORT:-9798}:9798
+    networks:
+      - default
+      - docker
     logging:
       options:
         max-size: 50m
 
   radarr-exporter:
-    image: ghcr.io/onedr0p/exportarr:latest
+    image: ghcr.io/onedr0p/exportarr:${EXPORTAAR_TAG:-latest}
     container_name: Exporter-Radarr
     hostname: exporterr
     restart: unless-stopped
@@ -127,19 +127,20 @@ services:
     command: ["exportarr", "radarr"]
     environment:
       TINI_SUBREAPER: "true"
-      PORT: $RADARR_EX_PORT
-      URL: "http://192.168.68.23:7878/"
+      PORT: ${RADARR_EX_PORT:-9798}
+      URL: $RADARR_URL
       APIKEY: $RADARR_API_KEY
     expose:
-      - $RADARR_EX_PORT
-    labels:
-      - "traefik.enable=false"
+      - ${RADARR_EX_PORT:-9798}
+    networks:
+      - default
+      - docker
     logging:
       options:
         max-size: 50m
 
   sonarr-exporter:
-    image: ghcr.io/onedr0p/exportarr:latest
+    image: ghcr.io/onedr0p/exportarr:${EXPORTAAR_TAG:-latest}
     container_name: Exporter-Sonarr
     hostname: exporters
     restart: unless-stopped
@@ -156,20 +157,21 @@ services:
     command: ["exportarr", "sonarr"]
     environment:
       TINI_SUBREAPER: "true"
-      PORT: $SONARR_EX_PORT
-      URL: "http://192.168.68.23:8989/"
+      PORT: ${SONARR_EX_PORT:-9707}
+      URL: $SONAAR_URL
       APIKEY: $SONARR_API_KEY
       ENABLE_EPISODE_QUALITY_METRICS: "false"
     expose:
-      - $SONARR_EX_PORT
-    labels:
-      - "traefik.enable=false"
+      - ${SONARR_EX_PORT:-9707}
+    networks:
+      - default
+      - docker
     logging:
       options:
         max-size: 50m
 
   tautulli-nsfk:
-    image: tautulli/tautulli
+    image: tautulli/tautulli:${TAUT_TAG:-latest}
     container_name: Tautulli-NSFK
     hostname: tautulli-nsfk
     restart: unless-stopped
@@ -187,21 +189,22 @@ services:
     mem_limit: 24m
     mem_reservation: 10m
     environment:
-      - PGID=$PGID
-      - PUID=$PUID
-      - TZ=$TZ
+      - PGID=${PGID:-1000}
+      - PUID=${PUID:-1000}
+      - TZ=${TZ:-America/Toronto}
     ports:
-      - $TAUTULLI_NSFK_PORT:8181
-    labels:
-      - "traefik.enable=false"
+      - ${TAUT_NSFK_PORT:-8181}:8181
     volumes:
       - $USERDIR/tautulli/nsfk:/config:rw
+    networks:
+      - default
+      - docker
     logging:
       options:
         max-size: 50m
 
   tautulli-multimedia:
-    image: tautulli/tautulli
+    image: tautulli/tautulli:${TAUT_TAG:-latest}
     container_name: Tautulli-Multimedia
     hostname: tautulli-mm
     restart: unless-stopped
@@ -219,22 +222,24 @@ services:
     mem_limit: 24m
     mem_reservation: 10m
     environment:
-      - PGID=$PGID
-      - PUID=$PUID
-      - TZ=$TZ
+      - PGID=${PGID:-1000}
+      - PUID=${PUID:-1000}
+      - TZ=${TZ:-America/Toronto}
     ports:
-      - $TAUTULLI_MM_PORT:8181
-    labels:
-      - "traefik.enable=false"
+      - ${TAUT_MM_PORT:-8181}:8181
     volumes:
       - $USERDIR/tautulli/multimedia:/config:rw
+    networks:
+      - default
+      - docker
     logging:
       options:
         max-size: 50m
 
-  #----------------- GRAFANA
+
+#----------------- GRAFANA
   Grafana:
-    image: grafana/grafana:latest-ubuntu
+    image: grafana/grafana:${GRAFANA_TAG:-latest-ubuntu}
     container_name: Grafana
     hostname: grafana
     restart: unless-stopped
@@ -249,25 +254,22 @@ services:
     mem_limit: 24m
     mem_reservation: 10m
     environment:
-      - GF_INSTALL_PLUGINS=grafana-googlesheets-datasource,mtanda-google-calendar-datasource,marcusolsson-csv-datasource,camptocamp-prometheus-alertmanager-datasource,grafana-clock-panel,grafana-worldmap-panel,grafana-piechart-panel,grafana-polystat-panel,grafana-singlestat-panel,macropower-analytics-panel,speakyourcode-button-panel,thiagoarrais-matomotracking-panel,marcusolsson-calendar-panel,integrationmatters-comparison-panel,briangann-gauge-panel,agenty-flowcharting-panel,marcusolsson-gantt-panel,mtanda-histogram-panel,michaeldmoore-multistat-panel,isaozler-paretochart-panel,corpglory-progresslist-panel,snuids-radar-panel,michaeldmoore-scatter-panel,mxswat-separator-panel,novatec-sdg-panel,snuids-trafficlights-panel,flant-statusmap-panel,auxmoney-waterfall-panel
+      - GF_INSTALL_PLUGINS=$GRAFANA_PLUGINS
     ports:
-      - $GRAFANA_PORT:3000
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(`grafana.traefik.me`)"
-      - "traefik.http.routers.grafana.tls=true"
-      - "traefik.http.routers.grafana-tls.tls.domains[0].main=grafana.traefik.me"
-      - "traefik.http.routers.grafana-tls.tls.domains[0].sans=grafana-*.traefik.me"
+      - ${GRAFANA_PORT:-3000}:3000
     volumes:
       - $USERDIR/grafana:/var/lib/grafana
     tmpfs:
       - /tmp
+    networks:
+      - default
+      - docker
     logging:
       options:
         max-size: 50m
 
   Loki:
-    image: grafana/loki:k73-88feda4-arm
+    image: grafana/loki:${LOKI_TAG:-2.4.1}
     container_name: Loki
     hostname: loki
     restart: unless-stopped
@@ -282,16 +284,20 @@ services:
     mem_limit: 24m
     mem_reservation: 10m
     ports:
-      - $LOKI_PORT:3100
-    labels:
-      - "traefik.enable=tfalse"
+      - ${LOKI_PORT:-3100}:3100
     environment:
-      - user=$UID
+      - user=${PUID:-1000}
     volumes:
       - $USERDIR/loki/loki-config.yml:/etc/loki/loki-config.yml
+    networks:
+      - default
+      - docker
+    logging:
+      options:
+        max-size: 50m
 
   Promtail:
-    image: grafana/promtail:k73-88feda4-arm
+    image: grafana/promtail:${PROM_TAG:-latest}
     container_name: Promtail
     hostname: promtail
     restart: unless-stopped
@@ -305,16 +311,22 @@ services:
     cpus: 0.5
     mem_limit: 24m
     mem_reservation: 10m
-    labels:
-      - "traefik.enable=false"
-    environment:
-      - user=$UID
     volumes:
       - /var/log:/var/log:ro
       - $USERDIR/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml
+    networks:
+      - default
+      - docker
+    logging:
+      options:
+        max-size: 50m
+    
 
-#----------------- COMMON
+#----------------- NETWORKING
 networks:
   default:
+    name: $DEFAULT_NET
     external: true
-    name: styx
+  docker:
+    name: $DOCKER_NET
+    external: true
