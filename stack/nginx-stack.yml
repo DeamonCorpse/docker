@@ -32,12 +32,12 @@ services:
       - $USERDIR/data:/data
       - $USERDIR/letsencrypt:/etc/letsencrypt
     depends_on:
-      - db
+      - npm-db
     logging:
       options:
         max-size: 50m
 
-  db:
+  npm-db:
     image: jc21/mariadb-aria:$DB_TAG
     container_name: npm-db
     hostname: npm-db
