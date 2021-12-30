@@ -81,33 +81,7 @@ services:
       options:
         max-size: 50m
 
-  #----------------- DDNS
-  cloudflare-ddns:
-    image: oznu/cloudflare-ddns:arm32v6
-    container_name: Cloudflare-DDNS
-    hostname: cloudflareddns
-    restart: unless-stopped
-    init: true
-    pids_limit: 1
-    cap_drop:
-      - ALL
-    security_opt:
-      - no-new-privileges:true
-    cpus: 0.05
-    mem_limit: 24m
-    mem_reservation: 10m
-    environment:
-      - API_KEY=$CLOUDFLARE_API
-      - ZONE=$CLOUDFLARE_ZONE
-      - SUBDOMAIN=$CLOUDFLARE_SUBDOMAIN
-      - PROXIED=true
-      - RRTYPE=$CLOUDFLARE_RRTYPE
-      - DNS_SERVER=$CLOUDFLARE_DNS
-      - CRON="@daily"
-    logging:
-      options:
-        max-size: 50m
-
+  
   #----------------- TRAEFIK
   traefik:
     image: traefik:v2.5
