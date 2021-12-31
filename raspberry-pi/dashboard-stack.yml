@@ -27,6 +27,7 @@ services:
       - ${HOMER_PORT:-8080}:8080
     volumes:
       - $USERDIR/homer:/www/assets
+      - $USERDIR/homer/icons/Icons/:/www/assets/icons
     networks:
       - default
       - docker
