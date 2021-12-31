@@ -1,7 +1,8 @@
 services:
-  #----------------- DASHBOARDS
+#----------------- DASHBOARDS
+#----- HOMER
   homer:
-    image: b4bz/homer:$HOMER_TAG
+    image: b4bz/homer:${HOMER_TAG:-latest}
     container_name: Homer
     hostname: homer
     restart: unless-stopped
@@ -20,25 +21,23 @@ services:
     mem_limit: 64m
     mem_reservation: 24m
     environment:
-      - UID=$PUID
-      - GID=$PGID
+      - UID=${PUID:-1000}
+      - GID=${PGID:-1000}
     ports:
-      - $HOMER_PORT:8080
+      - ${HOMER_PORT:-8080}:8080
     volumes:
       - $USERDIR/homer:/www/assets
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.homer.rule=Host(`homer.traefik.me`)"
-      - "traefik.http.routers.homer.tls=true"
-      - "traefik.http.routers.homer-tls.tls.domains[0].main=homer.traefik.me"
-      - "traefik.http.routers.homer-tls.tls.domains[0].sans=homer-*.traefik.me"
+    networks:
+      - default
+      - docker
     logging:
       options:
         max-size: 50m
 
-  #----------------- DASHBOARD BACKEND
+
+#----- HOMER BACKEND
   Node-Red:
-    image: nodered/node-red
+    image: nodered/node-red:${NRED_TAG:-latest}
     container_name: Node-Red
     hostname: nodered
     restart: unless-stopped
@@ -53,17 +52,168 @@ services:
     mem_limit: 128m
     mem_reservation: 32m
     ports:
-      - $NODERED_PORT:1880
+      - ${NRED_PORT:-1880}:1880
     volumes:
       - $USERDIR/homer/nodered:/data
-    labels:
-      - "traefik.enable=false"
+    networks:
+      - default
     logging:
       options:
         max-size: 50m
 
-#----------------- COMMON
+
+#----------------- DASHBOARDS
+#----- DASHY
+  main:
+    image: lissy93/dashy:${DASHY_TAG:-latest}
+    container_name: DashyMain
+    hostname: dashy-main
+    restart: unless-stopped
+    init: true
+    pids_limit: 2
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+      - NET_BIND_SERVICE
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.5
+    mem_limit: 256m
+    mem_reservation: 128m
+    environment:
+      - UID=${PUID:-1000}
+      - GID=${PGID:-1000}
+      - NODE_ENV=${DASHY_ENV:-production}
+      - IS_DOCKER=true
+      #- SSL_PRIV_KEY_PATH=/etc/ssl/certs/dashy-priv.key
+      #- SSL_PUB_KEY_PATH=/etc/ssl/certs/dashy-pub.pem
+    ports:
+      - ${DASHY_PORT1:-80}:80
+      #- ${DASHY_PORT2:-443}:443
+    volumes:
+      - $USERDIR2/main-conf.yml:/app/public/conf.yml
+      - $USERDIR2/icons/Icons/png:/app/public/item-icons:ro
+      - $USERDIR2/main-public/trivmviratvs.png:/app/public/favicon.ico
+      #- $USERDIR2/custom-theme.scss:/app/src/styles/user-defined-themes.scss:ro
+    networks:
+      - default
+      - docker
+    healthcheck:
+      test: ["CMD", "node", "/app/services/healthcheck"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      options:
+        max-size: 50m
+
+  admin:
+    image: lissy93/dashy:${DASHY_TAG:-latest}
+    container_name: DashyAdmin
+    hostname: dashy-admin
+    restart: unless-stopped
+    init: true
+    pids_limit: 2
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+      - NET_BIND_SERVICE
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.5
+    mem_limit: 256m
+    mem_reservation: 128m
+    environment:
+      - UID=${PUID:-1000}
+      - GID=${PGID:-1000}
+      - NODE_ENV=${DASHY_ENV:-production}
+      - IS_DOCKER=true
+      #- SSL_PRIV_KEY_PATH=/etc/ssl/certs/dashy-priv.key
+      #- SSL_PUB_KEY_PATH=/etc/ssl/certs/dashy-pub.pem
+    ports:
+      - ${DASHY_PORT1:-80}:80
+      #- ${DASHY_PORT2:-443}:443
+    volumes:
+      - $USERDIR2/admin-conf.yml:/app/public/conf.yml
+      - $USERDIR2/icons/Icons/png:/app/public/item-icons:ro
+      #- $USERDIR2/admin-public/:/app/public/favicon.ico
+      #- $USERDIR2/custom-theme.scss:/app/src/styles/user-defined-themes.scss:ro
+    networks:
+      - default
+      - docker
+    healthcheck:
+      test: ["CMD", "node", "/app/services/healthcheck"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      options:
+        max-size: 50m
+
+  bookmarks:
+    image: lissy93/dashy:${DASHY_TAG:-latest}
+    container_name: DashyBookmarks
+    hostname: dashy-bookmarks
+    restart: unless-stopped
+    init: true
+    pids_limit: 2
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
+      - NET_BIND_SERVICE
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.5
+    mem_limit: 256m
+    mem_reservation: 128m
+    environment:
+      - UID=${PUID:-1000}
+      - GID=${PGID:-1000}
+      - NODE_ENV=${DASHY_ENV:-production}
+      - IS_DOCKER=true
+      #- SSL_PRIV_KEY_PATH=/etc/ssl/certs/dashy-priv.key
+      #- SSL_PUB_KEY_PATH=/etc/ssl/certs/dashy-pub.pem
+    ports:
+      - ${DASHY_PORT1:-80}:80
+      #- ${DASHY_PORT2:-443}:443
+    volumes:
+      - $USERDIR2/bookmarks-conf.yml:/app/public/conf.yml
+      - $USERDIR2/icons/Icons/png:/app/public/item-icons:ro
+      #- $USERDIR2/bookmarks-public/:/app/public/favicon.ico
+      #- $USERDIR2/custom-theme.scss:/app/src/styles/user-defined-themes.scss:ro
+    networks:
+      - default
+      - docker
+    healthcheck:
+      test: ["CMD", "node", "/app/services/healthcheck"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      options:
+        max-size: 50m
+
+
+#----------------- NETWORKING
 networks:
   default:
+    name: $DEFAULT_NET
     external: true
+  docker:
     name: $DOCKER_NET
+    external: true
