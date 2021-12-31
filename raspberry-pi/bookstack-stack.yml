@@ -32,7 +32,7 @@ services:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - DB_HOST=$BOOKS_DB_HOST
-      - DB_PORT=${DB_PORT:-3306}
+      - DB_PORT=${BOOKS_DB_PORT:-3306}
       - DB_USER=$BOOKS_DB_USER
       - DB_PASS=$BOOKS_DB_PW
       - DB_DATABASE=$BOOKS_DB
