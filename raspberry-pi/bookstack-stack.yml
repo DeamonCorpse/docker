@@ -1,6 +1,6 @@
 services:
   bookstack:
-    image: linuxserver/bookstack:arm32v7-latest
+    image: linuxserver/bookstack:${BOOKS_TAG:-latest}
     container_name: Bookstack
     hostname: bookstack
     restart: unless-stopped
@@ -29,27 +29,29 @@ services:
     mem_limit: 24m
     mem_reservation: 10m
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - DB_CONNECTION=$DB_CONNECT
-      - DB_HOST=$DB_HOST
-      - DB_PORT=$DB_PORT
-      - DB_USER=$DB_USER
-      - DB_PASS=$DB_PASS
-      - DB_DATABASE=$DB_NAME
-      - APP_URL=$BS_URL
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - DB_HOST=$BOOKS_DB_HOST
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_USER=$BOOKS_DB_USER
+      - DB_PASS=$BOOKS_DB_PW
+      - DB_DATABASE=$BOOKS_DB
+      - APP_URL=$BOOKS_URL
     volumes:
-      - $USERDIR/bookstack/app:/config
+      - $USERDIR/app:/config
     ports:
-      - $BS_PORT:443
+      - ${BOOKS_PORT:-8070}:443
     depends_on:
       - db
+    networks:
+      - default
+      - docker
     logging:
       options:
         max-size: 50m
 
   db:
-    image: linuxserver/mariadb:version-110.4.17mariabionic
+    image: linuxserver/mariadb:${BOOKS_DB_TAG:-latest}
     container_name: Bookstack_DB
     hostname: bookstack-db
     restart: unless-stopped
@@ -78,23 +80,29 @@ services:
     mem_limit: 24m
     mem_reservation: 10m
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - MYSQL_ROOT_PASSWORD=$DB_ROOT_PASS
-      - MYSQL_DATABASE=$DB_NAME
-      - MYSQL_USER=$DB_USER
-      - MYSQL_PASSWORD=$DB_PASS
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/Toronto}
+      - MYSQL_ROOT_PASSWORD=$BOOKS_DB_ROOT_PW
+      - MYSQL_DATABASE=$BOOKS_DB
+      - MYSQL_USER=$BOOKS_DB_USER
+      - MYSQL_PASSWORD=$BOOKS_DB_PW
     volumes:
-      - $USERDIR/bookstack/db:/config
+      - $USERDIR/db:/config
     ports:
-      - $DB_PORT:3306
+      - ${BOOKS_DB_PORT:-3306}:3306
+    networks:
+      - default
     logging:
       options:
         max-size: 50m
 
-#----------------- COMMON
+
+#----------------- NETWORKING
 networks:
   default:
+    name: $DEFAULT_NET
     external: true
+  docker:
     name: $DOCKER_NET
+    external: true
