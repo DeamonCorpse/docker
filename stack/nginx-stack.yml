@@ -16,7 +16,7 @@ services:
       - no-new-privileges:true
     environment:
       DB_MYSQL_HOST: $NPM_DB_HOST
-      DB_MYSQL_PORT: $NPM_DB_PORT
+      DB_MYSQL_PORT: ${NPM_DB_PORT:-3306}
       DB_MYSQL_USER: $NPM_DB_USER
       DB_MYSQL_PASSWORD: $NPM_DB_PW
       DB_MYSQL_NAME: $NPM_DB_NAME
@@ -69,47 +69,47 @@ services:
 
 #----------------- DDNS
 #----- [name].duckdns.org
-  duckdns:
-    image: lscr.io/linuxserver/duckdns:${DDNS_TAG:-latest}
-    container_name: DuckDNS
-    hostname: duckdns
-    restart: unless-stopped
-    init: true
-    read_only: false
-    pids_limit: 3
-    cap_drop:
-      - ALL
-    cap_add:
-      - CAP_CHOWN
-      - CAP_SETGID
-      - CAP_SETUID
-    security_opt:
-      - no-new-privileges:true
-    cpus: 0.05
-    mem_limit: 24m
-    mem_reservation: 10m
-    environment:
-      - PUID=${PUID:-1000}
-      - GUID=${PGID:-1000}
-      - TZ=${TZ:-America/Toronto}
-      - SUBDOMAINS=$DUCKDNS_SUBDOMAINS
-      - TOKEN=$DUCKDNS_TOKEN
-      - LOG_FILE=false
-    volumes:
-      - $USERDIR2/duckdns/:/config
-    networks:
-      - docker
-      - default
-    logging:
-      options:
-        max-size: 50m
+#  duckdns:
+#    image: lscr.io/linuxserver/duckdns:${DDNS_TAG:-latest}
+#    container_name: DuckDNS
+#    hostname: duckdns
+#    restart: unless-stopped
+#    init: true
+#    read_only: false
+#    pids_limit: 3
+#    cap_drop:
+#      - ALL
+#    cap_add:
+#      - CAP_CHOWN
+#      - CAP_SETGID
+#      - CAP_SETUID
+#    security_opt:
+#      - no-new-privileges:true
+#    cpus: 0.05
+#    mem_limit: 24m
+#    mem_reservation: 10m
+#    environment:
+#      - PUID=${PUID:-1000}
+#      - GUID=${PGID:-1000}
+#      - TZ=${TZ:-America/Toronto}
+#      - SUBDOMAINS=$DUCKDNS_SUBDOMAINS
+#      - TOKEN=$DUCKDNS_TOKEN
+#      - LOG_FILE=false
+#    volumes:
+#      - $USERDIR2/duckdns/:/config
+#    networks:
+#      - docker
+#      - default
+#    logging:
+#      options:
+#        max-size: 50m
  
 
 #----------------- NETWORK
 networks:
   default:
     name: $DEFAULT_NET
-    internal: true
+    external: true
   docker:
     name: $DOCKER_NET
     external: true
