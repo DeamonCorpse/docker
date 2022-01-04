@@ -1,5 +1,5 @@
 services:
-  #----------------- CONTAINER MANAGEMENT
+#----------------- CONTAINER MANAGEMENT
   autoheal:
     image: willfarrell/autoheal:${AH_TAG:-latest}
     container_name: Autoheal
@@ -7,12 +7,12 @@ services:
     restart: unless-stopped
     init: true
     read_only: true
-    pids_limit: 2
+    pids_limit: 1
     security_opt:
       - no-new-privileges:true
     cpus: 0.10
-    mem_limit: 96m
-    mem_reservation: 48m
+    mem_limit: 12m
+    mem_reservation: 6m
     environment:
       - AUTOHEAL_CONTAINER_LABEL=${AH_LABEL:-all} # all to watch all containers
       - AUTOHEAL_INTERVAL=${AH_INTERVAL:-5} # check every x seconds
@@ -63,7 +63,7 @@ services:
       options:
         max-size: 50m
 
-  #----------------- CONTAINER SECURITY
+#----------------- CONTAINER SECURITY
   socket-proxy:
     image: ghcr.io/tecnativa/docker-socket-proxy:${DSP_TAG:-latest}
     container_name: Docker-Socket-Proxy
@@ -71,13 +71,13 @@ services:
     restart: unless-stopped
     init: true
     read_only: true
-    pids_limit: 5
+    pids_limit: 1
     privileged: true
     ports:
       - ${DSP_PORT:-2375}:2375
     cpus: 0.10
-    mem_limit: 24m
-    mem_reservation: 10m
+    mem_limit: 12m
+    mem_reservation: 6m
     environment:
       - LOG_LEVEL=info # debug,info,notice,warning,err,crit,alert,emerg
       ## Variables match the URL prefix (i.e. AUTH blocks access to /auth/* parts of the API, etc.).
@@ -123,7 +123,7 @@ services:
   # Use this environment variable in containers needing to connect to docker.sock
   # - DOCKER_HOST=tcp://socket-proxy:2375
 
-  #----------------- CONTAINER BACKUPS
+#----------------- CONTAINER BACKUPS
   duplicati:
     image: lscr.io/linuxserver/duplicati:${DUP_TAG:-latest}
     container_name: Duplicati
@@ -133,9 +133,9 @@ services:
     pids_limit: 2
     security_opt:
       - no-new-privileges:true
-    #cpus: 0.10
-    #mem_limit: 24m
-    #mem_reservation: 10m
+    cpus: 0.10
+    mem_limit: 96m
+    mem_reservation: 48m
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
@@ -146,7 +146,8 @@ services:
     volumes:
       - $USERDIR/duplicati:/config
       - $USERDIR/backups:/backups
-      - $USERDIR/portainer:/source
+      - $USERDIR/cron-scripts:/source/cron-scripts
+      - $USERDIR/portainer:/source/portainer
     networks:
       - default
     logging:
