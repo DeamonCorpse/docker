@@ -14,9 +14,16 @@ services:
     mem_limit: 96m
     mem_reservation: 48m
     environment:
-      - AUTOHEAL_CONTAINER_LABEL=${AH_LABEL:-all}
+      - AUTOHEAL_CONTAINER_LABEL=${AH_LABEL:-all} # all to watch all containers
+      - AUTOHEAL_INTERVAL=${AH_INTERVAL:-5} # check every x seconds
+      - AUTOHEAL_START_PERIOD=${AH_START:-0} # wait x seconds before first health check
+      - AUTOHEAL_DEFAULT_STOP_TIMEOUT=${AH_STOP:-10} # Docker waits max x seconds for a container to stop before killing during restarts
+      - DOCKER_SOCK=$DOCKER_HOST # tcp://HOST:PORT
+      - CURL_TIMEOUT=${CURL_TIMEOUT:-30} # --max-time x seconds for curl requests to Docker API
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      #- $USERDIR/ssl:/certs/:ro
     networks:
       - default
     logging:
