@@ -58,7 +58,7 @@ services:
 
   #----------------- CONTAINER SECURITY
   socket-proxy:
-    image: tecnativa/docker-socket-proxy:${DSP_TAG:-latest}
+    image: ghcr.io/tecnativa/docker-socket-proxy:${DSP_TAG:-latest}
     container_name: Docker-Socket-Proxy
     hostname: socket-proxy
     restart: unless-stopped
