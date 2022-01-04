@@ -9,9 +9,9 @@ services:
     read_only: false
     pids_limit: 2
     privileged: false
-    #cpus: 0.10
-    #mem_limit: 24m
-    #mem_reservation: 10m
+    cpus: 0.50
+    mem_limit: 24m
+    mem_reservation: 10m
     security_opt:
       - no-new-privileges:true
     environment:
@@ -46,9 +46,9 @@ services:
     read_only: false
     pids_limit: 2
     privileged: false
-    #cpus: 0.10
-    #mem_limit: 24m
-    #mem_reservation: 10m
+    cpus: 0.25
+    mem_limit: 96m
+    mem_reservation: 48m
     security_opt:
       - no-new-privileges:true
     environment:
@@ -76,7 +76,7 @@ services:
 #    restart: unless-stopped
 #    init: true
 #    read_only: false
-#    pids_limit: 3
+#    pids_limit: 1
 #    cap_drop:
 #      - ALL
 #    cap_add:
@@ -86,8 +86,8 @@ services:
 #    security_opt:
 #      - no-new-privileges:true
 #    cpus: 0.05
-#    mem_limit: 24m
-#    mem_reservation: 10m
+#    mem_limit: 12m
+#    mem_reservation: 6m
 #    environment:
 #      - PUID=${PUID:-1000}
 #      - GUID=${PGID:-1000}
