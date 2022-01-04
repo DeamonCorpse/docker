@@ -58,7 +58,7 @@ services:
       MYSQL_PASSWORD: $NPM_DB_PW
     networks:
       - default
-    ports:
+    expose:
       - ${NPM_DB_PORT:-3306}:3306
     volumes:
       - $USERDIR/db:/var/lib/mysql
