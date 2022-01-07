@@ -1,6 +1,6 @@
 services:
 #------------- WEBTOP
-#----- ARCH-KDE
+#----- ARCH-XFCE
   webtop:
     image: lscr.io/linuxserver/webtop:${WEBTOP1_TAG:-latest} 
     container_name: Webtop
@@ -13,26 +13,22 @@ services:
     #cpus: [0.10]
     #mem_limit: [24m]
     #mem_reservation: [10m]
-	shm_size:"1gb"
-	#cap_drop:
-      #- ALL
-	#cap_add:
-	  #- [cap]
+    shm_size:"1gb"
     security_opt:
       - no-new-privileges:true
-	  - seccomp:unconfined
+      - seccomp:unconfined
     environment:
-	  - PUID=${PUID:-1000}
+      - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
-	  - TZ=${TZ:-America/Toronto}
-	networks:
-	  - default
-	  - docker
-	ports:
+      - TZ=${TZ:-America/Toronto}
+    networks:
+      - default
+      - docker
+    ports:
       - ${WEBTOP1_PORT:-3000}:3000
-	volumes:
+    volumes:
       - $USERDIR/$DISTRO1_FOLDER:/config
-	logging:
+    logging:
       options:
         max-size: 50m
         max-file: 10
