@@ -28,6 +28,8 @@ services:
       - ${WEBTOP1_PORT:-3000}:3000
     volumes:
       - $USERDIR/$DISTRO1_FOLDER:/config
+    labels:
+      - com.centurylinklabs.watchtower.enable="false"
     logging:
       options:
         max-size: 50m
