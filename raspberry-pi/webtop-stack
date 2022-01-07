@@ -31,7 +31,7 @@ services:
 	ports:
       - ${WEBTOP1_PORT:-3000}:3000
 	volumes:
-      - $USERDIR/$DISTRO1-FOLDER:/config
+      - $USERDIR/$DISTRO1_FOLDER:/config
 	logging:
       options:
         max-size: 50m
