@@ -3,13 +3,13 @@ services:
 #----- ARCH-XFCE
   webtop:
     image: lscr.io/linuxserver/webtop:${WEBTOP1_TAG:-latest} 
-    container_name: Webtop
-    hostname: webtop
-	restart: unless-stopped
-	init: true
-	read_only: false
-    pids_limit: 2
-	privileged: true
+    container_name: Webtop-
+    hostname: webtop-
+    restart: unless-stopped
+    init: true
+    read_only: false
+    #pids_limit: 2
+    privileged: true
     #cpus: [0.10]
     #mem_limit: [24m]
     #mem_reservation: [10m]
@@ -25,7 +25,7 @@ services:
       - default
       - docker
     ports:
-      - ${WEBTOP1_PORT:-3000}:3000
+      - ${WEBTOP1_PORT:-3001}:3000
     volumes:
       - $USERDIR/$DISTRO1_FOLDER:/config
     labels:
