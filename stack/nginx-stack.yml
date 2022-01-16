@@ -2,7 +2,7 @@ services:
 #------------- NGINX
   app:
     image: jc21/nginx-proxy-manager:${NPM_TAG:-latest}
-    container_name: nginx
+    container_name: NGINX
     hostname: nginx
     restart: unless-stopped
     init: true
@@ -38,8 +38,8 @@ services:
         max-size: 50m
 
   npm-db:
-    image: jc21/mariadb-aria:$DB_TAG
-    container_name: npm-db
+    image: jc21/mariadb-aria:${DB_TAG:-latest}
+    container_name: NGINX-db
     hostname: npm-db
     restart: unless-stopped
     init: true
@@ -69,40 +69,40 @@ services:
 
 #----------------- DDNS
 #----- [name].duckdns.org
-#  duckdns:
-#    image: lscr.io/linuxserver/duckdns:${DDNS_TAG:-latest}
-#    container_name: DuckDNS
-#    hostname: duckdns
-#    restart: unless-stopped
-#    init: true
-#    read_only: false
-#    pids_limit: 1
-#    cap_drop:
-#      - ALL
-#    cap_add:
-#      - CAP_CHOWN
-#      - CAP_SETGID
-#      - CAP_SETUID
-#    security_opt:
-#      - no-new-privileges:true
-#    cpus: 0.05
-#    mem_limit: 12m
-#    mem_reservation: 6m
-#    environment:
-#      - PUID=${PUID:-1000}
-#      - GUID=${PGID:-1000}
-#      - TZ=${TZ:-America/Toronto}
-#      - SUBDOMAINS=$DUCKDNS_SUBDOMAINS
-#      - TOKEN=$DUCKDNS_TOKEN
-#      - LOG_FILE=false
-#    volumes:
-#      - $USERDIR2/duckdns/:/config
-#    networks:
-#      - docker
-#      - default
-#    logging:
-#      options:
-#        max-size: 50m
+  duckdns:
+    image: lscr.io/linuxserver/duckdns:${DDNS_TAG:-latest}
+    container_name: DuckDNS
+    hostname: duckdns
+    restart: unless-stopped
+    init: true
+    read_only: false
+    pids_limit: 1
+    cap_drop:
+      - ALL
+    cap_add:
+      - CAP_CHOWN
+      - CAP_SETGID
+      - CAP_SETUID
+    security_opt:
+      - no-new-privileges:true
+    cpus: 0.05
+    mem_limit: 12m
+    mem_reservation: 6m
+    environment:
+      - PUID=${PUID:-1000}
+      - GUID=${PGID:-1000}
+      - TZ=${TZ:-America/Toronto}
+      - SUBDOMAINS=$DUCKDNS_SUBDOMAINS
+      - TOKEN=$DUCKDNS_TOKEN
+      - LOG_FILE=false
+    volumes:
+      - $USERDIR2/duckdns/:/config
+    networks:
+      - docker
+      - default
+    logging:
+      options:
+        max-size: 50m
  
 
 #----------------- NETWORK
