@@ -10,7 +10,7 @@ services:
     pids_limit: 1
     security_opt:
       - no-new-privileges:true
-    cpus: 0.10
+    cpus: 0.25
     mem_limit: 12m
     mem_reservation: 6m
     environment:
@@ -18,7 +18,7 @@ services:
       - AUTOHEAL_INTERVAL=${AH_INTERVAL:-5} # check every x seconds
       - AUTOHEAL_START_PERIOD=${AH_START:-0} # wait x seconds before first health check
       - AUTOHEAL_DEFAULT_STOP_TIMEOUT=${AH_STOP:-10} # Docker waits max x seconds for a container to stop before killing during restarts
-      - DOCKER_SOCK=$DOCKER_HOST # tcp://HOST:PORT
+      #- DOCKER_SOCK=$DOCKER_HOST # tcp://HOST:PORT Uncomment if using docker-host-proxy
       - CURL_TIMEOUT=${CURL_TIMEOUT:-30} # --max-time x seconds for curl requests to Docker API
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -40,11 +40,11 @@ services:
     pids_limit: 2
     security_opt:
       - no-new-privileges:true
-    cpus: 0.10
+    cpus: 0.25
     mem_limit: 96m
     mem_reservation: 48m
     environment:
-      - DOCKER_HOST=$DOCKER_HOST
+      #- DOCKER_HOST=$DOCKER_HOST # Uncomment if using docker-host-proxy
       - WATCHTOWER_POLL_INTERVAL=${WT_POLL:-86400}
       - WATCHTOWER_INCLUDE_STOPPED=${WT_INCL_STOP:-true}
       - WATCHTOWER_CLEANUP=${WT_CLEAN:-true}
@@ -133,14 +133,14 @@ services:
     pids_limit: 2
     security_opt:
       - no-new-privileges:true
-    cpus: 0.10
+    cpus: 0.25
     mem_limit: 96m
     mem_reservation: 48m
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-America/Toronto}
-      - CLI_ARGS= #optional
+      #- CLI_ARGS= #optional
     ports:
       - ${DUP_PORT:-8200}:8200
     volumes:
