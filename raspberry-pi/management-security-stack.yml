@@ -145,7 +145,7 @@ services:
       - ${DUP_PORT:-8200}:8200
     volumes:
       - $USERDIR/duplicati:/config
-      - $USERDIR/backups:/backups
+      - $USERDIR2/backups:/backups
       - $USERDIR/cron-scripts:/source/cron-scripts
       - $USERDIR/portainer:/source/portainer
     networks:
