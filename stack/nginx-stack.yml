@@ -23,7 +23,6 @@ services:
       DISABLE_IPV6: 'true'
     networks:
       - default
-      - docker
     ports:
       - ${NPM_PORT1:-80}:80
       - ${NPM_PORT2:-81}:81
@@ -98,7 +97,6 @@ services:
     volumes:
       - $USERDIR2/duckdns/:/config
     networks:
-      - docker
       - default
     logging:
       options:
@@ -109,7 +107,4 @@ services:
 networks:
   default:
     name: $DEFAULT_NET
-    external: true
-  docker:
-    name: $DOCKER_NET
     external: true
