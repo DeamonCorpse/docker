@@ -5,5 +5,5 @@ sudo docker run -d \
   --security-opt="no-new-privileges:true" \
   -p 9000:9000 \
   -v /var/run/docker.sock:/var/run/docker.sock:ro \
-  -v /home/$USER/docker/portainer:/data \
+  -v /home/pi/docker/portainer:/data:rw \
   portainer/portainer-ce:latest
