@@ -9,6 +9,7 @@ services:
     init: true
     read_only: true
     pids_limit: 2
+    privileged: false
     cap_drop:
       - ALL
     cap_add:
