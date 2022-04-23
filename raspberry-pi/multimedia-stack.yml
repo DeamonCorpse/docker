@@ -29,7 +29,7 @@ services:
 
   #------------------ THE "ARRs"
   prowlarr:
-    image: ghcr.io/linuxserver/prowlarr:develop
+    image: lsrc.io/linuxserver/prowlarr:${PROWL_TAG:-develop}
     container_name: Prowlarr
     hostname: prowlarr
     restart: unless-stopped
@@ -50,14 +50,14 @@ services:
     mem_limit: 24m
     mem_reservation: 10m
     environment:
-      - PUID=1000
-      - PGID=1000
-      - DOCKER_MODS=ghcr.io/gilbn/theme.park:prowlarr
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - DOCKER_MODS=${DOCKER_MODS:-ghcr.io/gilbn/theme.park:prowlarr}
       - TP_THEME=plex
     olumes:
       - $USERDIR/prowlarr:/config:rw
     ports:
-      - $PROWL_PORT:9696
+      - ${PROWL_PORT:-9696}:9696
     logging:
       options:
         max-size: 50m
