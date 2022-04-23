@@ -1,6 +1,6 @@
 services:
   overseerr:
-    image: sctx/overseerr
+    image: sctx/overseerr:${OV_TAG:-latest}
     container_name: Overseerr
     hostname: overseer
     restart: unless-stopped
@@ -19,7 +19,7 @@ services:
     volumes:
       - $USERDIR/overseerr:/app/config:rw
     ports:
-      - $OV_PORT:5055
+      - ${OV_PORT:-5055}:5055
     logging:
       options:
         max-size: 50m
