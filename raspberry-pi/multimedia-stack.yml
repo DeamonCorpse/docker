@@ -54,7 +54,7 @@ services:
       - PGID=${PGID:-1000}
       - DOCKER_MODS=${DOCKER_MODS:-ghcr.io/gilbn/theme.park:prowlarr}
       - TP_THEME=plex
-    olumes:
+    volumes:
       - $USERDIR/prowlarr:/config:rw
     ports:
       - ${PROWL_PORT:-9696}:9696
