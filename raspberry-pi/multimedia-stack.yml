@@ -1,6 +1,6 @@
 services:
   overseerr:
-    image: sctx/overseerr:${OV_TAG:-latest}
+    image: lscr.io/linuxserver/overseerr:${OV_TAG:-latest}
     container_name: Overseerr
     hostname: overseer
     restart: unless-stopped
@@ -15,9 +15,12 @@ services:
     mem_limit: 24m
     mem_reservation: 10m
     environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ}
       - LOG_LEVEL=info
     volumes:
-      - $USERDIR/overseerr:/app/config:rw
+      - $USERDIR/overseerr:/config:rw
     ports:
       - ${OV_PORT:-5055}:5055
     logging:
