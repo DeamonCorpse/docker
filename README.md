@@ -1,47 +1,33 @@
 # DOCKER REPOSITORY
 
-I have been playing with Docker for a looong time and I finally decided to put some stuff on Github in case it might benefit someone.
+I have been experimenting and using Docker for a good while now but I just recently decided to take advantage of git & github to store my files in case it might benefit someone.
 
-This repository stores both my current and archived docker run, docker compose and docker swarm files.
+This repository stores both my current and archived docker run, docker compose, docker stack and docker swarm files. I have also started to re-write the stack files I am currently using with variables to facilitate re-deployment later and ensure more portability between systems.
+<hr>
 <br>
 
-## Repo breakdown
-
-### Raspberry-Pi
-Since RPi is ARM-based, and they are the only ARM devices which I run Docker on), I decided to put all the relevant docker files in there.
-
-### Single Container Deployment
-
-- **compose** folder: Docker-compose yml files
-- **compose -archive** folder: Archive for docker-compose files
-- **run**: Docker run txt files
-- **run-archive**: Archive for docker run files
-
-### Stacks Deployment
-
-- **stack** folder: Docker-compose **stacks** yml files
-- **stack - archive** folder: Archive for docker-compose **stack** files
-
-### Swarm Deployment
-
-- **swarm** folder: Docker-compose **swarm** yml files
-- **swarm - archive** folder: Archive for docker-compose **swarm** files
+# REPOSITORY FOLDERS
+### docker-application-stacks
+- Docker stack files which contain **more than one application to be deployed**.
+- **This is where the most current files are**.
+<br>
+<br>
+> The next folders are mainly kept for historical purpose and reference
+### docker-compose
+- You guessed it. This is where I store my compose files
 <br>
 
-*Anything with **archive** is obviously not maintained but I decided to keep the files for future reference.*
+### docker-individual-stacks
+- As the name suggests, there are stack files but they each **deploy only one application**.
+- I tend to group applications based on their functionality so this folder is not used much and is kept *mainly for historical purpose and reference*.
 <br>
 
-## PRESENTLY IN USE
-- xxx
-- xxx
-
+### docker-run
+- Although I do prefer to use stacks, I also sometimes use docker-run to have a look at an application and see if I want to use it.
 <br>
 
-## ARCHIVED
-- xxx
-- xxx
+### docker-swarm
+- Watching all the "kings and queens of ducker" on youtube, I was convinced docker swarm was the way to go...Turned out if was not.
 <br>
-
-
 <hr>
 Feel free to use whatever helps in your docker adventures!
