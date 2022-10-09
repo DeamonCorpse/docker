@@ -1,6 +1,6 @@
 services:
 #  deluge:
-#    image: lscr.io/linuxserver/deluge:$DELUGE_TAG
+#    image: lscr.io/linuxserver/deluge:${DEL_TAG:-latest}
 #    container_name: Deluge
 #    restart: unless-stopped
 #    hostname: deluge
@@ -20,9 +20,8 @@ services:
 #    mem_limit: 24m
 #    mem_reservation: 10m
 #    ports:
-#      - $DELUGE_PORT1:8112
-#      - $DELUGE_PORT2:6881
-#      - $DELUGE_PORT2:6881/udp
+#      - $DELUGE_PORT1:${DEL_PORT1:-8112}
+#      - $DELUGE_PORT2:${DEL_PORT2:-6881}
 #    environment: 
 #      - PUID=$PUID
 #      - PGID=$PGID
@@ -36,7 +35,7 @@ services:
 #        max-size: 50m
 
 # jdownloader:
-#    image: jaymoulin/jdownloader:$MYJD_TAG
+#    image: jaymoulin/jdownloader:${MYJD_TAG:-latest}
 #    container_name: JDownloader
 #    restart: unless-stopped
 #    hostname: jdownloader
@@ -57,11 +56,11 @@ services:
 #    mem_reservation: 10m
 #    user: $PUID:$PGID
 #    ports:
-#      - $JDOWNLOADER_PORT:3129
+#      - $JDOWNLOADER_PORT:${MYJD_PORT:-3129}
 #    environment: 
 #      - MYJD_USER=$MYJD_UN
-#      - MYJD_PASSWORD=$MYJD_PASSWD
-#      - MYJD_DEVICE_NAME=$DEVICE_NAME
+#      - MYJD_PASSWORD=$MYJD_PASS
+#      - MYJD_DEVICE_NAME=$MYJD_DEVICE
 #    volumes:
 #      - $USERDIR/jdownloader:/opt/JDownloader/cfg
 #      - $USERDIR/dowloads/jdownloader:/opt/JDownloader/Downloads
@@ -71,7 +70,7 @@ services:
 #        max-size: 10m
 
 #  transmission:
-#    image: haugene/transmission-openvpn:$TRANS_TAG
+#    image: haugene/transmission-openvpn:${TRANS_TAG:-latest}
 #    container_name: Transmission
 #    hostname: transmission
 #    restart: unless-stopped
@@ -90,31 +89,31 @@ services:
 #      - PGID=$PGID
 #      - TRANSMISSION_WEB_UI=flood-for-transmission
 #      - TRANSMISSION_RPC_USERNAME=$TRANS_UN
-#      - TRANSMISSION_RPC_PASSWORD=$TRANS_PASSWD
+#      - TRANSMISSION_RPC_PASSWORD=$TRANS_PASS
 #      - TRANSMISSION_RPC_AUTHENTICATION_REQUIRED=true
 #      - OPENVPN_PROVIDER=$VPN_PROVIDER
 #      - NORDVPN_COUNTRY=$VPN_COUNTRY
 #      - NORDVPN_CATEGORY=$VPN_CAT
 #      - NORDVPN_PROTOCOL=$VPN_PROTOCOL
 #      - OPENVPN_USERNAME=$VPN_UN
-#      - OPENVPN_PASSWORD=$VPN_PASSWD
+#      - OPENVPN_PASSWORD=$VPN_PASS
 #      - LOCAL_NETWORK=$LOCAL_NET
 #    volumes:
 #      - $USERDIR/transmission:/config
 #      - $USERDIR/downloads/torrents:/data/torrents
 #    ports:
-#      - $TRANS_PORT1:9091
-#      - $TRANS_PORT2:51413
+#      - $TRANS_PORT1:${TRANS_PORT1:-9091}
+#      - $TRANS_PORT2:${TRANS_PORT2:-51413}
 #    dns:
-#      - $DNS1
-#      - $DNS2
+#      - $TRANS_DNS1:${TRANS_DNS1:-1.1.1.1}
+#      - $TRANS_DNS2:${TRANS_DNS2:-8.8.8.8}
 #    logging:
 #      options:
 #        max-size: 50m
 
 
   youtubedl:
-    image: tzahi12345/youtubedl-material:$YTDL_TAG
+    image: tzahi12345/youtubedl-material:${YTDL_TAG:-latest}
     container_name: Youtube-DL
     hostname: ytdl
     restart: unless-stopped
@@ -142,7 +141,7 @@ services:
       - $USERDIR/downloads/ytdl/audio:/app/audio:rw
       - $USERDIR/downloads/ytdl/video:/app/video:rw
     ports:
-      - $YTDL_PORT:17442
+      - $YTDL_PORT:${ytdl_port:-17442}
     logging:
       options:
         max-size: 50m
