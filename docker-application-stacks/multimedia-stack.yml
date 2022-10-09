@@ -52,7 +52,7 @@ services:
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
-      - DOCKER_MODS=${DOCKER_MODS:-ghcr.io/gilbn/theme.park:prowlarr}
+      - DOCKER_MODS=${PROWL_MODS:-ghcr.io/gilbn/theme.park:prowlarr}
       - TP_THEME=plex
     volumes:
       - $USERDIR/prowlarr:/config:rw
@@ -93,13 +93,13 @@ services:
       - $USERDIR/readarr:/config:rw
       - $USERDIR/downloads/books:/downloads:rw
     ports:
-      - ${RAD_PORT:-8787}:8787
+      - ${READ_PORT:-8787}:8787
     logging:
       options:
         max-size: 50m
 
   radarr:
-    image: lscr.io/linuxserver/radarr:${RAD_PORT:-latest}
+    image: lscr.io/linuxserver/radarr:${RAD_TAG:-latest}
     container_name: Radarr
     hostname: radarr
     restart: unless-stopped
