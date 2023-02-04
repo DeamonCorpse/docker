@@ -1,7 +1,9 @@
-#----------------- GITIGNORE FILE V 1.1 -----------------#
+#----------------- GITIGNORE FILE V 1.2 -----------------#
 # Revision History
-# V 1.O         -   Initial
-# V 1.1         -   Added fstab
+# V 1.O    - Initial
+# V 1.1    - Added fstab
+# V 1.2    - Added *.env,TEMPLATE.*
+#
 #--------------------------------------------------------#
 
 #---------- FILE TYPES
@@ -16,7 +18,7 @@ ehthumbsdb                  #
 *.fseventsd                 #
 *.gz                        # gzip file
 *.icns                      # Icons
-Icon?                       # icon         
+Icon?                       # icon
 *.iso                       # iso file
 *.jar                       #
 *.lnk                       # MS Windows shortcuts
@@ -47,6 +49,8 @@ Thumbs.db                   # MS Windows thumbnails
 #=== Specific Files
 fstab/fstab
 etc/.docker-creds
+*.env
+TEMPLATES.*
 
 
 #---------- DIRECTORY TYPES
