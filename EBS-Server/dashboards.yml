@@ -1,35 +1,4 @@
 services:
-  family-dashboard:
-    image: b4bz/homer:${HOMER_TAG:-latest}
-    container_name: Family-Dashboard
-    hostname: familydashboard
-    restart: unless-stopped
-    privileged: false
-    security_opt:
-      - no-new-privileges:true
-    deploy:
-      resources:
-        limits:
-          memory: 64M
-        reservations:
-          memory: 24M
-    environment:
-      - UID=$UID
-      - GID=$GID
-      - INIT_ASSETS=0
-    volumes:
-      - $USERDIR/dashboards/family:/www/assets:rw
-      #- $ICONS:/www/assets/icons:ro
-    labels:
-      - autoheal:true
-    ports:
-      - ${HOMER_PORT:-8080}:8080
-    networks:
-      - docker
-    logging:
-      options:
-        max-size: 50m
-
   ebs-dashboard:
     image: ghcr.io/benphelps/homepage:${HOMEPAGE_TAG:-latest}
     container_name: EBS-Dashboard
