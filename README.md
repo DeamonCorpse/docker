@@ -4,26 +4,23 @@ Storage for both my current and archived docker run, compose, stack and swarm fi
 
 ---
 
+### ARCHIVES
 
-
-## ARCHIVES
-
-### docker-application-stacks
+#### docker-application-stacks
 
 - Docker stack files which contain **more than one application to be deployed**.
 
-### docker-individual-stacks
+#### docker-individual-stacks
 
 - As the name suggests, there are stack files but they each **deploy only one application**.
 - I tend to group applications based on their functionality so this folder is not used much and is kept.
 
-### docker-run
+#### docker-run
 
 - Although I do prefer to use stacks, I also sometimes use docker-run to have a look at an application and see if I want to use it.
 
-### docker-swarm
+#### docker-swarm
 
-- Watching all the "kings and queens of ducker" on youtube, I was convinced docker swarm was the way to go...Turned out if was not.
-
+- Watching all the "youtube kings and queens of docker", I was convinced docker swarm was the way to go...Turned out if was not for me.
 
 Feel free to use whatever helps in your docker adventures!
