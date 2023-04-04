@@ -1,0 +1,11 @@
+sudo docker run -d \
+  --name Portainer-Agent \
+  --hostname=portaineragent \
+  --restart unless-stopped \
+  --security-opt="no-new-privileges:true" \
+  --network="ebs" \
+  -p 9001:9001 \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  -v /var/lib/docker/volumes:/var/lib/docker/volumes \
+  -l autoheal=true \
+  portainer/agent:2.17.1
