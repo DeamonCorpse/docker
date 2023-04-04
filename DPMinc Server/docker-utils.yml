@@ -108,7 +108,7 @@ services:
     container_name: Code-Server
     hostname: codeserver
     restart: unless-stopped
-    read_only: true
+    read_only: false
     privileged: false
     security_opt:
       - no-new-privileges:true
@@ -124,7 +124,7 @@ services:
       - TZ=$TZ
       - DEFAULT_WORKSPACE=$WORKSPACE
       - INSTALL_PACKAGES=make|wget|curl
-#      - INSTALL_PIP_PACKAGES=
+      #      - INSTALL_PIP_PACKAGES=
       - DOCKER_MODS=$CODESERVER_DOCKER_MODS
       - VSCODE_EXTENSION_IDS=$CODESERVER_EXTENSIONS
     volumes:
