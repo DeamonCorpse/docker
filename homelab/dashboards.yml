@@ -1,0 +1,75 @@
+services:
+  family-dashboard:
+    image: b4bz/homer:${HOMER_TAG:-latest}
+    container_name: Family-Dashboard
+    hostname: familydashboard
+    restart: unless-stopped
+    #init: true
+    read_only: true
+    #pids_limit: 2
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 32M
+        reservations:
+          memory: 8M
+    environment:
+      - UID=$UID
+      - GID=$GID
+    volumes:
+      - $USERDIR/dashboards/family:/www/assets:rw
+      - $ICONS:/www/assets/icons:ro
+    labels:
+      - autoheal:true
+    ports:
+      - ${HOMER_PORT:-8080}:8080
+    networks:
+      - docker
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
+  homelab-dashboard:
+    image: ghcr.io/benphelps/homepage:${HOMEPAGE_TAG:-latest}
+    container_name: Homelab-Dashboard
+    hostname: homelabdashboard
+    restart: unless-stopped
+    #init: true
+    read_only: true
+    #pids_limit: 2
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+    volumes:
+      - $USERDIR/dashboards/homelab:/app/config:rw
+      - $ICONS:/app/public/icons:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - autoheal:true
+    ports:
+      - ${HOMEPAGE_PORT:-3000}:3000
+    networks:
+      - docker
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true

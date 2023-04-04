@@ -1,0 +1,47 @@
+services:
+  pihole:
+    image: pihole/pihole:${PIHOLE_TAG:-latest}
+    container_name: Pi-hole
+    hostname: pihole
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_add:
+      - NET_ADMIN
+      - CAP_NET_BIND_SERVICE
+      - CAP_SYS_NICE
+      - CAP_CHOWN
+    environment:
+      - TZ=$TZ
+      - WEBPASSWORD=$PIHOLE_PASS
+      - FTLCONF_LOCAL_IPV4=$IP
+      - PIHOLE_DNS_=$PIHOLE_DNS
+      - DNSSEC=true
+      - IPv6=false
+      - DHCP_IPv6=false
+      - TEMPERATUREUNIT=c
+      - WEBTHEME=darker
+    volumes:
+      - $USERDIR/pihole:/etc/pihole:rw
+      - $USERDIR/pihole/etc-dnsmasq.d:/etc/dnsmasq.d
+    ports:
+      - ${PIHOLE_HTTP_PORT:-80}:80/tcp
+      - ${PIHOLE_DNS_PORT:-53}:53/udp
+      #- ${PIHOLE_DHCP_PORT:-67}:67/udp
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
+
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true

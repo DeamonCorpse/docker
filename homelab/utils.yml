@@ -1,0 +1,38 @@
+services:
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:${CLOUDBEAVER_TAG:-latest}
+    container_name: Cloudbeaver
+    hostname: cloudbeaver
+    restart: unless-stopped
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+        reservations:
+          memory: 24M
+    volumes:
+          - $USERDIR/cloudbeaver:/opt/cloudbeaver/workspace:rw
+          - /etc/localtime:/etc/localtime:ro
+    labels:
+      - autoheal:true
+    ports:
+      - ${CLOUDBEAVER_PORT:-8978}:8978/tcp
+    networks:
+      - docker
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
+
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true

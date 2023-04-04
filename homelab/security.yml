@@ -1,0 +1,46 @@
+services:
+#---------- DOCKER BENCH SECURITY
+# Docker Bench Security (DBS) (https://github.com/docker/docker-bench-security)
+# script is run from the CLI.
+# The DBS folder is located at ~/docker/dbs
+# Prior to running the script, ensure to do a 'git pull'
+# To run the script: 'sudo sh docker-bench-security.sh'
+  npm:
+    image: jlesage/nginx-proxy-manager:${NPM_TAG:-latest}
+    container_name: Nginx-PM
+    hostname: npm
+    restart: "unless-stopped"
+    security_opt:
+      - no-new-privileges:true
+    cap_add:
+      - SYS_NICE
+    environment:
+      - TZ=$TZ
+      - USER_ID=$UID
+      - GROUP_ID=$GID
+      - UMASK=000
+      - APP_NICENESS=-10
+      - DISABLE_IPV6=1
+      - TP_HOTIO=true
+      - TP_THEME=$NPM_THEME
+    volumes:
+      - $USERDIR/npm:/config:rw
+      - $USERDIR/npm/98-themepark-nginx-proxy-manager:/etc/cont-init.d/98-themepark-nginx-proxy-manager:ro
+    labels:
+      - autoheal:true
+    ports:
+      - ${NPM_UI_PORT:-8181}:8181/tcp
+      - ${NPM_HTTPS_PORT:-443}:4443/tcp
+      - ${NPM_HTTP_PORT:-8080}:8080/tcp
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true

@@ -1,0 +1,99 @@
+services:
+  glances:
+    image: nicolargo/glances:${GLANCES_TAG:-alpine-latest}
+    container_name: Glances
+    hostname: glances
+    restart: unless-stopped
+    pid: host
+    security_opt:
+      - no-new-privileges:true
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 12M
+#        reservations:
+#          memory: 6M
+    environment:
+      - "GLANCES_OPT=-w"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime:ro
+      - $USERDIR/glances/glances.conf:/glances/conf/glances.conf:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${GLANCES_PORTS:-61208-61209}:61208-61209
+
+  scrutiny:
+    image: ghcr.io/analogj/scrutiny:${SCRUTINY_TAG:-master-omnibus}
+    container_name: Scrutiny
+    hostname: scrutiny
+    restart: unless-stopped
+    privileged: true
+    security_opt:
+      - no-new-privileges:true
+    cap_add:
+      - SYS_ADMIN
+      - SYS_RAWIO
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 12M
+#        reservations:
+#          memory: 6M
+    environment:
+      - TZ=$TZ
+    volumes:
+      - /run/udev:/run/udev:ro
+      - /dev/disk:/dev/disk:ro
+      - $USERDIR/scrutiny:/opt/scrutiny/config:rw
+      - $USERDIR/scrutiny/influxdb:/opt/scrutiny/influxdb:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${SCRUTINY_UI_PORT:-8080}:8080
+      - ${SCRUTINY_DB_PORT:-8086}:8086
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:${CADVISOR_TAG:-latest}
+    container_name: cAdvisor
+    hostname: cadvisor
+    restart: unless-stopped
+    privileged: true
+    security_opt:
+      - no-new-privileges:true
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 12M
+#        reservations:
+#          memory: 6M
+    environment:
+      - TZ=$TZ
+      - HOST_CONTAINERNAME=cAdvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    labels:
+      - autoheal:true
+    ports:
+      - ${CADVISOR_UI_PORT:-8080}:8080
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true

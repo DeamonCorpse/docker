@@ -50,7 +50,9 @@ Thumbs.db                   # MS Windows thumbnails
 fstab/fstab
 etc/.docker-creds
 *.env
+*.secret
 TEMPLATES.*
+unRaid
 
 
 #---------- DIRECTORY TYPES

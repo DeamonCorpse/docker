@@ -1,0 +1,178 @@
+services:
+  plex-nsfk:
+    image: plexinc/pms-docker:${PLEX_TAG:-latest}
+    container_name: Plex-NSFK
+    hostname: plex-nsfk
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    #    deploy:
+    #      resources:
+    #        limits:
+    #          memory: 12M
+    #        reservations:
+    #          memory: 6M
+    environment:
+      - TZ=$TZ
+      - PLEX_CLAIM=$PLEX_CLAIM
+      - PLEX_UID=$UID
+      - PLEX_GID=$GID
+      - ALLOWED_NETWORKS=$ALLOWED_NETWORKS
+    volumes:
+      - $USERDIR/plex-nsfk:/config:rw
+      - $USERDIR/plex-nsfk/transcode:/temp:rw
+      - $USERDIR/nsfk-media:/media:rw
+      - $BACKUPS/plex-nsfk:/backups:rw
+      - $NSFK/Movies:/remote_movies:rw
+      - $NSFK/Clips:/remote_clips:rw
+      - $NSFK/Nice:/remote_nice:rw
+      - $NSFK/Pictures:/remote_pictures:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${PLEX_GDM_PORT1:-32400}:32400/tcp
+      - ${PLEX_GDM_PORT2:-32410}:32410/udp
+      - ${PLEX_GDM_PORT3:-32412-32414}:32412-32414/udp
+      - ${PLEX_TCPCOMPANION_PORT:-3005}:3005/tcp
+      - ${PLEX_DLNA_PORT1:-1900}:1900/udp
+      - ${PLEX_DLNA_PORT2:-32469}:32469/tcp
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+
+  photoprism-db:
+    image: lscr.io/linuxserver/mariadb:${PHOTOPRISM_DB_TAG:-latest}
+    container_name: PhotoprismDB
+    hostname: photoprism-db
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+      - seccomp:unconfined
+      - apparmor:unconfined
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+    environment:
+      - TZ=$TZ
+      - PUID=$UID
+      - PGID=$GID
+      - MYSQL_ROOT_PASSWORD=$PHOTOPRISM_SQL_ROOT_PW
+      - MYSQL_DATABASE=$PHOTOPRISM_DATABASE
+      - MYSQL_USER=$PHOTOPRISM_SQL_USER
+      - MYSQL_PASSWORD=$PHOTOPRISM_SQL_PW
+    volumes:
+      - $USERDIR/photoprism/db:/config:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${PHOTOPRISMDB_PORT:-3306}:3306
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+
+  photoprism:
+    image: photoprism/photoprism:${PHOTOPRISM_TAG:-latest}
+    container_name: Photoprism
+    hostname: photoprism
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+      - seccomp:unconfined
+      - apparmor:unconfined
+    deploy:
+      resources:
+        limits:
+          memory: 6G
+        reservations:
+          memory: 3G
+    shm_size: 2gb
+    environment:
+      - TZ=$TZ
+      - PHOTOPRISM_UID=$UID
+      - PHOTOPRISM_GID=$GID
+      - PHOTOPRISM_UMASK=0000
+      #----- APPLICATION SECURITY
+      - PHOTOPRISM_ADMIN_USER=$PHOTOPRISM_ADMIN
+      - PHOTOPRISM_ADMIN_PASSWORD=$PHOTOPRISM_ADMIN_PW
+      - PHOTOPRISM_AUTH_MODE=password
+      - PHOTOPRISM_SESSION_MAXAGE=259200
+      - PHOTOPRISM_SESSION_TIMEOUT=28800
+      - PHOTOPRISM_WORKERS=1
+      #----- APPLICATION PAGE SETTINGS
+      - PHOTOPRISM_SITE_TITLE=$PHOTOPRISM_SITE_TITLE
+      - PHOTOPRISM_SITE_CAPTION=$PHOTOPRISM_SITE_CAPTION
+      - PHOTOPRISM_SITE_DESCRIPTION=$PHOTOPRISM_SITE_DESCRIPTION
+      - PHOTOPRISM_SITE_AUTHOR=$PHOTOPRISM_SITE_AUTHOR
+      #----- DATABASE SETTINGS
+      - PHOTOPRISM_DATABASE_DRIVER=mysql
+      - PHOTOPRISM_DATABASE_SERVER=photoprism-db:3306
+      - PHOTOPRISM_DATABASE_NAME=$PHOTOPRISM_DATABASE
+      - PHOTOPRISM_DATABASE_USER=$PHOTOPRISM_SQL_USER
+      - PHOTOPRISM_DATABASE_PASSWORD=$PHOTOPRISM_SQL_PW
+      #----- APPLICATION SETTINGS
+      - PHOTOPRISM_EXPERIMENTAL=false
+      - PHOTOPRISM_DISABLE_WEBDAV=false
+      - PHOTOPRISM_DISABLE_SETTINGS=false
+      - PHOTOPRISM_SETTINGS_HIDDEN=false
+      - PHOTOPRISM_DISABLE_TENSORFLOW=false
+      - PHOTOPRISM_DISABLE_FACES=false
+      - PHOTOPRISM_DISABLE_PLACES=false
+      - PHOTOPRISM_DISABLE_CLASSIFICATION=false
+      - PHOTOPRISM_DISABLE_FFMPEG=false
+      - PHOTOPRISM_DISABLE_EXIFTOOL=false
+      - PHOTOPRISM_EXIF_BRUTEFORCE=false
+      - PHOTOPRISM_DISABLE_HEIFCONVERT=false
+      - PHOTOPRISM_DISABLE_DARKTABLE=false
+      - PHOTOPRISM_DISABLE_RAW=false
+      - PHOTOPRISM_RAW_PRESETS=false
+      - PHOTOPRISM_DISABLE_RAWTHERAPEE=false
+      - PHOTOPRISM_UPLOAD_NSFW=true
+      - PHOTOPRISM_DETECT_NSFW=true
+      #----- IMAGE QUALITY
+      - PHOTOPRISM_THUMB_COLOR=sRGB
+      - PHOTOPRISM_THUMB_FILTER=lanczos
+      - PHOTOPRISM_THUMB_SIZE=4096
+      - PHOTOPRISM_THUMB_SIZE_UNCACHED=7680
+      - PHOTOPRISM_THUMB_UNCACHED=false
+      - PHOTOPRISM_JPEG_QUALITY=95
+      - PHOTOPRISM_JPEG_SIZE=7680
+      - PHOTOPRISM_THUMB_UNCACHED=true
+      - PHOTOPRISM_DARKTABLE_PRESETS=false
+      - PHOTOPRISM_AUTO_INDEX=180
+      - PHOTOPRISM_AUTO_IMPORT=180
+      #----- STORAGE
+      - PHOTOPRISM_STORAGE_PATH=/photoprism/storage
+      - PHOTOPRISM_ORIGINALS_PATH=/photoprism/originals
+      - PHOTOPRISM_IMPORT_PATH=/photoprism/import
+      - PHOTOPRISM_BACKUP_PATH=/photoprism/backup
+      #----- CUSTOMIZATION
+      - PHOTOPRISM_DEFAULT_LOCALE=en
+      - PHOTOPRISM_DEFAULT_THEME=Onyx
+      - PHOTOPRISM_APP_MODE=fullscreen
+    volumes:
+      - $USERDIR/photoprism:/photoprism/storage:rw
+      - $USERDIR/photoprism/import:/photoprism/import:rw
+      - $PHOTOS:/photoprism/originals:ro
+      - $BACKUPS/photoprism:/photoprism/backup:rw
+    ports:
+      - ${PHOTOPRISM_UI_PORT:-2342}:2342
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+    depends_on:
+      - photoprism-db
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true

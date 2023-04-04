@@ -1,0 +1,38 @@
+services:
+  dpm-dashboard:
+    image: ghcr.io/benphelps/homepage:${HOMEPAGE_TAG:-latest}
+    container_name: DPM-Dashboard
+    hostname: dpmdashboard
+    restart: unless-stopped
+    read_only: true
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+    volumes:
+      - $USERDIR/dashboards/dpm:/app/config:rw
+      - $ICONS:/app/public/icons:ro
+      - $ICONS_WORK:/app/public/work-icons:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/locatime:ro
+    labels:
+      - autoheal:true
+    ports:
+      - ${HOMEPAGE_PORT:-3000}:3000
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+        max-file: 10
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true
