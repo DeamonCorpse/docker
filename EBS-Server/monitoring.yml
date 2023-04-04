@@ -1,0 +1,33 @@
+services:
+  glances:
+    image: nicolargo/glances:${GLANCES_TAG:-alpine-latest}
+    container_name: Glances
+    hostname: glances
+    restart: unless-stopped
+    read_only: false
+    pid: host
+    security_opt:
+      - no-new-privileges:true
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 12M
+#        reservations:
+#          memory: 6M
+    environment:
+      - "GLANCES_OPT=-w"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime:ro
+      - $USERDIR/glances/glances.conf:/glances/conf/glances.conf:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${GLANCES_PORTS:-61208-61209}:61208-61209
+
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true
