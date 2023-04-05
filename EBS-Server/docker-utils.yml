@@ -146,39 +146,6 @@ services:
       theme-park:
         condition: service_started
 
-  crontab-ui:
-    image: alseambusher/crontab-ui:${CRONTAB_TAG:-latest}
-    container_name: Crontab-UI
-    hostname: crontabui
-    restart: unless-stopped
-    read_only: false
-    privileged: false
-    security_opt:
-      - no-new-privileges:true
-    deploy:
-      resources:
-        limits:
-          memory: 4G
-        reservations:
-          memory: 1G
-    environment:
-      - HOST=$CRONTAB_HOST
-      - CRON_DB_PATH=$USERDIR/crontab-ui-server/db
-      - ENABLE_AUTOSAVE=true
-    volumes:
-      - $USERDIR/crontab-ui-server:/crontab-ui/crontabs/:rw
-    labels:
-      - autoheal:true
-    ports:
-      - ${CRONTAB_PORT:-8000}:8000
-    networks:
-      - docker
-    logging:
-      options:
-        #syslog-address: "tcp://192.168.68.62:514"
-        max-size: 50m
-        max-file: 10
-
 #----------------- NETWORKING
 networks:
   docker:
