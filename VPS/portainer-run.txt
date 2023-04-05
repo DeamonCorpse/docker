@@ -1,0 +1,11 @@
+sudo docker run -d \
+  --name Portainer \
+  --hostname=portainer \
+  --restart unless-stopped \
+  --security-opt="no-new-privileges:true" \
+  --network="vps" \
+  -p 9443:9443 \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  -v /home/user/docker/portainer:/data:rw \
+  -l autoheal=true \
+  portainer/portainer-ce:latest
