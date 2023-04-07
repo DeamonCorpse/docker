@@ -29,6 +29,28 @@ services:
         max-size: 50m
         max-file: 10
 
+  phpmyadmin:
+    image: phpmyadmin:${PHPMA_TAG:-latest}
+    container_name: phpMyAdmin
+    hostname: phpmyadmin
+    restart: unless-stopped
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PMA_ARBITRARY=1
+    labels:
+      - autoheal:true
+    ports:
+      - ${PHPMA_PORT:-8080}:80
+    networks:
+      - docker
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 1
 
 
 #----------------- NETWORKING
