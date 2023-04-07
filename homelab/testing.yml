@@ -1,0 +1,80 @@
+services:
+  database:
+    image: powertic/percona-docker
+    container_name: MauticDB
+    hostname: mauticdb
+    restart: unless-stopped
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 64M
+#        reservations:
+#          memory: 24M
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --sql-mode=""
+    environment:
+      - MYSQL_ROOT_PASSWORD:$MAUTIC_DB_PASSWORD
+    volumes:
+      - $USERDIR/mautic/db:/var/lib/mysql:rw
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - autoheal:true
+    ports:
+      - ${MAUTICDB_PORT:-3306}:3306
+    networks:
+      - mautic
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
+  mautic:
+    image: mautic/mautic:${MAUTIC_TAG:-latest}
+    container_name: Mautic
+    hostname: mautic
+    restart: unless-stopped
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 64M
+#        reservations:
+#          memory: 24M
+    environment:
+      - MAUTIC_DB_HOST=database
+      - MAUTIC_DB_USER=$MAUTIC_DB_USER
+      - MAUTIC_DB_PASSWORD=$MAUTIC_DB_PASSWORD
+      - MAUTIC_DB_NAME=$MAUTIC_DB_NAME
+    volumes:
+      - $USERDIR/mautic/mautic:/var/www/html:rw
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - autoheal:true
+    ports:
+      - ${MAUTIC_PORT:-8080}:80
+    networks:
+      - mautic
+      - docker
+    depends_on:
+      - database
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
+#----------------- NETWORKING
+networks:
+  mautic:
+    name: $MAUTIC_NET
+    external: true
+  docker:
+    name: $DOCKER_NET
+    external: true
