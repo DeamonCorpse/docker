@@ -16,14 +16,14 @@ services:
 #          memory: 24M
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --sql-mode=""
     environment:
-      - MYSQL_ROOT_PASSWORD:$MAUTIC_DB_PASSWORD
+      - MYSQL_ROOT_PASSWORD=$MDB_ROOT_PW
     volumes:
       - $USERDIR/mautic/db:/var/lib/mysql:rw
       - /etc/localtime:/etc/localtime:ro
     labels:
       - autoheal:true
     ports:
-      - ${MAUTICDB_PORT:-3306}:3306
+      - ${MDB_PORT:-3306}:3306
     networks:
       - mautic
     logging:
@@ -52,6 +52,9 @@ services:
       - MAUTIC_DB_USER=$MAUTIC_DB_USER
       - MAUTIC_DB_PASSWORD=$MAUTIC_DB_PASSWORD
       - MAUTIC_DB_NAME=$MAUTIC_DB_NAME
+      - MAUTIC_ADMIN_USERNAME=$MADMIN_UN
+      - MAUTIC_ADMIN_PASSWORD=$MADMIN_PW
+      - MAUTIC_ADMIN_EMAIL=$MADMIN_MAIL
     volumes:
       - $USERDIR/mautic/mautic:/var/www/html:rw
       - /etc/localtime:/etc/localtime:ro
