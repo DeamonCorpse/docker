@@ -1,0 +1,73 @@
+services:
+  autoheal:
+    image: willfarrell/autoheal:${AUTOHEAL_TAG:-latest}
+    container_name: Autoheal
+    hostname: autoheal
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 12M
+        reservations:
+          memory: 6M
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=autoheal
+      - AUTOHEAL_CONTAINER_LABEL=all
+      - AUTOHEAL_INTERVAL=5
+      - AUTOHEAL_START_PERIOD=1
+      - AUTOHEAL_DEFAULT_STOP_TIMEOUT=10
+      - DOCKER_SOCK=/var/run/docker.sock
+      - CURL_TIMEOUT=30
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+
+  watchtower:
+    image: containrrr/watchtower:${WATCHTOWER_TAG:-latest}
+    container_name: Watchtower
+    hostname: watchtower
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 96M
+        reservations:
+          memory: 48M
+    environment:
+      - TZ=$TZ
+      - WATCHTOWER_HTTP_API_METRICS=true
+      - WATCHTOWER_HTTP_API_TOKEN=$WATCHTOWER_API_TOKEN
+      - WATCHTOWER_SCHEDULE=$WATCHTOWER_SCHEDULE
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_LOG_LEVEL=debug
+      - WATCHTOWER_INCLUDE_STOPPED=true
+      - WATCHTOWER_LABEL_ENABLE=false # Update containers that have a `com.centurylinklabs.watchtower.enable` label set to true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - autoheal:true
+    ports:
+      - ${WATCHTOWER_HTTP_API_PORT:-8080}:8080
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true
