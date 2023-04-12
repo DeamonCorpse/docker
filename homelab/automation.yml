@@ -1,0 +1,100 @@
+services:
+#----- n8n
+  database:
+    image: mariadb:${N8NDB_TAG:-latest}
+    container_name: n8n-DB
+    hostname: n8ndb
+    restart: unless-stopped
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 64M
+#        reservations:
+#          memory: 24M
+    environment:
+      - MARIADB_ROOT_PASSWORD=$N8NDB_ROOT_PW
+      - MARIADB_DATABASE=$N8NDB
+      - MARIADB_USER=$N8NDB_USER
+      - MARIADB_PASSWORD=$N8NDB_PW
+      - MARIADB_MYSQL_LOCALHOST_USER=true
+    volumes:
+      - $USERDIR/n8n/database:/var/lib/mysql:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${N8NDB_PORT:-5678}:3306
+    networks:
+      - n8n
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+    healthcheck:
+      test: "/usr/bin/mysql --user=$N8NDB_USER --password=$N8NDB_PW --execute 'SELECT 1;'"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  n8n:
+    image: n8nio/n8n:${N8N_TAG:-latest}
+    container_name: n8n
+    hostname: n8n
+    restart: unless-stopped
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 64M
+#        reservations:
+#          memory: 24M
+    command: n8n start --tunnel
+    environment:
+      - GENERIC_TIMEZONE=$TZ
+      - TZ=$TZ
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=$N8N_USER
+      - N8N_BASIC_AUTH_PASSWORD=$N8N_USER_PW
+      - DB_TYPE=$N8N_DB_TYPE
+      - DB_MYSQLDB_HOST=database
+      - DB_MYSQLDB_DATABASE=$N8NDB
+      - DB_MYSQLDB_USER=$N8NDB_USER
+      - DB_MYSQLDB_PASSWORD=$N8NDB_PW
+      - WEBHOOK_URL=$N8N_HOOK
+      - EXECUTIONS_PROCESS=main
+    volumes:
+      - $USERDIR/n8n/n8n:/home/node/.n8n:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${N8N_PORT:-5678}:5678
+    networks:
+      - docker
+      - n8n
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+    links:
+      - database
+    depends_on:
+      database:
+        condition: service_healthy
+
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true
+  n8n:
+    name: $N8N_NET
+    external: true
