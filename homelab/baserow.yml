@@ -141,7 +141,7 @@ services:
     environment:
       <<: *backend-variables
     ports:
-      - "${HOST_PUBLISH_IP:-127.0.0.1}:${BR_BE_PORT:-8000}:8000"
+      - ${BR_BE_PORT:-8000}:8000
     volumes:
       - $USERDIR/baserow/backend:/baserow/media:rw
     labels:
@@ -175,7 +175,7 @@ services:
     labels:
       - autoheal:true
     ports:
-      - "${HOST_PUBLISH_IP:-127.0.0.1}:${BR_FE_PORT:-3000}:3000"
+      - ${BR_FE_PORT:-3000}:3000
     networks:
       - baserow
       - docker

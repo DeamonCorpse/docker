@@ -1,4 +1,22 @@
 services:
+  cloudflared:
+    image: cloudflare/cloudflared:${CLOUDFLARED_TAG:-latest}
+    container_name: Cloudflared
+    hostname: cloudflared
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${CF_TOKEN}
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+
   duckdns:
     image: lscr.io/linuxserver/duckdns:${DUCKDNS_TAG:-latest}
     container_name: DuckDNS

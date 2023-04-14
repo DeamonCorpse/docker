@@ -1,63 +1,22 @@
 services:
-#  duckdns:
-#    image: lscr.io/linuxserver/duckdns:${DUCKDNS_TAG:-latest}
-#    container_name: DuckDNS
-#    hostname: duckdns
-#    restart: unless-stopped
-#    security_opt:
-#      - no-new-privileges:true
-#    #    deploy:
-#    #      resources:
-#    #        limits:
-#    #          memory: 24M
-#    #        reservations:
-#    #          memory: 10M
-#    environment:
-#      - PUID=$UID
-#      - PGID=$GID
-#      - UMASK=022
-#      - SUBDOMAINS=$DUCKDNS_SUBDOMAINS
-#      - TOKEN=$DUCKDNS_TOKEN
-#      - LOG_FILE=false
-#    volumes:
-#      - $USERDIR/duckdns:/config:rw
-#    labels:
-#      - autoheal:true
-#    networks:
-#      - docker
-#    logging:
-#      options:
-#        max-size: 50m
-#
-#  speedtest-tracker:
-#    image: ghcr.io/alexjustesen/speedtest-tracker:$#{SPEEDTEST_TAG:-latest}
-#    container_name: Speed-Test-Tracker
-#    hostname: speedtestracker
-#    restart: unless-stopped
-#    security_opt:
-#      - no-new-privileges:true
-#    #    deploy:
-#    #      resources:
-#    #        limits:
-#    #          memory: 24M
-#    #        reservations:
-#    #          memory: 10M
-#    environment:
-#      - PUID=$UID
-#      - PGID=$GID
-#      - TZ=$TZ
-#    volumes:
-#      - $USERDIR/speedtestracker:/config:rw
-#    labels:
-#      - autoheal:true
-#    ports:
-#      - ${SPEEDTEST_WEBUI_PORT:-9443}:443
-#    networks:
-#      - docker
-#    logging:
-#      options:
-#        max-size: 50m
-#
+  cloudflared:
+    image: erisamoe/cloudflared:${CLOUDFLARED_TAG:-latest}
+    container_name: Cloudflared
+    hostname: cloudflared
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${CF_TOKEN}
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+
   uptime-kuma:
     image: louislam/uptime-kuma:${KUMA_TAG:-latest}
     container_name: UptimeKuma
