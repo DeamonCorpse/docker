@@ -1,0 +1,51 @@
+services:
+  plex:
+    image: plexinc/pms-docker:${PLEX_TAG:-latest}
+    container_name: Plex-Multimedia
+    hostname: plexmultimedia
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 4G
+#        reservations:
+#          memory: 1G
+    environment:
+      - TZ=$TZ
+      - PLEX_UID=$UID
+      - PLEX_GID=$GID
+      - PLEX_CLAIM=${PLEX_CLAIM}
+      - ADVERTISE_IP=${HOST_IP}:${PLEX_UI_PORT}
+      - CHANGE_CONFIG_DIR_OWNERSHIP=true
+      - ALLOWED_NETWORKS=${ALLOWED_NETWORKS}
+    volumes:
+      - $USERDIR/plex/multimedia:/config:rw
+      - $USERDIR/plex/multimedia/temp:/transcode:rw
+      - $PATH TO MEDIA:movies:rw
+      - /home/backups/plex:/backups:rw
+    ports:
+      - ${PLEX_UI_PORT:-32400}:32400/tcp
+      - ${PLEX_PORT2:-3005}:3005/tcp
+      - ${PLEX_PORT3:-8324}:8324/tcp
+      - ${PLEX_PORT4:-32469}:32469/tcp
+      - ${PLEX_PORT5:-1900}:1900/udp
+      - ${PLEX_PORT6:-32410}:32410/udp
+      - ${PLEX_PORT7:-32412}:32412/udp
+      - ${PLEX_PORT8:-32413}:32413/udp
+      - ${PLEX_PORT9:-32414}:32414/udp
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true

@@ -25,9 +25,63 @@ services:
     ports:
       - ${GLANCES_PORTS:-61208-61209}:61208-61209
 
+#--- WEBSITE MONITORING - MATOMO
+  db:
+    image: mariadb:${MARIADB_TAG:-10.11}
+    container_name: Matomo-DB
+    hostname: matomodb
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command: --max-allowed-packet=64MB
+    volumes:
+      - $USERDIR/matomo/db:/var/lib/mysql:rw
+    environment:
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PW}
+      #- MARIADB_DATABASE=${MARIADB_DB}
+      #- MARIADB_USER=${MARIADB_USER}
+      #- MARIADB_PASSWORD=${MARIADB_PW}
+    networks:
+      - matomo
+    logging:
+      options:
+        max-size: 50m
+
+  matomo:
+    image: matomo:${MATOMO_TAG:-latest}
+    container_name: Matomo
+    hostname: matomo
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $USERDIR/matomo/matomo:/var/www/html:rw
+      - $USERDIR/matomo/matomo/config:/var/www/html/config:rw
+      - $USERDIR/matomo/matomo/logs:/var/www/html/logs:rw
+    environment:
+      - MATOMO_DATABASE_HOST=${MATOMO_DB_HOST}
+      - MATOMO_DATABASE_ADAPTER=${MATOMO_DB_ADAPTER}
+      - MATOMO_DATABASE_DBNAME=${MARIADB_DB}
+      - MATOMO_DATABASE_TABLES_PREFIX=${MATOMODB_PREFIX}
+      - MATOMO_DATABASE_USERNAME=${MARIADB_USER}
+      - MATOMO_DATABASE_PASSWORD=${MARIADB_PW}
+    ports:
+      - ${MATOMO_PORT:-8080}:80
+    networks:
+      - matomo
+      - docker
+    logging:
+      options:
+        max-size: 50m
+    depends_on:
+      - db
+
 
 #----------------- NETWORKING
 networks:
   docker:
     name: $DOCKER_NET
     external: true
+  matomo:
+    name: $MATOMO_NET
+    external: false

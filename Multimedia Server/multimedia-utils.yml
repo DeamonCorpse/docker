@@ -1,0 +1,163 @@
+services:
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:${OVERSEERR_TAG:-latest}
+    container_name: Overseer
+    hostname: overseer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 4G
+#        reservations:
+#          memory: 1G
+    environment:
+      - TZ=$TZ
+      - PUID=$UID
+      - PGID=$GID
+      - DOCKER_MODS=${TP_MODS}:overseerr
+      - TP_SCHEME=${TP_SCHEME}
+      - TP_DOMAIN=${TP_DOMAIN}
+      - TP_THEME=${TP_THEME}
+    volumes:
+      - $USERDIR/overseerr:/config:rw
+      - /home/backups/overseerr:/backups:rw
+    ports:
+      - ${OVERSEERR_PORT:-5055}:5055
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+      - arrs
+    logging:
+      options:
+        max-size: 50m
+
+  tautulli:
+    image: lscr.io/linuxserver/tautulli:${TAUTULLI_TAG:-latest}
+    container_name: Tautulli
+    hostname: tautulli
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 4G
+#        reservations:
+#          memory: 1G
+    environment:
+      - TZ=$TZ
+      - PID=$UID
+      - PGID=$GID
+    volumes:
+      - $USERDIR/tautulli:/config:rw
+      - /home/backups/tautulli:/backups:rw
+    ports:
+      - ${TAUTULLI_PORT:-8181}:8181
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+      - arrs
+    logging:
+      options:
+        max-size: 50m
+
+
+#--- TUBE ARCHIVIST
+  tubearchivist:
+    image: bbilly1/tubearchivist:${TA_TAG:-latest}
+    container_name: Tube-Archivist
+    hostname: tubearchivist
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 4G
+#        reservations:
+#          memory: 1G
+    environment:
+      - TZ=$TZ
+      - HOST_UID=$UID
+      - HOST_GID=$GID
+      - ES_URL=http://archivist-es:9200
+      - TA_HOST=tubearchivist.local
+      - TA_USERNAME=${TA_UN}
+      - TA_PASSWORD=${TA_PW}
+      - REDIS_HOST=archivist-redis
+      - ELASTIC_PASSWORD=${ES_PW}
+    ports:
+      - ${TA_PORT:-8000}:8000
+    volumes:
+      - $USERDIR/media:/youtube:rw
+      - $USERDIR/archivist/cache:/cache:rw
+      - /home/backups/tubearchivist:/backups:rw
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+      - archivist
+    logging:
+      options:
+        max-size: 50m
+    depends_on:
+      - archivist-es
+      - archivist-redis
+
+  archivist-redis:
+    image: redis/redis-stack-server:${REDIS_TAG:-latest}
+    container_name: TA-Redis
+    hostname: taredis
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $USERDIR/redis:/data:rw
+    expose:
+      - 6379
+    labels:
+      - autoheal:true
+    networks:
+      - archivist
+    depends_on:
+      - archivist-es
+
+  archivist-es:
+    image: bbilly1/tubearchivist-es:${ES_TAG:-latest}
+    container_name: TA-ESearch
+    hostname: taesearch
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    environment:
+      - ELASTIC_PASSWORD=${ES_PW}
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=true
+      - discovery.type=single-node
+      - path.repo=/usr/share/elasticsearch/data/snapshot
+    volumes:
+      - $USERDIR/es:/usr/share/elasticsearch/data:rw
+    expose:
+      - 9200
+    labels:
+      - autoheal:true
+    networks:
+      - archivist
+
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true
+  archivist:
+    name: $ARCHIVIST_NET
+    external: false
