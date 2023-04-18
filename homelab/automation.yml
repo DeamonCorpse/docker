@@ -89,6 +89,67 @@ services:
       database:
         condition: service_healthy
 
+#----- STRAPI
+  strapi:
+    image: strapi/strapi:${STRAPI_TAG:-latest}
+    container_name: Strapi
+    hostname: strapi
+    restart: unless-stopped
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - DATABASE_CLIENT=${DB_CLIENT}
+      - DATABASE_HOST=${DB_HOST}
+      - DATABASE_PORT=${SDB_PORT}
+      - DATABASE_NAME=${DB_NAME}
+      - DATABASE_USERNAME=${DB_UN}
+      - DATABASE_PASSWORD=${DB_PW}
+      - NODE_ENV=${NODE_ENV}
+      - STRAPI_DISABLE_UPDATE_NOTIFICATION=true
+      - STRAPI_TELEMETRY_DISABLED=true
+      - BROWSER=true
+    volumes:
+      - $USERDIR/strapi/strapi/config:/opt/app/config:rw
+      - $USERDIR/strapi/strapi/src:/opt/app/src:rw
+      - $USERDIR/strapi/strapi/uploads:/opt/app/public/uploads:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${STRAPI_PORT:-1337}:1337
+    networks:
+      - strapi
+      - docker
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+    depends_on:
+      - strapiDB
+
+  strapiDB:
+    image: postgres:${SDB_TAG:-12-alpine}
+    container_name: Strapi-DB
+    hostname: strapidb
+    restart: unless-stopped
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - POSTGRES_USER=${DB_UN}
+      - POSTGRES_PASSWORD=${DB_PW}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - $USERDIR/strapi/db:/var/lib/postgresql/data:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${SDB_PORT:-5432}:5432
+    networks:
+      - strapi
 
 #----------------- NETWORKING
 networks:
@@ -98,3 +159,6 @@ networks:
   n8n:
     name: $N8N_NET
     external: true
+  strapi:
+    name: $STRAPI_NET
+    external: false
