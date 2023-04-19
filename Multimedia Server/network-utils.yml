@@ -17,40 +17,6 @@ services:
       options:
         max-size: 50m
 
-  uptime-kuma:
-    image: louislam/uptime-kuma:${KUMA_TAG:-latest}
-    container_name: UptimeKuma
-    hostname: uptimekuma
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    #    deploy:
-    #      resources:
-    #        limits:
-    #          memory: 24M
-    #        reservations:
-    #          memory: 10M
-    environment:
-      - PUID=$UID
-      - PGID=$GID
-      - NODE_ENV=production
-      - DOCKER_MODS=$KUMA_MODS
-      - TP_DOMAIN=$TP_DOMAIN
-      - TP_SCHEME=$TP_SCHEME
-      - TP_THEME=$TP_THEME
-    volumes:
-      - $USERDIR/uptime-kuma:/app/data:rw
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    labels:
-      - autoheal:true
-    ports:
-      - ${KUMA_WEBUI_PORT:-3001}:3001
-    networks:
-      - docker
-    logging:
-      options:
-        max-size: 50m
-
 #----------------- NETWORKING
 networks:
   docker:

@@ -22,14 +22,14 @@ services:
       - TP_THEME=${TP_THEME}
     volumes:
       - $USERDIR/overseerr:/config:rw
-      - /home/backups/overseerr:/backups:rw
+      - /home/casaos/backups/overseerr:/backups:rw
     ports:
       - ${OVERSEERR_PORT:-5055}:5055
     labels:
       - autoheal:true
     networks:
       - docker
-      - arrs
+      #- arrs
     logging:
       options:
         max-size: 50m
@@ -53,14 +53,14 @@ services:
       - PGID=$GID
     volumes:
       - $USERDIR/tautulli:/config:rw
-      - /home/backups/tautulli:/backups:rw
+      - /home/casaos/backups/tautulli:/backups:rw
     ports:
       - ${TAUTULLI_PORT:-8181}:8181
     labels:
       - autoheal:true
     networks:
       - docker
-      - arrs
+      #- arrs
     logging:
       options:
         max-size: 50m
@@ -84,8 +84,8 @@ services:
       - TZ=$TZ
       - HOST_UID=$UID
       - HOST_GID=$GID
-      - ES_URL=http://archivist-es:9200
-      - TA_HOST=tubearchivist.local
+      - ES_URL=http://${TA_HOST}:${ES_PORT}
+      - TA_HOST=${TA_HOST}
       - TA_USERNAME=${TA_UN}
       - TA_PASSWORD=${TA_PW}
       - REDIS_HOST=archivist-redis
@@ -93,9 +93,9 @@ services:
     ports:
       - ${TA_PORT:-8000}:8000
     volumes:
-      - $USERDIR/media:/youtube:rw
+      - /home/casaos/storage/youtube:/youtube:rw
       - $USERDIR/archivist/cache:/cache:rw
-      - /home/backups/tubearchivist:/backups:rw
+      - /home/casaos/backups/tubearchivist:/backups:rw
     labels:
       - autoheal:true
     networks:
@@ -116,7 +116,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $USERDIR/redis:/data:rw
+      - $USERDIR/archivist/redis:/data:rw
     expose:
       - 6379
     labels:
@@ -127,7 +127,7 @@ services:
       - archivist-es
 
   archivist-es:
-    image: bbilly1/tubearchivist-es:${ES_TAG:-latest}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_TAG:-latest}
     container_name: TA-ESearch
     hostname: taesearch
     restart: unless-stopped
@@ -144,9 +144,9 @@ services:
       - discovery.type=single-node
       - path.repo=/usr/share/elasticsearch/data/snapshot
     volumes:
-      - $USERDIR/es:/usr/share/elasticsearch/data:rw
-    expose:
-      - 9200
+      - $USERDIR/archivist/es:/usr/share/elasticsearch/data:rw
+    ports:
+      - ${ES_PORT:-9200}:9200
     labels:
       - autoheal:true
     networks:

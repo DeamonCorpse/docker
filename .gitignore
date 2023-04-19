@@ -47,6 +47,7 @@ Thumbs.db                   # MS Windows thumbnails
 .com.apple.timemachine.donotpresent
 
 #=== Specific Files
+.creds
 fstab/fstab
 etc/.docker-creds
 *.env

@@ -24,7 +24,7 @@ services:
     volumes:
       - $USERDIR/jackett:/config:rw
       - $USERDIR/jackett/downloads:/downloads:rw
-      - /home/backups/jackett:/backups:rw
+      - $BACKDIR/jackett:/backups:rw
     ports:
       - ${JACKETT_PORT:-9117}:9117
     labels:
@@ -59,7 +59,7 @@ services:
       - TP_THEME=${TP_THEME}
     volumes:
       - $USERDIR/prowlarr:/config:rw
-      - /home/backups/prowlarr:/backups:rw
+      - $BACKDIR/prowlarr:/backups:rw
     ports:
       - ${PROWLARR_PORT:-9696}:9696
     labels:
@@ -96,9 +96,9 @@ services:
       - ${RADARR_PORT:-7878}:7878
     volumes:
       - $USERDIR/radarr:/config:rw
-      - path to movies:/movies:rw
       - $USERDIR/radarr/recycle:/recycle:rw
-      - /home/backups/radarr:/backups:rw
+      - $STORDIR/video/:/movies:rw
+      - $BACKDIR/radarr:/backups:rw
     labels:
       - autoheal:true
     networks:
@@ -132,9 +132,9 @@ services:
       - ${SONARR_PORT:-8989}:8989
     volumes:
       - $USERDIR/sonarr:/config:rw
-      - path to tv-shows:/tv_shows:rw
       - $USERDIR/sonarr/recycle:/recycle:rw
-      - /home/backups/sonarr:/backups:rw
+      - $STORDIR/tv-series:/tv_shows:rw
+      - $BACKDIR/sonarr:/backups:rw
     labels:
       - autoheal:true
     networks:
@@ -167,10 +167,10 @@ services:
       - ${WHISPARR_PORT:-6969}:6969
     volumes:
       - $USERDIR/whisparr:/config:rw
-      - $USERDIR/whisparr/98-themepark-whisparr:/etc/cont-init.d/98-themepark:ro
-      - path to nsfk:/nsfk:rw
       - $USERDIR/whisparr/recycle:/recycle:rw
-      - /home/backups/whisparr:/backups:rw
+      - $USERDIR/whisparr/98-themepark-whisparr:/etc/cont-init.d/98-themepark:ro
+      - $STORDIR/nsfk:/nsfk:rw
+      - $BACKDIR/whisparr:/backups:rw
     labels:
       - autoheal:true
     networks:
