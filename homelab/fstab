@@ -1,0 +1,28 @@
+# /etc/fstab: static file system information.
+#
+# Use 'blkid' to print the universally unique identifier for a
+# device; this may be used with UUID= as a more robust way to name devices
+# that works even if disks are added and removed. See fstab(5).
+#
+# systemd generates mount units based on this file, see systemd.mount(5).
+# Please run 'systemctl daemon-reload' after making changes here.
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+# / was on /dev/ubuntu-vg/ubuntu-lv during curtin installation
+/dev/disk/by-id/dm-uuid-LVM-Z6idkoBL2CMs3fkWWWS0gNH5JjSccvoB9UnQsPSSEaNrba1bwHyoxf4jIkFGh5VU / ext4 defaults 0 1
+
+# /boot was on /dev/nvme0n1p2 during curtin installation
+/dev/disk/by-uuid/5317831e-4362-4b83-8912-f3da419066d7 /boot ext4 defaults 0 1
+
+# /boot/efi was on /dev/nvme0n1p1 during curtin installation
+/dev/disk/by-uuid/F9C9-ED8C /boot/efi vfat defaults 0 1
+/swap.img       none    swap    sw      0       0
+
+#----- MOUNT NAS MEDIA FOLDERS
+//192.168.68.5/Video     /home/deamon/media/Videos     cifs     credentials=/home/deamon/.creds,file_mode=0777,dir_mode=0777     0     0
+//192.168.68.5/Photos     /home/deamon/media/Photos     cifs     credentials=/home/deamon/.creds,file_mode=0777,dir_mode=0777     0     0
+//192.168.68.5/NSFW     /home/deamon/media/NSFK     cifs     credentials=/home/deamon/.creds,file_mode=0777,dir_mode=0777     0     0
+
+
+#----- MOUNT NAS BACKUP FOLDER
+//192.168.68.5/Backups  /home/deamon/backups    cifs    credentials=/home/deamon/.creds,dir_mode=0777,file_mode=0777        0       0

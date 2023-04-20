@@ -152,7 +152,7 @@ services:
         max-size: 50m
 
   whisparr:
-    image: ghcr.io/hotio/whisparr:${WHISPARR_TAG:-latest}
+    image: cr.hotio.dev/hotio/whisparr:${WHISPARR_TAG:-latest}
     container_name: Whisparr
     hostname: whisparr
     restart: unless-stopped
@@ -171,14 +171,14 @@ services:
       - PID=$UID
       - PGID=$GID
       - UMASK=002
-      - TP_HOTIO=true
-      - TP_THEME=${TP_THEME}
+#      - TP_HOTIO=true
+#      - TP_THEME=${TP_THEME}
     ports:
       - ${WHISPARR_PORT:-6969}:6969
     volumes:
       - $USERDIR/whisparr:/config:rw
       - $USERDIR/whisparr/recycle:/recycle:rw
-      - $USERDIR/whisparr/98-themepark-whisparr:/etc/cont-init.d/98-themepark:ro
+#      - $USERDIR/whisparr/98-themepark-whisparr:/etc/cont-init.d/98-themepark:rw
       - $STORDIR/nsfk:/nsfk:rw
       - $BACKDIR/whisparr:/backups:rw
     labels:
