@@ -11,8 +11,10 @@ services:
     deploy:
       resources:
         limits:
+          cpus: '0.4'
           memory: 12M
         reservations:
+          cpus: '0.2'
           memory: 6M
     environment:
       - AUTOHEAL_CONTAINER_LABEL=autoheal
@@ -45,6 +47,14 @@ services:
     privileged: false
     security_opt:
       - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 50M
+        reservations:
+          cpus: '0.05'
+          memory: 35M
     environment:
       - PUID=$UID
       - PGID=$GID
@@ -77,9 +87,11 @@ services:
     deploy:
       resources:
         limits:
-          memory: 96M
+          cpus: '0.05'
+          memory: 20M
         reservations:
-          memory: 48M
+          cpus: '0.02'
+          memory: 10M
     environment:
       - TZ=$TZ
       - WATCHTOWER_HTTP_API_METRICS=true
@@ -115,9 +127,11 @@ services:
     deploy:
       resources:
         limits:
-          memory: 4G
-        reservations:
+          cpus: '1.0'
           memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 500M
     environment:
       - PUID=$UID
       - PGID=$GID
