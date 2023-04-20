@@ -11,18 +11,21 @@ services:
     deploy:
       resources:
         limits:
-          memory: 64M
+          cpus: '1.0'
+          memory: 512M
         reservations:
-          memory: 24M
+          cpus: '0.25'
+          memory: 256M
     volumes:
-          - $USERDIR/cloudbeaver:/opt/cloudbeaver/workspace:rw
-          - /etc/localtime:/etc/localtime:ro
+      - $USERDIR/cloudbeaver:/opt/cloudbeaver/workspace:rw
+      - /etc/localtime:/etc/localtime:ro
     labels:
       - autoheal:true
     ports:
       - ${CLOUDBEAVER_PORT:-8978}:8978/tcp
     networks:
       - docker
+      - databases
     logging:
       options:
         #syslog-address: "tcp://192.168.68.62:514"
@@ -57,4 +60,7 @@ services:
 networks:
   docker:
     name: $DOCKER_NET
+    external: true
+  databases:
+    name: $DB_NET
     external: true

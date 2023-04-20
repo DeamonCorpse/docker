@@ -7,6 +7,14 @@ services:
     security_opt:
       - no-new-privileges:true
     command: tunnel --no-autoupdate run
+    deploy:
+      resources:
+        limits:
+          cpus: '0.05'
+          memory: 30M
+        reservations:
+          cpus: '0.025'
+          memory: 20M
     environment:
       - TUNNEL_TOKEN=${CF_TOKEN}
     labels:

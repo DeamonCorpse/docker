@@ -1,21 +1,27 @@
-#----------------- GITIGNORE FILE V 1.2 -----------------#
+#----------------- GITIGNORE FILE V 1.4 -----------------#
 # Revision History
 # V 1.O    - Initial
 # V 1.1    - Added fstab
 # V 1.2    - Added *.env,TEMPLATE.*
-#
+# V 1.3    - Added a few more tmp file extensions
+# V 1.4    - Added .creds. Cleanup
 #--------------------------------------------------------#
 
 #---------- FILE TYPES
-*~                          # tmp file
+*~                          # Tmp file
 *.7z                        # 7zip file
 * alias                     # macOS alias
 *.bak                       # Backup file
 *.cab                       # MS Windows installer file
+*.class                     #
+*.com                       #
 [Dd]esktop.ini              # MS Windows config file
 ehthumbsdb                  #
+*.dll                       # Dynamic library file
 *.dmg                       # macOS installer file
+*.exe                       # Windows executable file
 *.fseventsd                 #
+fstab                       # FSTAB linux file
 *.gz                        # gzip file
 *.icns                      # Icons
 Icon?                       # icon
@@ -27,9 +33,14 @@ Icon?                       # icon
 *.msix                      # MS Windows installer file
 *.msm                       # MS Windows installer file
 *.msp                       # MS Windows installer file
+*.o                         # Compiled source file
 *.rar                       # rar file
+*.so                        # Compiled source file
 *.stackdump                 # Dump file
+*.swo                       # Tmp file
+*.swp                       # Tmp File
 *.tar                       # tar file
+TEMPLATES.*                 # Template files
 Thumbs.AppleDB              # macOS Thumbnails
 Thumbs.db                   # MS Windows thumbnails
 *.tmp                       # Temp file
@@ -37,7 +48,7 @@ Thumbs.db                   # MS Windows thumbnails
 *.vscode                    # vscode file
 *.zip                       # zip file
 
-#=----- File(s) that might appear at the root of a volume
+#----- File(s) that might appear at the root of a volume
 .DocumentRevisions-V100
 .fseventsd
 .Spotlight-V100
@@ -46,15 +57,14 @@ Thumbs.db                   # MS Windows thumbnails
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
 
-#=== Specific Files
+#----- File(s) containing secrets
 .creds
-fstab/fstab
-etc/.docker-creds
+.docker-creds
 *.env
 *.secret
-TEMPLATES.*
-unRaid
 
+#----- Specific Files
+unRaid
 
 #---------- DIRECTORY TYPES
 .AppleDouble                 # macOS

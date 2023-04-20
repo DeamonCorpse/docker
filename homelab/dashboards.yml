@@ -13,8 +13,10 @@ services:
     deploy:
       resources:
         limits:
-          memory: 32M
+          cpus: '0.05'
+          memory: 12M
         reservations:
+          cpus: '0.01'
           memory: 8M
     environment:
       - UID=$UID
@@ -48,9 +50,11 @@ services:
     deploy:
       resources:
         limits:
-          memory: 128M
+          cpus: '0.5'
+          memory: 300M
         reservations:
-          memory: 64M
+          cpus: '0.25'
+          memory: 80M
     volumes:
       - $USERDIR/dashboards/homelab:/app/config:rw
       - $ICONS:/app/public/icons:ro

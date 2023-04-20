@@ -9,12 +9,14 @@ services:
     privileged: false
     security_opt:
       - no-new-privileges:true
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 64M
-#        reservations:
-#          memory: 24M
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 400M
+        reservations:
+          cpus: '0.1'
+          memory: 80M
     environment:
       - MARIADB_ROOT_PASSWORD=$N8NDB_ROOT_PW
       - MARIADB_DATABASE=$N8NDB
@@ -29,6 +31,7 @@ services:
       - ${N8NDB_PORT:-5678}:3306
     networks:
       - n8n
+      - databases
     logging:
       options:
         #syslog-address: "tcp://192.168.68.62:514"
@@ -49,12 +52,14 @@ services:
     privileged: false
     security_opt:
       - no-new-privileges:true
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 64M
-#        reservations:
-#          memory: 24M
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 500M
+        reservations:
+          cpus: '0.05'
+          memory: 80M
     command: n8n start --tunnel
     environment:
       - GENERIC_TIMEZONE=$TZ
@@ -99,6 +104,14 @@ services:
     privileged: false
     security_opt:
       - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 300M
+        reservations:
+          cpus: '0.05'
+          memory: 80M
     environment:
       - DATABASE_CLIENT=${DB_CLIENT}
       - DATABASE_HOST=${DB_HOST}
@@ -138,6 +151,14 @@ services:
     privileged: false
     security_opt:
       - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 100M
+        reservations:
+          cpus: '0.01'
+          memory: 20M
     environment:
       - POSTGRES_USER=${DB_UN}
       - POSTGRES_PASSWORD=${DB_PW}
@@ -150,6 +171,7 @@ services:
       - ${SDB_PORT:-5432}:5432
     networks:
       - strapi
+      - databases
 
 #----------------- NETWORKING
 networks:
@@ -162,3 +184,6 @@ networks:
   strapi:
     name: $STRAPI_NET
     external: false
+  databases:
+    name: $DB_NET
+    external: true

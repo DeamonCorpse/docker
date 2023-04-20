@@ -1,0 +1,38 @@
+services:
+  mm-dashboard:
+    image: ghcr.io/benphelps/homepage:${HOMEPAGE_TAG:-latest}
+    container_name: MM-Dashboard
+    hostname: mmdashboard
+    restart: unless-stopped
+    read_only: true
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 300M
+        reservations:
+          cpus: '0.25'
+          memory: 80M
+    volumes:
+      - $USERDIR/dashboards/multimedia:/app/config:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - autoheal:true
+    ports:
+      - ${HOMEPAGE_PORT:-3000}:3000
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+        max-file: 10
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true

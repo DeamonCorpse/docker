@@ -6,6 +6,6 @@ sudo docker run -d \
   --network="multimedia" \
   -p 9443:9443 \
   -v /var/run/docker.sock:/var/run/docker.sock:ro \
-  -v /DATA/AppData/portainer:/data:rw \
+  -v /home/multimedia/media/docker/portainer:/data:rw \
   -l autoheal=true \
   portainer/portainer-ce:latest

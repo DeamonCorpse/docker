@@ -6,12 +6,14 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 4G
-#        reservations:
-#          memory: 1G
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 200M
+        reservations:
+          cpus: '0.05'
+          memory: 100M
     environment:
       - TZ=$TZ
       - PID=$UID
@@ -43,12 +45,14 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 4G
-#        reservations:
-#          memory: 1G
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 200M
+        reservations:
+          cpus: '0.5'
+          memory: 100M
     environment:
       - TZ=$TZ
       - PID=$UID
@@ -78,12 +82,14 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 4G
-#        reservations:
-#          memory: 1G
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 400M
+        reservations:
+          cpus: '0.1'
+          memory: 240M
     environment:
       - TZ=$TZ
       - PID=$UID
@@ -114,12 +120,14 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 4G
-#        reservations:
-#          memory: 1G
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 400M
+        reservations:
+          cpus: '0.1'
+          memory: 240M
     environment:
       - TZ=$TZ
       - PID=$UID
@@ -133,7 +141,7 @@ services:
     volumes:
       - $USERDIR/sonarr:/config:rw
       - $USERDIR/sonarr/recycle:/recycle:rw
-      - $STORDIR/tv-series:/tv_shows:rw
+      - $STORDIR/video/tv-series:/tv_shows:rw
       - $BACKDIR/sonarr:/backups:rw
     labels:
       - autoheal:true
@@ -150,12 +158,14 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 4G
-#        reservations:
-#          memory: 1G
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 150M
+        reservations:
+          cpus: '0.1'
+          memory: 100M
     environment:
       - TZ=$TZ
       - PID=$UID

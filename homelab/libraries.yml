@@ -6,12 +6,14 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    #    deploy:
-    #      resources:
-    #        limits:
-    #          memory: 12M
-    #        reservations:
-    #          memory: 6M
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '0.4'
+#          memory: 12M
+#        reservations:
+#          cpus: '0.2'
+#          memory: 6M
     environment:
       - TZ=$TZ
       - PLEX_CLAIM=$PLEX_CLAIM
@@ -54,9 +56,11 @@ services:
     deploy:
       resources:
         limits:
-          memory: 2G
+          cpus: '0.5'
+          memory: 400M
         reservations:
-          memory: 512M
+          cpus: '0.1'
+          memory: 80M
     environment:
       - TZ=$TZ
       - PUID=$UID
@@ -89,9 +93,11 @@ services:
     deploy:
       resources:
         limits:
-          memory: 6G
+          cpus: '4.0'
+          memory: 1G
         reservations:
-          memory: 3G
+          cpus: '0.05'
+          memory: 80M
     shm_size: 2gb
     environment:
       - TZ=$TZ

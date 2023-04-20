@@ -7,12 +7,14 @@ services:
     pid: host
     security_opt:
       - no-new-privileges:true
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 12M
-#        reservations:
-#          memory: 6M
+    deploy:
+      resources:
+        limits:
+          cpus: '0.15'
+          memory: 50M
+        reservations:
+          cpus: '0.05'
+          memory: 30M
     environment:
       - "GLANCES_OPT=-w"
     volumes:
@@ -35,12 +37,14 @@ services:
     cap_add:
       - SYS_ADMIN
       - SYS_RAWIO
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 12M
-#        reservations:
-#          memory: 6M
+    deploy:
+      resources:
+        limits:
+          cpus: '0.15'
+          memory: 100M
+        reservations:
+          cpus: '0.05'
+          memory: 80M
     environment:
       - TZ=$TZ
     volumes:
@@ -67,12 +71,14 @@ services:
     privileged: true
     security_opt:
       - no-new-privileges:true
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 12M
-#        reservations:
-#          memory: 6M
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 50M
+        reservations:
+          cpus: '0.02'
+          memory: 20M
     environment:
       - TZ=$TZ
       - HOST_CONTAINERNAME=cAdvisor

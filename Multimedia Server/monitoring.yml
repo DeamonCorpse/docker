@@ -8,12 +8,14 @@ services:
     pid: host
     security_opt:
       - no-new-privileges:true
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 12M
-#        reservations:
-#          memory: 6M
+    deploy:
+      resources:
+        limits:
+          cpus: '0.15'
+          memory: 50M
+        reservations:
+          cpus: '0.05'
+          memory: 30M
     environment:
       - "GLANCES_OPT=-w"
     volumes:
