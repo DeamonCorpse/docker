@@ -11,13 +11,13 @@ services:
     deploy:
       resources:
         limits:
-          memory: 128M
+          cpus: '0.5'
+          memory: 300M
         reservations:
-          memory: 64M
+          cpus: '0.25'
+          memory: 80M
     volumes:
       - $USERDIR/dashboards/dpm:/app/config:rw
-      - $ICONS:/app/public/icons:ro
-      - $ICONS_WORK:/app/public/work-icons:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/localtime:/etc/locatime:ro
     labels:

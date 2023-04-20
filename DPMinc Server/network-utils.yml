@@ -7,6 +7,14 @@ services:
     security_opt:
       - no-new-privileges:true
     command: tunnel --no-autoupdate run
+    deploy:
+      resources:
+        limits:
+          cpus: '0.05'
+          memory: 30M
+        reservations:
+          cpus: '0.025'
+          memory: 20M
     environment:
       - TUNNEL_TOKEN=${CF_TOKEN}
     labels:
@@ -24,12 +32,14 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    #    deploy:
-    #      resources:
-    #        limits:
-    #          memory: 24M
-    #        reservations:
-    #          memory: 10M
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 180M
+        reservations:
+          cpus: '0.1'
+          memory: 80M
     environment:
       - PUID=$UID
       - PGID=$GID

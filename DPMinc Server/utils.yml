@@ -8,12 +8,14 @@ services:
     privileged: false
     security_opt:
       - no-new-privileges:true
-    #deploy:
-    #  resources:
-    #    limits:
-    #      memory: 64M
-    #    reservations:
-    #      memory: 24M
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 24M
+        reservations:
+          cpus: '0.05'
+          memory: 6M
     environment:
       - PLUGIN_INSTALLER=true
     volumes:
