@@ -4,6 +4,8 @@ services:
     container_name: Jackett
     hostname: jackett
     restart: unless-stopped
+    read_only: false
+    privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
@@ -43,6 +45,8 @@ services:
     container_name: Prowlarr
     hostname: prowlarr
     restart: unless-stopped
+    read_only: false
+    privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
@@ -80,6 +84,8 @@ services:
     container_name: Radarr
     hostname: radarr
     restart: unless-stopped
+    read_only: false
+    privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
@@ -118,6 +124,8 @@ services:
     container_name: Sonarr
     hostname: sonarr
     restart: unless-stopped
+    read_only: false
+    privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
@@ -156,6 +164,8 @@ services:
     container_name: Whisparr
     hostname: whisparr
     restart: unless-stopped
+    read_only: false
+    privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
