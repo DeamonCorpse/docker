@@ -6,7 +6,6 @@ services:
     restart: unless-stopped
     #init: true
     read_only: true
-    #pids_limit: 2
     privileged: false
     security_opt:
       - no-new-privileges:true
@@ -23,7 +22,6 @@ services:
       - GID=$GID
     volumes:
       - $USERDIR/dashboards/family:/www/assets:rw
-      - $ICONS:/www/assets/icons:ro
     labels:
       - autoheal:true
     ports:
@@ -43,7 +41,6 @@ services:
     restart: unless-stopped
     #init: true
     read_only: true
-    #pids_limit: 2
     privileged: false
     security_opt:
       - no-new-privileges:true
@@ -57,7 +54,6 @@ services:
           memory: 80M
     volumes:
       - $USERDIR/dashboards/homelab:/app/config:rw
-      - $ICONS:/app/public/icons:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/localtime:/etc/localtime:ro
     labels:
