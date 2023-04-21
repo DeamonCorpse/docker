@@ -4,6 +4,7 @@ services:
     container_name: EBS-Dashboard
     hostname: ebsdashboard
     restart: unless-stopped
+    read_only: true
     privileged: false
     security_opt:
       - no-new-privileges:true
