@@ -4,6 +4,8 @@ services:
     container_name: Cloudflared
     hostname: cloudflared
     restart: unless-stopped
+    read_only: true
+    privileged: false
     security_opt:
       - no-new-privileges:true
     command: tunnel --no-autoupdate run
@@ -25,35 +27,13 @@ services:
       options:
         max-size: 50m
 
-#  duckdns:
-#    image: lscr.io/linuxserver/duckdns:${DUCKDNS_TAG:-latest}
-#    container_name: DuckDNS
-#    hostname: duckdns
-#    restart: unless-stopped
-#    security_opt:
-#      - no-new-privileges:true
-#    environment:
-#      - PUID=$UID
-#      - PGID=$GID
-#      - UMASK=022
-#      - SUBDOMAINS=$DUCKDNS_SUBDOMAINS
-#      - TOKEN=$DUCKDNS_TOKEN
-#      - LOG_FILE=false
-#    volumes:
-#      - $USERDIR/duckdns:/config:rw
-#    labels:
-#      - autoheal:true
-#    networks:
-#      - docker
-#    logging:
-#      options:
-#        max-size: 50m
-
   speedtest-tracker:
     image: ghcr.io/alexjustesen/speedtest-tracker:${SPEEDTEST_TAG:-latest}
     container_name: Speed-Test-Tracker
     hostname: speedtestracker
     restart: unless-stopped
+    read_only: false
+    privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
@@ -85,6 +65,8 @@ services:
     container_name: UptimeKuma
     hostname: uptimekuma
     restart: unless-stopped
+    read_only: true
+    privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
@@ -115,6 +97,32 @@ services:
     logging:
       options:
         max-size: 50m
+
+#----- NOT IN USE
+#  duckdns:
+#    image: lscr.io/linuxserver/duckdns:${DUCKDNS_TAG:-latest}
+#    container_name: DuckDNS
+#    hostname: duckdns
+#    restart: unless-stopped
+#    security_opt:
+#      - no-new-privileges:true
+#    environment:
+#      - PUID=$UID
+#      - PGID=$GID
+#      - UMASK=022
+#      - SUBDOMAINS=$DUCKDNS_SUBDOMAINS
+#      - TOKEN=$DUCKDNS_TOKEN
+#      - LOG_FILE=false
+#    volumes:
+#      - $USERDIR/duckdns:/config:rw
+#    labels:
+#      - autoheal:true
+#    networks:
+#      - docker
+#    logging:
+#      options:
+#        max-size: 50m
+
 
 #----------------- NETWORKING
 networks:

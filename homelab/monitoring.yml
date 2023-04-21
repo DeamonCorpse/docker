@@ -4,6 +4,8 @@ services:
     container_name: Glances
     hostname: glances
     restart: unless-stopped
+    read_only: false
+    privileged: false
     pid: host
     security_opt:
       - no-new-privileges:true
@@ -31,6 +33,7 @@ services:
     container_name: Scrutiny
     hostname: scrutiny
     restart: unless-stopped
+    read_only: false
     privileged: true
     security_opt:
       - no-new-privileges:true
@@ -68,6 +71,7 @@ services:
     container_name: cAdvisor
     hostname: cadvisor
     restart: unless-stopped
+    read_only: true
     privileged: true
     security_opt:
       - no-new-privileges:true

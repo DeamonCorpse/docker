@@ -1,10 +1,4 @@
 services:
-#---------- DOCKER BENCH SECURITY
-# Docker Bench Security (DBS) (https://github.com/docker/docker-bench-security)
-# script is run from the CLI.
-# The DBS folder is located at ~/docker/dbs
-# Prior to running the script, ensure to do a 'git pull'
-# To run the script: 'sudo sh docker-bench-security.sh'
   npm:
     image: jlesage/nginx-proxy-manager:${NPM_TAG:-latest}
     container_name: Nginx-PM
@@ -38,6 +32,12 @@ services:
       options:
         max-size: 50m
 
+#---------- DOCKER BENCH SECURITY
+# Docker Bench Security (DBS) (https://github.com/docker/docker-bench-security)
+# script is run from the CLI.
+# The DBS folder is located at ~/docker/dbs
+# Prior to running the script, ensure to do a 'git pull'
+# To run the script: 'sudo sh docker-bench-security.sh'
 
 #----------------- NETWORKING
 networks:

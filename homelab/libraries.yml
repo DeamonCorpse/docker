@@ -4,6 +4,8 @@ services:
     container_name: Plex-NSFK
     hostname: plex-nsfk
     restart: unless-stopped
+    read_only: false
+    privileged: false
     security_opt:
       - no-new-privileges:true
 #    deploy:
@@ -49,6 +51,8 @@ services:
     container_name: PhotoprismDB
     hostname: photoprism-db
     restart: unless-stopped
+    read_only: false
+    privileged: false
     security_opt:
       - no-new-privileges:true
       - seccomp:unconfined
@@ -86,6 +90,8 @@ services:
     container_name: Photoprism
     hostname: photoprism
     restart: unless-stopped
+    read_only: true
+    privileged: false
     security_opt:
       - no-new-privileges:true
       - seccomp:unconfined
