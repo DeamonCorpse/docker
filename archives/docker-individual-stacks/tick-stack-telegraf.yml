@@ -1,5 +1,3 @@
-version: "2"
-
 services:
   telegraf:
     image: telegraf:[1.16.2]
