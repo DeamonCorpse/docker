@@ -3,6 +3,7 @@ auth_enabled: false
 
 server:
   http_listen_port: 3100
+  grpc_listen_port: 9096
 
 common:
   ring:
@@ -11,6 +12,10 @@ common:
       store: inmemory
   replication_factor: 1
   path_prefix: /tmp/loki
+  storage:
+    filesystem:
+      chunks_directory: /tmp/loki/chunks
+      rules_directory: /tmp/loki/rules
 
 schema_config:
   configs:

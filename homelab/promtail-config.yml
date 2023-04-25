@@ -7,16 +7,24 @@ positions:
   filename: /tmp/positions.yaml
 
 clients:
-  - url: http://gateway:3100/loki/api/v1/push
-    tenant_id: tenant1
+  - url: http://localhost:3100/loki/api/v1/push
+    #tenant_id: tenant1
 
 scrape_configs:
-  - job_name: flog_scrape
-    docker_sd_configs:
-      - host: unix:///var/run/docker.sock
-        refresh_interval: 5s
-    relabel_configs:
-      - source_labels: ['__meta_docker_container_name']
-        regex: '/(.*)'
-        target_label: 'container'
+#----- LOCALHOST LOGS
+- job_name: localhost
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: varlogs
+      __path__: /var/log/*log
 
+#----- DOCKER LOGS
+#  - job_name: docker
+#    static_configs:
+#    pipeline_stages:
+#      - docker: {}
+#    labels:
+#      job: docker
+#      __path__: /var/lib/docker/containers/*/*-json.log

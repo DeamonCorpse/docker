@@ -30,6 +30,8 @@ services:
       - autoheal:true
     ports:
       - ${GLANCES_PORTS:-61208-61209}:61208-61209
+    networks:
+      - docker
     logging:
       options:
         #syslog-address: "tcp://192.168.68.62:514"
@@ -147,14 +149,12 @@ services:
           memory: 255M
     environment:
       - GF_DEFAULT_INSTANCE_NAME=Grafana
-      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN}
       - GF_INSTALL_PLUGINS=${GRAFANA_PLUGINS}
       - GF_PLUGIN_GRAFANA_IMAGE_RENDERER_RENDERING_IGNORE_HTTPS_ERRORS=true
       - GF_FEATURE_TOGGLES_ENABLE=newNavigation
     volumes:
       - $USERDIR/grafana:/var/lib/grafana:rw
       - $USERDIR/grafana/plugins:/var/lib/grafana/plugins:rw
-      - $USERDIR/grafana/provisioning:/etc/grafana/provisioning:rw
       - $LOGDIR/grafana:/var/log/grafana:rw
     #tmpfs:
       #- /tmp
@@ -185,6 +185,7 @@ services:
       #- ALL
     security_opt:
       - no-new-privileges:true
+    command: "-config.file=/etc/loki/loki-config.yml -target=read"
     deploy:
       restart_policy:
         condition: unless-stopped
@@ -200,13 +201,12 @@ services:
     environment:
       - user=${UID:-1000}
     volumes:
-      - $USERDIR/loki:/loki:rw
-      - $USERDIR/loki/loki-config.yml:/etc/loki/loki-config.yml:rw
+      - $USERDIR/loki:/etc/loki:rw
+      - $USERDIR/loki/loki-config.yml:/etc/loki/loki-config.yml:ro
     ports:
       - ${LOKI_PORT:-3100}:3100
     networks:
       - monitoring
-      - docker
     logging:
       options:
         #syslog-address: "tcp://192.168.68.62:514"
@@ -229,7 +229,7 @@ services:
       #- ALL
     security_opt:
       - no-new-privileges:true
-    user: $UID
+    command: -config.file=/etc/promtail/promtail-config.yml
     deploy:
       restart_policy:
         condition: unless-stopped
@@ -238,14 +238,14 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 24M
+          memory: 50M
         reservations:
           cpus: '0.25'
-          memory: 10M
+          memory: 24M
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - $USERDIR/promtail:/etc/promtail:rw
-      - $USERDIR/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:rw
+      - $USERDIR/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
       - $LOGDIR:/logs:ro
       - /var/log:/var/log:ro
     networks:
@@ -258,5 +258,5 @@ networks:
     name: $DOCKER_NET
     external: true
   monitoring:
-    name: MONITOR_NET
+    name: $MONITOR_NET
     external: false
