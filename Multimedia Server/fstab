@@ -16,13 +16,13 @@ UUID=F087-0E41  /boot/efi       vfat    umask=0077      0       1
 UUID=65ef69be-05ac-469a-929f-1e01e69c278b none            swap    sw              0       0
 
 # MOUNT STORAGE SSD DRIVE
-UUID=e8ec9cf8-1921-460b-a8d0-174380a33d17       /home/multimedia/media    ext4    defaults        0       0
+UUID=e8ec9cf8-1921-460b-a8d0-174380a33d17       /media    ext4    defaults        0       0
 
 # MOUNT NAS MEDIA FOLDERS
-//192.168.68.5/Video    /home/multimedia/media/video      cifs    credentials=/home/multimedia/.creds,dir_mode=0777,file_mode=0777        0       0
-//192.168.68.5/NSFW      /home/multimedia/media/nsfk       cifs    credentials=/home/multimedia/.creds,dir_mode=0777,file_mode=0777        0       0
-//192.168.68.5/Photos   /home/multimedia/media/photos     cifs    credentials=/home/multimedia/.creds,dir_mode=0777,file_mode=0777        0       0
+//192.168.68.5/Video    /media/video      cifs    credentials=/home/multimedia/.creds,dir_mode=0777,file_mode=0777        0       0
+//192.168.68.5/NSFW      /media/nsfk       cifs    credentials=/home/multimedia/.creds,dir_mode=0777,file_mode=0777        0       0
+//192.168.68.5/Photos   /media/photos     cifs    credentials=/home/multimedia/.creds,dir_mode=0777,file_mode=0777        0       0
 
 
 # MOUNT NAS BACKUP FOLDER
-//192.168.68.5/Backups  /home/multimedia/media/backups    cifs    credentials=/home/multimedia/.creds,dir_mode=0777,file_mode=0777        0       0
+//192.168.68.5/Backups  /media/backups    cifs    credentials=/home/multimedia/.creds,dir_mode=0777,file_mode=0777        0       0
