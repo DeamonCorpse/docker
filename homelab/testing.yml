@@ -3,12 +3,15 @@ services:
     image: powertic/percona-docker
     container_name: MauticDB
     hostname: mauticdb
-    restart: unless-stopped
     read_only: false
     privileged: false
     security_opt:
       - no-new-privileges:true
-#    deploy:
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
 #      resources:
 #        limits:
 #          memory: 64M
@@ -36,12 +39,15 @@ services:
     image: mautic/mautic:${MAUTIC_TAG:-latest}
     container_name: Mautic
     hostname: mautic
-    restart: unless-stopped
     read_only: false
     privileged: false
     security_opt:
       - no-new-privileges:true
-#    deploy:
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
 #      resources:
 #        limits:
 #          memory: 64M

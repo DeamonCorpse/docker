@@ -3,12 +3,15 @@ services:
     image: plexinc/pms-docker:${PLEX_TAG:-latest}
     container_name: Plex-NSFK
     hostname: plex-nsfk
-    restart: unless-stopped
     read_only: false
     privileged: false
     security_opt:
       - no-new-privileges:true
-#    deploy:
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
 #      resources:
 #        limits:
 #          cpus: '0.4'
@@ -50,7 +53,6 @@ services:
     image: lscr.io/linuxserver/mariadb:${PHOTOPRISM_DB_TAG:-latest}
     container_name: PhotoprismDB
     hostname: photoprism-db
-    restart: unless-stopped
     read_only: false
     privileged: false
     security_opt:
@@ -58,6 +60,10 @@ services:
       - seccomp:unconfined
       - apparmor:unconfined
     deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
       resources:
         limits:
           cpus: '0.5'
@@ -89,7 +95,6 @@ services:
     image: photoprism/photoprism:${PHOTOPRISM_TAG:-latest}
     container_name: Photoprism
     hostname: photoprism
-    restart: unless-stopped
     read_only: true
     privileged: false
     security_opt:
@@ -97,6 +102,10 @@ services:
       - seccomp:unconfined
       - apparmor:unconfined
     deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
       resources:
         limits:
           cpus: '4.0'

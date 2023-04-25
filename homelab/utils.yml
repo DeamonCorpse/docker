@@ -3,12 +3,15 @@ services:
     image: dbeaver/cloudbeaver:${CLOUDBEAVER_TAG:-latest}
     container_name: Cloudbeaver
     hostname: cloudbeaver
-    restart: unless-stopped
     read_only: false
     privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
       resources:
         limits:
           cpus: '1.0'

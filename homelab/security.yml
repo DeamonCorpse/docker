@@ -3,11 +3,17 @@ services:
     image: jlesage/nginx-proxy-manager:${NPM_TAG:-latest}
     container_name: Nginx-PM
     hostname: npm
-    restart: "unless-stopped"
+    read_only: false
+    privileged: false
     security_opt:
       - no-new-privileges:true
     cap_add:
       - SYS_NICE
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
     environment:
       - TZ=$TZ
       - USER_ID=$UID

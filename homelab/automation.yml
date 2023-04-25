@@ -4,12 +4,15 @@ services:
     image: mariadb:${N8NDB_TAG:-latest}
     container_name: n8n-DB
     hostname: n8ndb
-    restart: unless-stopped
     read_only: false
     privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
       resources:
         limits:
           cpus: '0.5'
@@ -47,12 +50,15 @@ services:
     image: n8nio/n8n:${N8N_TAG:-latest}
     container_name: n8n
     hostname: n8n
-    restart: unless-stopped
     read_only: false
     privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
       resources:
         limits:
           cpus: '0.5'
@@ -99,12 +105,15 @@ services:
     image: strapi/strapi:${STRAPI_TAG:-latest}
     container_name: Strapi
     hostname: strapi
-    restart: unless-stopped
     read_only: false
     privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
       resources:
         limits:
           cpus: '0.5'
@@ -146,12 +155,15 @@ services:
     image: postgres:${SDB_TAG:-12-alpine}
     container_name: Strapi-DB
     hostname: strapidb
-    restart: unless-stopped
     read_only: false
     privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
       resources:
         limits:
           cpus: '0.1'

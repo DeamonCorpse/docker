@@ -3,13 +3,16 @@ services:
     image: cloudflare/cloudflared:${CLOUDFLARED_TAG:-latest}
     container_name: Cloudflared
     hostname: cloudflared
-    restart: unless-stopped
     read_only: true
     privileged: false
     security_opt:
       - no-new-privileges:true
     command: tunnel --no-autoupdate run
     deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
       resources:
         limits:
           cpus: '0.05'
@@ -31,12 +34,15 @@ services:
     image: ghcr.io/alexjustesen/speedtest-tracker:${SPEEDTEST_TAG:-latest}
     container_name: Speed-Test-Tracker
     hostname: speedtestracker
-    restart: unless-stopped
     read_only: false
     privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
       resources:
         limits:
           cpus: '0.75'
@@ -64,12 +70,15 @@ services:
     image: louislam/uptime-kuma:${KUMA_TAG:-latest}
     container_name: UptimeKuma
     hostname: uptimekuma
-    restart: unless-stopped
     read_only: true
     privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
       resources:
         limits:
           cpus: '0.25'

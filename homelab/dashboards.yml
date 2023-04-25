@@ -3,13 +3,16 @@ services:
     image: b4bz/homer:${HOMER_TAG:-latest}
     container_name: Family-Dashboard
     hostname: familydashboard
-    restart: unless-stopped
     #init: true
     read_only: true
     privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
       resources:
         limits:
           cpus: '0.05'
@@ -38,13 +41,16 @@ services:
     image: ghcr.io/benphelps/homepage:${HOMEPAGE_TAG:-latest}
     container_name: Homelab-Dashboard
     hostname: homelabdashboard
-    restart: unless-stopped
     #init: true
     read_only: true
     privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
       resources:
         limits:
           cpus: '0.5'
