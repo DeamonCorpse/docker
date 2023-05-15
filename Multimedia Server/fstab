@@ -25,4 +25,4 @@ UUID=e8ec9cf8-1921-460b-a8d0-174380a33d17       /media    ext4    defaults      
 
 
 # MOUNT NAS BACKUP FOLDER
-//192.168.68.5/Backups  /home/multimedia/media/backups    cifs    credentials=/home/multimedia/.creds,dir_mode=0777,file_mode=0777        0       0
+//192.168.68.5/Backups  /home/multimedia/backups    cifs    credentials=/home/multimedia/.creds,dir_mode=0777,file_mode=0777        0       0
