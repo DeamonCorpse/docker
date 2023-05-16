@@ -1,0 +1,132 @@
+services:
+# MongoDB: https://hub.docker.com/_/mongo/
+  mongo:
+    image: mongo:${MONGO_TAG:-4.2.24}
+    container_name: graylogDB
+    hostname: graylogdb
+    #read_only: true
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+    #  resources:
+    #    limits:
+    #      cpus: '0.5'
+    #      memory: 300M
+    #    reservations:
+    #      cpus: '0.25'
+    #      memory: 80M
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_UN}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PW}
+    volumes:
+      - $USERDIR/graylog/db:/data/db
+    labels:
+      - autoheal:true
+    networks:
+      - graynet
+
+  opensearch:
+    image: opensearchproject/opensearch:${OS_TAG:-2}
+    container_name: OpenSearch
+    hostname: opensearch
+    #read_only: true
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      #resources:
+      #  limits:
+      #    cpus: '2.0'
+      #    memory: 1G
+      #  reservations:
+      #    cpus: '1.0'
+      #    memory: 500M
+    environment:
+      - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - action.auto_create_index=false
+      - plugins.security.ssl.http.enabled=false
+      - plugins.security.disabled=true
+    volumes:
+      - $USERDIR/graylog/os:/usr/share/opensearch/data
+    labels:
+      - autoheal:true
+    ports:
+      - ${OS_PORT:-9200}:9200/tcp
+    networks:
+      - graynet
+
+  graylog:
+    image: graylog/graylog:${GRAYLOG_TAG:-5.0}
+    container_name: graylog
+    hostname: graylog
+    entrypoint: /usr/bin/tini -- wait-for-it opensearch:9200 -- /docker-entrypoint.sh
+    #read_only: true
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+    #  resources:
+    #    limits:
+    #      cpus: '0.5'
+    #      memory: 300M
+    #    reservations:
+    #      cpus: '0.25'
+    #      memory: 80M
+    environment:
+      - GRAYLOG_PASSWORD_SECRET=${GRAYLOG_PW}
+      - GRAYLOG_ROOT_PASSWORD_SHA2=${GRAYLOG_ROOT_PW_SHA2}
+      - GRAYLOG_HTTP_BIND_ADDRESS=0.0.0.0:9000
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://127.0.0.1:9000/
+      - GRAYLOG_ELASTICSEARCH_HOSTS=http://opensearch:9200
+      - GRAYLOG_MONGODB_URI=mongodb://mongodb:27017/graylog
+      - GRAYLOG_TIMEZONE=${TZ}
+      - TZ=${TZ}
+    volumes:
+      - $USERDIR/graylog/graylog:/usr/share/graylog/data
+    labels:
+      - autoheal:true
+    ports:
+      - ${GRAYLOG_UI_PORT:-9000}:9000
+      - ${SYSLOG_TCP_PORT:-1514}:1514/tcp
+      - ${SYSLOG_UDP_PORT:-1514}:1514/udp
+      - ${GELF_TCP_PORT:-12201}:12201/tcp
+      - ${GELF_UDP_PORT:-12201}:12201/udp
+    networks:
+      - graynet
+      - docker
+    depends_on:
+      opensearch:
+        condition: "service_started"
+      mongo:
+        condition: "service_started"
+
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true
+  graynet:
+    external: false
