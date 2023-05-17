@@ -1,5 +1,4 @@
 services:
-# MongoDB: https://hub.docker.com/_/mongo/
   mongo:
     image: mongo:${MONGO_TAG:-4.2.24}
     container_name: graylogDB
@@ -34,7 +33,7 @@ services:
     image: opensearchproject/opensearch:${OS_TAG:-2}
     container_name: OpenSearch
     hostname: opensearch
-    #read_only: true
+    read_only: false
     privileged: false
     security_opt:
       - no-new-privileges:true
@@ -58,28 +57,31 @@ services:
       #    cpus: '1.0'
       #    memory: 500M
     environment:
-      - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g
+      - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
+      - DISABLE_INSTALL_DEMO_CONFIG=true
       - bootstrap.memory_lock=true
       - discovery.type=single-node
       - action.auto_create_index=false
       - plugins.security.ssl.http.enabled=false
-      - plugins.security.disabled=true
+      - DISABLE_SECURITY_PLUGIN=true
     volumes:
-      - $USERDIR/graylog/os:/usr/share/opensearch/data
+      - $USERDIR/logs:/var/lib/opensearch/data
     labels:
       - autoheal:true
     ports:
-      - ${OS_PORT:-9200}:9200/tcp
+      - ${OS_API_PORT:-9200}:9200/tcp
+      - ${OS_PERF_PORT:-9600}:9600
     networks:
       - graynet
 
+  # THIS SHIT DOES NOT FUCKING WORK!!! 2 DAYS NOW...
   graylog:
     image: graylog/graylog:${GRAYLOG_TAG:-5.0}
     container_name: graylog
     hostname: graylog
     entrypoint: /usr/bin/tini -- wait-for-it opensearch:9200 -- /docker-entrypoint.sh
-    #read_only: true
-    privileged: false
+    #read_only: false
+    #privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
@@ -95,38 +97,43 @@ services:
     #      cpus: '0.25'
     #      memory: 80M
     environment:
-      - GRAYLOG_PASSWORD_SECRET=${GRAYLOG_PW}
+      - GRAYLOG_IS_MASTER=true
+    #  #- GRAYLOG_NODE_ID_FILE=/usr/share/graylog/data/config/node-id
+    #  - GRAYLOG_PASSWORD_SECRET=${GRAYLOG_PW}
       - GRAYLOG_ROOT_PASSWORD_SHA2=${GRAYLOG_ROOT_PW_SHA2}
       - GRAYLOG_HTTP_BIND_ADDRESS=0.0.0.0:9000
-      - GRAYLOG_HTTP_EXTERNAL_URI=http://127.0.0.1:9000/
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://127.0.0.1:9000
       - GRAYLOG_ELASTICSEARCH_HOSTS=http://opensearch:9200
-      - GRAYLOG_MONGODB_URI=mongodb://mongodb:27017/graylog
-      - GRAYLOG_TIMEZONE=${TZ}
-      - TZ=${TZ}
-    volumes:
-      - $USERDIR/graylog/graylog:/usr/share/graylog/data
+      - GRAYLOG_MONGODB_URI=mongodb://graylogdb:27017/graylog
+      - GRAYLOG_ROOT_TIMEZONE=${TZ}
+    #volumes:
+    #  - $USERDIR/graylog/graylog:/usr/share/graylog/data:rw
+    #  - $USERDIR/graylog/graylog/log:/usr/share/graylog/data/log:rw
+    #  - $USERDIR/graylog/graylog/journal:/usr/share/graylog/data/journal:rw
+    #  - $USERDIR/graylog/graylog/config:/usr/share/graylog/data/config:rw
+    #  - /tmp/node-id:/usr/share/graylog/data/config/node-id:rw
     labels:
       - autoheal:true
     ports:
       - ${GRAYLOG_UI_PORT:-9000}:9000
       - ${SYSLOG_TCP_PORT:-1514}:1514/tcp
       - ${SYSLOG_UDP_PORT:-1514}:1514/udp
-      - ${GELF_TCP_PORT:-12201}:12201/tcp
+      - ${RAW_TCP_PORT:-5555}:5555/tcp
+      - ${RAW_UDP_PORT:-5555}:5555/udp
+      - ${GELF_RAW_TCP_PORT:-12201}:12201/tcp
       - ${GELF_UDP_PORT:-12201}:12201/udp
+      #- ${FORWARDER_TCP_PORT:-13301}:13301/tcp
+      #- ${FORWARDER_TCP_PORT2:-13302}:13302/tcp
     networks:
       - graynet
-      - docker
     depends_on:
-      opensearch:
-        condition: "service_started"
       mongo:
+        condition: "service_started"
+      opensearch:
         condition: "service_started"
 
 
 #----------------- NETWORKING
 networks:
-  docker:
-    name: $DOCKER_NET
-    external: true
   graynet:
-    external: false
+    external: true
