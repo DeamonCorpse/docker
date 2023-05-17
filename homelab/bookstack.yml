@@ -1,0 +1,108 @@
+services:
+#----- DATABASE
+  db:
+    image: linuxserver/mariadb:${BS_TAG:-latest}
+    container_name: BookstackDB
+    hostname: bookstackdb
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      #resources:
+      #  limits:
+      #    cpus: '0.5'
+      #    memory: 400M
+      #  reservations:
+      #    cpus: '0.1'
+      #    memory: 80M
+    environment:
+      - PUID=$UID
+      - PGID=$GID
+      - TZ=$TZ
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PW}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PW}
+    volumes:
+      - $USERDIR/bookstack/db:/config:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${DB_PORT:-3306}:3306
+    networks:
+      - bookstack
+
+#----- MEMORY/CACHE
+  redis:
+    image: redis:${RED_TAG:-latest}
+    container_name: RedisBS
+    hostname: redisbs
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+    command: redis-server --loglevel warning
+    volumes:
+      - $USERDIR/bookstack/redis:/data:rw
+      #- $USERDIR/bookstack/redis/config:/usr/local/etc/redis/redis.conf:rw
+    labels:
+      - autoheal:true
+    expose:
+      - ${RED_PORT:-6379}
+    networks:
+      - bookstack
+
+#----- APPLICATION
+  bookstack:
+    image: ghcr.io/linuxserver/bookstack:${BS_TAG:-latest}
+    container_name: Bookstack
+    hostname: bookstack
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      #resources:
+      #  limits:
+      #    cpus: '0.5'
+      #    memory: 400M
+      #  reservations:
+      #    cpus: '0.1'
+      #    memory: 80M
+    environment:
+      - PUID=$UID
+      - PGID=$GID
+      - DB_CONNECTION=mysql
+      - DB_HOST=bookstackdb
+      - DB_PORT=3306
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PW}
+      - DB_DATABASE=${DB_NAME}
+      - APP_URL=https://${HOST_IP}:${BS_PORT}
+    volumes:
+      - $USERDIR/bookstack/app:/config:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${BS_PORT:-443}:443
+    networks:
+      - bookstack
+    depends_on:
+      db:
+        condition: "service_started"
+      redis:
+        condition: "service_started"
