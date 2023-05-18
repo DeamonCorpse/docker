@@ -38,10 +38,10 @@ services:
       - bookstack
 
 #----- MEMORY/CACHE
-  redis:
-    image: redis/redis-stack-server:${RED_TAG:-latest}
-    container_name: BS-Redis
-    hostname: redisbs
+  memcached:
+    image: memcached:${MEM_TAG:-latest}
+    container_name: BS-Memcached
+    hostname: bsmem
     read_only: false
     privileged: false
     security_opt:
@@ -58,14 +58,39 @@ services:
         reservations:
           cpus: '0.5'
           memory: 512M
-    volumes:
-      - $USERDIR/bookstack/redis:/data:rw
     labels:
       - autoheal:true
-    expose:
-      - ${RED_PORT:-6379}
     networks:
       - bookstack
+
+#  redis:
+#    image: redis/redis-stack-server:${RED_TAG:-latest}
+#    container_name: BS-Redis
+#    hostname: redisbs
+#    read_only: false
+#    privileged: false
+#    security_opt:
+#      - no-new-privileges:true
+#    deploy:
+#      restart_policy:
+#        condition: unless-stopped
+#        delay: 5s
+#        window: 120s
+#      resources:
+#        limits:
+#          cpus: '1.0'
+#          memory: 1G
+#        reservations:
+#          cpus: '0.5'
+#          memory: 512M
+#    volumes:
+#      - $USERDIR/bookstack/redis:/data:rw
+#    labels:
+#      - autoheal:true
+#    expose:
+#      - ${RED_PORT:-6379}
+#    networks:
+#      - bookstack
 
 #----- APPLICATION
   bookstack:
