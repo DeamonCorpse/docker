@@ -39,8 +39,8 @@ services:
 
 #----- MEMORY/CACHE
   redis:
-    image: redis:${RED_TAG:-latest}
-    container_name: RedisBS
+    image: redis/redis-stack-server:${RED_TAG:-latest}
+    container_name: BS-Redis
     hostname: redisbs
     read_only: false
     privileged: false
@@ -51,10 +51,15 @@ services:
         condition: unless-stopped
         delay: 5s
         window: 120s
-    command: redis-server --loglevel warning
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
     volumes:
       - $USERDIR/bookstack/redis:/data:rw
-      #- $USERDIR/bookstack/redis/config:/usr/local/etc/redis/redis.conf:rw
     labels:
       - autoheal:true
     expose:
