@@ -32,7 +32,7 @@ services:
     ports:
       - ${TA_PORT:-8000}:8000
     volumes:
-      - $MEDIADIR/video/youtube:/youtube:rw
+      - $MEDIADIR/Videos/youtube:/youtube:rw
       - $USERDIR/archivist/cache:/cache:rw
       - $BACKDIR/tubearchivist:/backups:rw
     labels:
