@@ -65,7 +65,7 @@ services:
           memory: 100M
     environment:
       - TZ=$TZ
-      - PID=$UID
+      - PUID=$UID
       - PGID=$GID
       - DOCKER_MODS=${TP_MODS}:prowlarr
       - TP_SCHEME=${TP_SCHEME}
@@ -107,7 +107,7 @@ services:
           memory: 240M
     environment:
       - TZ=$TZ
-      - PID=$UID
+      - PUID=$UID
       - PGID=$GID
       - DOCKER_MODS=${TP_MODS}:radarr
       - TP_SCHEME=${TP_SCHEME}
@@ -150,7 +150,7 @@ services:
           memory: 240M
     environment:
       - TZ=$TZ
-      - PID=$UID
+      - PUID=$UID
       - PGID=$GID
       - DOCKER_MODS=${TP_MODS}:sonarr
       - TP_SCHEME=${TP_SCHEME}
@@ -193,7 +193,7 @@ services:
           memory: 100M
     environment:
       - TZ=$TZ
-      - PID=$UID
+      - PUID=$UID
       - PGID=$GID
       - UMASK=002
 #      - TP_HOTIO=true
