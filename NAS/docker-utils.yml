@@ -5,10 +5,13 @@ services:
     hostname: autoheal
     read_only: true
     privileged: false
-    restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
       resources:
         limits:
           memory: 12M
@@ -31,7 +34,7 @@ services:
       - docker
     logging:
       options:
-        #syslog-address: "tcp://192.168.68.62:514"
+        #syslog-address: "udp://192.168.68.5:514"
         max-size: 50m
         max-file: 10
 
@@ -39,12 +42,15 @@ services:
     image: containrrr/watchtower:${WATCHTOWER_TAG:-latest}
     container_name: Watchtower
     hostname: watchtower
-    restart: unless-stopped
     read_only: true
     privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
       resources:
         limits:
           memory: 96M
