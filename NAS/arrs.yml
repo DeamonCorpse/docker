@@ -1,0 +1,225 @@
+services:
+  jackett:
+    image: lscr.io/linuxserver/jackett:${JACKETT_TAG:-latest}
+    container_name: Jackett
+    hostname: jackett
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      resources:
+        limits:
+          #cpus: '1.0'
+          memory: 200M
+        reservations:
+          #cpus: '0.05'
+          memory: 100M
+    environment:
+      - TZ=$TZ
+      - PID=$UID
+      - PGID=$GID
+      - AUTO_UPDATE=true
+      - DOCKER_MODS=${TP_MODS}:jackett
+      - TP_SCHEME=${TP_SCHEME}
+      - TP_DOMAIN=${TP_DOMAIN}
+      - TP_THEME=${TP_THEME}
+    volumes:
+      - $USERDIR/jackett:/config:rw
+      - $USERDIR/jackett/downloads:/downloads:rw
+      - $BACKDIR/jackett:/backups:rw
+    ports:
+      - ${JACKETT_PORT:-9117}:9117
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+      - arrs
+    logging:
+      options:
+        max-size: 50m
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:${PROWLARR_TAG:-latest}
+    container_name: Prowlarr
+    hostname: prowlarr
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      resources:
+        limits:
+          #cpus: '1.0'
+          memory: 200M
+        reservations:
+          #cpus: '0.5'
+          memory: 100M
+    environment:
+      - TZ=$TZ
+      - PID=$UID
+      - PGID=$GID
+      - DOCKER_MODS=${TP_MODS}:prowlarr
+      - TP_SCHEME=${TP_SCHEME}
+      - TP_DOMAIN=${TP_DOMAIN}
+      - TP_THEME=${TP_THEME}
+    volumes:
+      - $USERDIR/prowlarr:/config:rw
+      - $BACKDIR/prowlarr:/backups:rw
+    ports:
+      - ${PROWLARR_PORT:-9696}:9696
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+      - arrs
+    logging:
+      options:
+        max-size: 50m
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:${RADARR_TAG:-latest}
+    container_name: Radarr
+    hostname: radarr
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      resources:
+        limits:
+          #cpus: '0.25'
+          memory: 400M
+        reservations:
+          #cpus: '0.1'
+          memory: 240M
+    environment:
+      - TZ=$TZ
+      - PID=$UID
+      - PGID=$GID
+      - DOCKER_MODS=${TP_MODS}:radarr
+      - TP_SCHEME=${TP_SCHEME}
+      - TP_DOMAIN=${TP_DOMAIN}
+      - TP_THEME=${TP_THEME}
+    ports:
+      - ${RADARR_PORT:-7878}:7878
+    volumes:
+      - $USERDIR/radarr:/config:rw
+      - $USERDIR/radarr/recycle:/recycle:rw
+      - $MOVDIR:/movies:rw
+      - $BACKDIR/radarr:/backups:rw
+    labels:
+      - autoheal:true
+    networks:
+      - arrs
+    logging:
+      options:
+        max-size: 50m
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:${SONARR_TAG:-latest}
+    container_name: Sonarr
+    hostname: sonarr
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      resources:
+        limits:
+          #cpus: '0.25'
+          memory: 400M
+        reservations:
+          #cpus: '0.1'
+          memory: 240M
+    environment:
+      - TZ=$TZ
+      - PID=$UID
+      - PGID=$GID
+      - DOCKER_MODS=${TP_MODS}:sonarr
+      - TP_SCHEME=${TP_SCHEME}
+      - TP_DOMAIN=${TP_DOMAIN}
+      - TP_THEME=${TP_THEME}
+    ports:
+      - ${SONARR_PORT:-8989}:8989
+    volumes:
+      - $USERDIR/sonarr:/config:rw
+      - $USERDIR/sonarr/recycle:/recycle:rw
+      - $SERDIR:/tv_shows:rw
+      - $BACKDIR/sonarr:/backups:rw
+    labels:
+      - autoheal:true
+    networks:
+      - arrs
+    logging:
+      options:
+        max-size: 50m
+
+  whisparr:
+    image: cr.hotio.dev/hotio/whisparr:${WHISPARR_TAG:-latest}
+    container_name: Whisparr
+    hostname: whisparr
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      resources:
+        limits:
+          #cpus: '0.2'
+          memory: 150M
+        reservations:
+          #cpus: '0.1'
+          memory: 100M
+    environment:
+      - TZ=$TZ
+      - PID=$UID
+      - PGID=$GID
+      - UMASK=002
+#      - TP_HOTIO=true
+#      - TP_THEME=${TP_THEME}
+    ports:
+      - ${WHISPARR_PORT:-6969}:6969
+    volumes:
+      - $USERDIR/whisparr:/config:rw
+      - $USERDIR/whisparr/recycle:/recycle:rw
+#      - $USERDIR/whisparr/98-themepark-whisparr:/etc/cont-init.d/98-themepark:rw
+      - $NSDIR:/nsfk:rw
+      - $BACKDIR/whisparr:/backups:rw
+    labels:
+      - autoheal:true
+    networks:
+      - arrs
+    logging:
+      options:
+        max-size: 50m
+
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true
+  arrs:
+    name: $ARRS_NET
+    external: false

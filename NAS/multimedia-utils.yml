@@ -1,0 +1,79 @@
+services:
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:${OVERSEERR_TAG:-latest}
+    container_name: Overseer
+    hostname: overseer
+    restart: unless-stopped
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 250M
+        reservations:
+          cpus: '0.05'
+          memory: 50M
+    environment:
+      - TZ=$TZ
+      - PUID=$UID
+      - PGID=$GID
+      - DOCKER_MODS=${TP_MODS}:overseerr
+      - TP_SCHEME=${TP_SCHEME}
+      - TP_DOMAIN=${TP_DOMAIN}
+      - TP_THEME=${TP_THEME}
+    volumes:
+      - $USERDIR/overseerr:/config:rw
+      - $BACKDIR/overseerr:/backups:rw
+    ports:
+      - ${OVERSEERR_PORT:-5055}:5055
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+
+  tautulli:
+    image: lscr.io/linuxserver/tautulli:${TAUTULLI_TAG:-latest}
+    container_name: Tautulli
+    hostname: tautulli
+    restart: unless-stopped
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 80M
+        reservations:
+          cpus: '0.05'
+          memory: 40M
+    environment:
+      - TZ=$TZ
+      - PID=$UID
+      - PGID=$GID
+    volumes:
+      - $USERDIR/tautulli:/config:rw
+      - $BACKDIR/tautulli:/backups:rw
+    ports:
+      - ${TAUTULLI_PORT:-8181}:8181
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true

@@ -38,6 +38,47 @@ services:
         max-size: 50m
         max-file: 10
 
+  theme-park:
+    image: ghcr.io/gilbn/theme.park:${THEMEPARK_TAG:-latest}
+    container_name: Theme-Park
+    hostname: themepark
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      resources:
+        limits:
+          #cpus: '0.1'
+          memory: 50M
+        reservations:
+          #cpus: '0.05'
+          memory: 35M
+    environment:
+      - PUID=$UID
+      - PGID=$GID
+      - TZ=$TZ
+      - TP_URL_BASE=themepark
+    volumes:
+      - $USERDIR/theme-park:/config:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${THEMPARK_HTTP_PORT:-8080}:80
+      - ${THEMPARK_HTTPS_PORT:-4443}:443
+    networks:
+      - docker
+    logging:
+      logging:
+      options:
+        #syslog-address: "udp://192.168.68.5:514"
+        max-size: 50m
+        max-file: 10
+
   watchtower:
     image: containrrr/watchtower:${WATCHTOWER_TAG:-latest}
     container_name: Watchtower
@@ -75,7 +116,7 @@ services:
       - docker
     logging:
       options:
-        #syslog-address: "tcp://192.168.68.62:514"
+        #syslog-address: "udp://192.168.68.5:514"
         max-size: 50m
         max-file: 10
 
