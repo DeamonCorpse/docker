@@ -3,7 +3,7 @@ services:
     image: ghcr.io/benphelps/homepage:${HOMEPAGE_TAG:-latest}
     container_name: Multimedia-Dashboard
     hostname: mmdashboard
-    read_only: true
+    read_only: false
     privileged: false
     security_opt:
       - no-new-privileges:true
