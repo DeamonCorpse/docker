@@ -3,7 +3,7 @@ services:
     image: bbilly1/tubearchivist:${TA_TAG:-latest}
     container_name: Tube-Archivist
     hostname: tubearchivist
-    read_only: true
+    read_only: false
     privileged: false
     security_opt:
       - no-new-privileges:true
