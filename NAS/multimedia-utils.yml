@@ -32,6 +32,7 @@ services:
       - autoheal:true
     networks:
       - docker
+      - arrs
     logging:
       options:
         #syslog-address: "udp://192.168.68.5:514"
@@ -126,4 +127,7 @@ services:
 networks:
   docker:
     name: $DOCKER_NET
+    external: true
+  arrs:
+    name: $ARRS_NET
     external: true
