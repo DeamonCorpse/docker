@@ -23,6 +23,9 @@
 //192.168.68.5/Photos     /home/deamon/media/Photos     cifs     credentials=/home/deamon/.creds,file_mode=0777,dir_mode=0777     0     0
 //192.168.68.5/NSFW     /home/deamon/media/NSFK     cifs     credentials=/home/deamon/.creds,file_mode=0777,dir_mode=0777     0     0
 
+#----- TUBE ARCHIVIST IMPORT
+//192.168.68.5/Temp_File_Share/DSM_Drop/archivist     /home/deamon/media/archivist-import     cifs     credentials=/home/deamon/.creds,file_mode=0777,dir_mode=0777     0     0
+
 #----- MOUNT NAS BACKUP FOLDER
 //192.168.68.5/Backups  /home/deamon/backups    cifs    credentials=/home/deamon/.creds,dir_mode=0777,file_mode=0777        0       0
 
