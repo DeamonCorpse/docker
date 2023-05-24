@@ -34,6 +34,7 @@ services:
     volumes:
       - $MEDIADIR/Videos/youtube:/youtube:rw
       - $USERDIR/archivist/cache:/cache:rw
+      - $TA_IMPORT:/cache/import:rw
       - $BACKDIR/tubearchivist:/backups:rw
     labels:
       - autoheal:true
