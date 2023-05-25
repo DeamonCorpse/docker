@@ -1,8 +1,8 @@
 services:
-  mm-dashboard:
+  dashboard:
     image: ghcr.io/benphelps/homepage:${HOMEPAGE_TAG:-latest}
-    container_name: MM-Dashboard
-    hostname: mmdashboard
+    container_name: Homelab2-Dashboard
+    hostname: hl2dashboard
     restart: unless-stopped
     read_only: true
     privileged: false
@@ -17,7 +17,7 @@ services:
           cpus: '0.25'
           memory: 80M
     volumes:
-      - $USERDIR/dashboards/multimedia:/app/config:rw
+      - $USERDIR/dashboard:/app/config:rw
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/localtime:/etc/localtime:ro
     labels:

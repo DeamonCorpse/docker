@@ -3,7 +3,7 @@ sudo docker run -d \
   --hostname=portainer \
   --restart unless-stopped \
   --security-opt="no-new-privileges:true" \
-  --network="multimedia" \
+  --network="homelab2" \
   --memory-reservation="24m" \
   --memory="64m" \
   --cpus=0.1 \
