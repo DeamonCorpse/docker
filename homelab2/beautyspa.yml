@@ -1,0 +1,37 @@
+services:
+  ebs-dashboard:
+    image: ghcr.io/benphelps/homepage:${HOMEPAGE_TAG:-latest}
+    container_name: EBS-Dashboard
+    hostname: ebsdashboard
+    restart: unless-stopped
+    read_only: true
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 300M
+        reservations:
+          cpus: '0.25'
+          memory: 80M
+    volumes:
+      - $USERDIR/dashboard:/app/config:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - autoheal:true
+    ports:
+      - ${HOMEPAGE_PORT:-3000}:3000
+    networks:
+      - spa
+    logging:
+      options:
+        max-size: 50m
+
+#----------------- NETWORKING
+networks:
+  spa:
+    name: $SPA_NET
+    external: true
