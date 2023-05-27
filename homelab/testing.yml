@@ -80,36 +80,6 @@ services:
         max-size: 50m
         max-file: 10
 
-#----- GRAV
-  grav:
-    image: lscr.io/linuxserver/grav:${GRAV_TAG:-latest}
-    container_name: Grav
-    hostname: grav
-    read_only: false
-    privileged: false
-    security_opt:
-      - no-new-privileges:true
-    deploy:
-      restart_policy:
-        condition: unless-stopped
-        delay: 5s
-        window: 120s
-#      resources:
-#        limits:
-#          memory: 64M
-#        reservations:
-#          memory: 24M
-    environment:
-      - PUID=$UID
-      - PGID=$GID
-      - TZ=$TZ
-    volumes:
-      - $USERDIR/grav:/config
-    labels:
-      - autoheal:true
-    ports:
-      - ${GRAV_PORT:-80}:80
-
 
 #----------------- NETWORKING
 networks:

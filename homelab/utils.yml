@@ -58,40 +58,6 @@ services:
 #        max-size: 50m
 #        max-file: 1
 
-  kanboard:
-    image: ghcr.io/kanboard/kanboard:${KANBOARD_TAG:-latest}
-    container_name: Kanboard
-    hostname: kanboard
-    restart: unless-stopped
-    read_only: false
-    privileged: false
-    security_opt:
-      - no-new-privileges:true
-    deploy:
-      resources:
-        limits:
-          cpus: '0.1'
-          memory: 24M
-        reservations:
-          cpus: '0.05'
-          memory: 6M
-    environment:
-      - PLUGIN_INSTALLER=true
-    volumes:
-      - $USERDIR/dpm/kanboard:/var/www/app/data:rw
-      - $USERDIR/dpm/kanboard/plugins:/var/www/app/plugins:rw
-      - /etc/localtime:/etc/localtime:ro
-    labels:
-      - autoheal:true
-    ports:
-      - ${KANBOARD_PORT:-80}:80/tcp
-    networks:
-      - dpm
-    logging:
-      options:
-        #syslog-address: "tcp://192.168.68.62:514"
-        max-size: 50m
-        max-file: 10
 
 #----------------- NETWORKING
 networks:
