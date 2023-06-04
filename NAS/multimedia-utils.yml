@@ -70,7 +70,7 @@ services:
       - TP_THEME=${TP_THEME}
     volumes:
       - $USERDIR/overseerr:/config:rw
-      - $BACKDIR/overseerr:/backups:rw
+      #- $BACKDIR/overseerr:/backups:rw
     ports:
       - ${OVERSEERR_PORT:-5055}:5055
     labels:
@@ -109,7 +109,7 @@ services:
       - PGID=$GID
     volumes:
       - $USERDIR/tautulli:/config:rw
-      - $BACKDIR/tautulli:/backups:rw
+      #- $BACKDIR/tautulli:/backups:rw
     ports:
       - ${TAUTULLI_PORT:-8181}:8181
     labels:
