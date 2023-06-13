@@ -25,7 +25,7 @@ services:
       - MYSQL_USER=${SEM_USER:-semaphore}
       - MYSQL_PASSWORD=${SEM_DB_PW}
     volumes:
-      - $USERDIR/semaphore/db:/config:rw
+      - $USERDIR/db:/var/lib/mysql:rw
     labels:
       - autoheal:true
     ports:
@@ -66,7 +66,7 @@ services:
       - SEMAPHORE_DB_HOST=${SEM_DB_HOST:-mysql}
       - SEMAPHORE_DB_PORT=${SEM_DB_PORT:-3306}
       - SEMAPHORE_DB_DIALECT=mysql
-      - SEMAPHORE_PLAYBOOK_PATH=$USERDIR/tmp
+      - SEMAPHORE_PLAYBOOK_PATH=$USERDIR/playbooks
       - SEMAPHORE_ADMIN=${SEM_ADM:-admin}
       - SEMAPHORE_ADMIN_NAME=${SEM_ADM_UN:-admin}
       - SEMAPHORE_ADMIN_PASSWORD=${SEM_ADM_PW}
@@ -74,7 +74,7 @@ services:
       - SEMAPHORE_ACCESS_KEY_ENCRYPTION=${SEM_KEY}
       - ANSIBLE_HOST_KEY_CHECKING=false
     volumes:
-      - $USERDIR/semaphore:/etc/semaphore:rw
+      - $USERDIR:/etc/semaphore:rw
     labels:
       - autoheal:true
     ports:
