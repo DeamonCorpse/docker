@@ -1,0 +1,102 @@
+services:
+  database:
+    image: lscr.io/linuxserver/mariadb:${SEM_DB_TAG:-10.11.4}
+    container_name: SemaphoreDB
+    hostname: semaphoredb
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 400M
+        reservations:
+          cpus: '0.1'
+          memory: 80M
+    environment:
+      - MYSQL_DATABASE=${SEM_DB_NAME:-semaphore}
+      - MYSQL_ROOT_PASSWORD=${SEM_DB_ROOT_PW}
+      - MYSQL_USER=${SEM_USER:-semaphore}
+      - MYSQL_PASSWORD=${SEM_DB_PW}
+    volumes:
+      - $USERDIR/semaphore/db:/config:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${SEM_DB_PORT:-3306}:3306
+    networks:
+      - semaphore
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
+  semaphore:
+    image: semaphoreui/semaphore:${SEM_TAG:-latest}
+    container_name: Semaphore
+    hostname: semaphore
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+#      resources:
+#        limits:
+#          cpus: '0.5'
+#          memory: 300M
+#        reservations:
+#          cpus: '0.25'
+#          memory: 80M
+    user: $UID:$GID
+    environment:
+      - SEMAPHORE_DB_USER=${SEM_USER:-semaphore}
+      - SEMAPHORE_DB=${SEM_DB_NAME:-semaphore}
+      - SEMAPHORE_DB_PASS=${SEM_DB_PW}
+      - SEMAPHORE_DB_HOST=${SEM_DB_HOST:-mysql}
+      - SEMAPHORE_DB_PORT=${SEM_DB_PORT:-3306}
+      - SEMAPHORE_DB_DIALECT=mysql
+      - SEMAPHORE_PLAYBOOK_PATH=$USERDIR/tmp
+      - SEMAPHORE_ADMIN=${SEM_ADM:-admin}
+      - SEMAPHORE_ADMIN_NAME=${SEM_ADM_UN:-admin}
+      - SEMAPHORE_ADMIN_PASSWORD=${SEM_ADM_PW}
+      - SEMAPHORE_ADMIN_EMAIL=${SEM_ADM_EMAIL}
+      - SEMAPHORE_ACCESS_KEY_ENCRYPTION=${SEM_KEY}
+      - ANSIBLE_HOST_KEY_CHECKING=false
+    volumes:
+      - $USERDIR/semaphore:/etc/semaphore:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${SEM_PORT:-3000}:3000
+    networks:
+      - semaphore
+      - docker
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+    depends_on:
+      database:
+        condition: service_healthy
+
+
+#----------------- NETWORKING
+networks:
+  semaphore:
+    name: $SEM_NET
+    external: true
+  docker:
+    name: $DOCKER_NET
+    external: true
