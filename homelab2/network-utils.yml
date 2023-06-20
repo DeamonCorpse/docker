@@ -1,0 +1,38 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:${CLOUDFLARED_TAG:-latest}
+    container_name: Cloudflared
+    hostname: cloudflared
+    read_only: true
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    command: tunnel --no-autoupdate run
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.05'
+          memory: 30M
+        reservations:
+          cpus: '0.025'
+          memory: 20M
+    environment:
+      - TUNNEL_TOKEN=${CF_TOKEN}
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true
