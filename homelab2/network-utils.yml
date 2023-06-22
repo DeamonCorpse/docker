@@ -35,7 +35,7 @@ services:
     image: openspeedtest/${SPEEDTEST_TAG:-latest}
     container_name: Open-Speed-Test
     hostname: openspeedtest
-    read_only: true
+    read_only: false
     privileged: false
     security_opt:
       - no-new-privileges:true
