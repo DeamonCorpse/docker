@@ -30,7 +30,6 @@ services:
       options:
         max-size: 50m
 
-
   openspeedtest:
     image: openspeedtest/${SPEEDTEST_TAG:-latest}
     container_name: Open-Speed-Test
@@ -44,13 +43,13 @@ services:
         condition: unless-stopped
         delay: 5s
         window: 120s
-      resources:
-        limits:
-          cpus: '0.05'
-          memory: 30M
-        reservations:
-          cpus: '0.025'
-          memory: 20M
+      #resources:
+      #  limits:
+      #    cpus: '0.05'
+      #    memory: 30M
+      #  reservations:
+      #    cpus: '0.025'
+      #    memory: 20M
     labels:
       - autoheal:true
     networks:

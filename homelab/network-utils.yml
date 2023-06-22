@@ -30,6 +30,34 @@ services:
       options:
         max-size: 50m
 
+  openspeedtest:
+    image: openspeedtest/${OSPEEDTEST_TAG:-latest}
+    container_name: Open-Speed-Test
+    hostname: openspeedtest
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      #resources:
+      #  limits:
+      #    cpus: '0.05'
+      #    memory: 30M
+      #  reservations:
+      #    cpus: '0.025'
+      #    memory: 20M
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+    ports:
+      - ${OSPEEDTEST_HTTP_PORT:-3000}:3000
+      - ${OSPEEDTEST_HTTPS_PORT:-3001}:3001
+
   speedtest-tracker:
     image: ghcr.io/alexjustesen/speedtest-tracker:${SPEEDTEST_TAG:-latest}
     container_name: Speed-Test-Tracker
