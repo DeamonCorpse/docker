@@ -31,6 +31,35 @@ services:
         max-size: 50m
 
 
+  openspeedtest:
+    image: openspeedtest/${SPEEDTEST_TAG:-latest}
+    container_name: Open-Speed-Test
+    hostname: openspeedtest
+    read_only: true
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.05'
+          memory: 30M
+        reservations:
+          cpus: '0.025'
+          memory: 20M
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+    ports:
+      - ${SPEEDTEST_HTTP_PORT:-3000}:3000
+      - ${SPEEDTEST_HTTPS_PORT:-3001}:3001
+
+
 #----------------- NETWORKING
 networks:
   docker:
