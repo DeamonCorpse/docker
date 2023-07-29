@@ -31,7 +31,7 @@ services:
     # supported versions are 12, 13, and 14
     image: postgres:${PDB_TAG:-14-alpine}
     container_name: Plausible-DB
-    hostname: plausible-db
+    hostname: plausible_db
     security_opt:
       - no-new-privileges:true
     deploy:
@@ -49,7 +49,11 @@ services:
     volumes:
       - $USERDIR/plausible/db:/var/lib/postgresql/data
     environment:
+      - DATABASE_URL=postgres://${PG_USER}:${PG_PASSWORD}@plausible_db:5432/plausible_db
+      - POSTGRES_USER=$PG_USER
       - POSTGRES_PASSWORD=$PG_PASSWORD
+      - POSTGRES_DB=plausible
+      - POSTGRES_HOST_AUTH_METHOD=md5
     labels:
       - autoheal:true
     networks:
@@ -63,7 +67,7 @@ services:
   plausible_events_db:
     image: clickhouse/clickhouse-server:${PEDB_TAG:-22.6-alpine}
     container_name: Plausible-Events-DB
-    hostname: plausible-events-db
+    hostname: plausible_events_db
     cap_add:
       - SYS_NICE
       - NET_ADMIN
@@ -86,6 +90,10 @@ services:
       - $USERDIR/plausible/clickhouse:/var/lib/clickhouse
       - $USERDIR/plausible/clickhouse/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro
       - $USERDIR/plausible/clickhouse/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro
+    environment:
+      - CLICKHOUSE_DATABASE_URL=http://plausible_events_db:8123/plausible_events_db
+      - CLICKHOUSE_FLUSH_INTERVAL_MS=5000
+      - CLICKHOUSE_MAX_BUFFER_SIZE=10000
     labels:
       - autoheal:true
     ulimits:
@@ -162,7 +170,9 @@ services:
       - BASE_URL=$PLAUSIBLE_URL
       - SECRET_KEY_BASE=$PLAUSIBLE_KEY
       - LISTEN_IP=${PLAUSIBLE_LISTEN:-0.0.0.0}
+      - RELEASE_DISTRIBUTION=none
       - DISABLE_REGISTRATION=invite_only
+      - LOG_FAILED_LOGIN_ATTEMPTS=true
       - GEOLITE2_COUNTRY_DB=$PLAUSIBLE_VOLUME/geoip/GeoLite2-Country.mmdb
       - GOOGLE_CLIENT_ID=$PLAUSIBLE_GOOGLE_ID
       - GOOGLE_CLIENT_SECRET=$PLAUSIBLE_CLIENTS
@@ -174,11 +184,11 @@ services:
       - SMTP_HOST_SSL_ENABLED=true
       - SMTP_RETRIES=5
       - CRON_ENABLED=true
-      - VIRTUAL_HOST=$PLAUSIBLE_VIRT_HOST
-      - LETSENCRYPT_HOST=$PLAUSIBLE_VIRT_HOST
+#      - VIRTUAL_HOST=$PLAUSIBLE_VIRT_HOST
+#      - LETSENCRYPT_HOST=$PLAUSIBLE_VIRT_HOST
       #- TRUSTED_PROXIES=$PLAUSIBLE_TRUSTED_PROXIES
-    volumes:
-      - $USERDIR/plausible/geoip:/geoip:ro
+#    volumes:
+#      - $USERDIR/plausible/geoip:/geoip:ro
     labels:
       - autoheal:true
     ports:
