@@ -14,10 +14,10 @@ services:
         window: 120s
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 400M
         reservations:
-          cpus: '0.1'
+          cpus: "0.1"
           memory: 80M
     environment:
       - MYSQL_DATABASE=${SEM_DB_NAME:-semaphore}
@@ -39,6 +39,7 @@ services:
         max-file: 10
 
   semaphore:
+    #---Ansible UI
     image: semaphoreui/semaphore:${SEM_TAG:-latest}
     container_name: Semaphore
     hostname: semaphore
@@ -51,13 +52,13 @@ services:
         condition: unless-stopped
         delay: 5s
         window: 120s
-#      resources:
-#        limits:
-#          cpus: '0.5'
-#          memory: 300M
-#        reservations:
-#          cpus: '0.25'
-#          memory: 80M
+    #      resources:
+    #        limits:
+    #          cpus: '0.5'
+    #          memory: 300M
+    #        reservations:
+    #          cpus: '0.25'
+    #          memory: 80M
     user: $UID:$GID
     environment:
       - SEMAPHORE_DB_USER=${SEM_USER:-semaphore}
@@ -90,7 +91,6 @@ services:
     depends_on:
       database:
         condition: service_started
-
 
 #----------------- NETWORKING
 networks:
