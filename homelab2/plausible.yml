@@ -1,0 +1,207 @@
+services:
+  mail:
+    image: bytemark/smtp:${BYTEMARK_TAG:-latest}
+    container_name: Bytemark
+    hostname: bytemark
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+#      resources:
+#        limits:
+#          cpus: '0.15'
+#          memory: 50M
+#        reservations:
+#          cpus: '0.05'
+#          memory: 30M
+    labels:
+      - autoheal:true
+    networks:
+      - plausible
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
+  plausible_db:
+    # supported versions are 12, 13, and 14
+    image: postgres:${PDB_TAG:-14-alpine}
+    container_name: Plausible-DB
+    hostname: plausible-db
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+#      resources:
+#        limits:
+#          cpus: '0.15'
+#          memory: 50M
+#        reservations:
+#          cpus: '0.05'
+#          memory: 30M
+    volumes:
+      - $USERDIR/plausible/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=$PG_PASSWORD
+    labels:
+      - autoheal:true
+    networks:
+      - plausible
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
+  plausible_events_db:
+    image: clickhouse/clickhouse-server:${PEDB_TAG:-22.6-alpine}
+    container_name: Plausible-Events-DB
+    hostname: plausible-events-db
+    cap_add:
+      - SYS_NICE
+      - NET_ADMIN
+      - IPC_LOCK
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+#      resources:
+#        limits:
+#          cpus: '0.15'
+#          memory: 50M
+#        reservations:
+#          cpus: '0.05'
+#          memory: 30M
+    volumes:
+      - $USERDIR/plausible/clickhouse:/var/lib/clickhouse
+      - $USERDIR/plausible/clickhouse/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro
+      - $USERDIR/plausible/clickhouse/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro
+    labels:
+      - autoheal:true
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - plausible
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
+  geoip:
+    image: maxmindinc/geoipupdate:${GEOIP_TAG:-latest}
+    container_name: GeoIP
+    hostname: geoip
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+#      resources:
+#        limits:
+#          cpus: '0.15'
+#          memory: 50M
+#        reservations:
+#          cpus: '0.05'
+#          memory: 30M
+    environment:
+      - GEOIPUPDATE_ACCOUNT_ID=$GEOIP_ID
+      - GEOIPUPDATE_LICENSE_KEY=$GEOIP_KEY
+      - GEOIPUPDATE_EDITION_IDS=GeoLite2-Country
+      - GEOIPUPDATE_HOST=updates.maxmind.com # optional
+      - GEOIPUPDATE_FREQUENCY=168 # Optional. Updates every 7 day
+    volumes:
+      - $USERDIR/plausible/geoip:/usr/share/GeoIP
+    labels:
+      - autoheal:true
+    networks:
+      - plausible
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
+  plausible:
+    image: plausible/analytics:${PLAUSIBLE_TAG:-latest}
+    container_name: Plausible
+    hostname: plausible
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+#      resources:
+#        limits:
+#          cpus: '0.15'
+#          memory: 50M
+#        reservations:
+#          cpus: '0.05'
+#          memory: 30M
+    command: sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run"
+    environment:
+      - ADMIN_USER_EMAIL=$PLAUSIBLE_ADMIN_EMAIL
+      - ADMIN_USER_NAME=$PLAUSIBLE_ADMIN_NAME
+      - ADMIN_USER_PWD=$PLAUSIBLE_ADMIN_PWD
+      - BASE_URL=$PLAUSIBLE_URL
+      - SECRET_KEY_BASE=$PLAUSIBLE_KEY
+      - LISTEN_IP=${PLAUSIBLE_LISTEN:-0.0.0.0}
+      - DISABLE_REGISTRATION=invite_only
+      - GEOLITE2_COUNTRY_DB=$PLAUSIBLE_VOLUME/geoip/GeoLite2-Country.mmdb
+      - GOOGLE_CLIENT_ID=$PLAUSIBLE_GOOGLE_ID
+      - GOOGLE_CLIENT_SECRET=$PLAUSIBLE_CLIENTS
+      - MAILER_EMAIL=$PLAUSIBLE_ADMIN_EMAIL
+      - SMTP_HOST_ADDR=$PLAUSIBLE_SMTP_ADDR
+      - SMTP_HOST_PORT=$PLAUSIBLE_HOST_PORT
+      - SMTP_USER_NAME=$PLAUSIBLE_SMTP_UN
+      - SMTP_USER_PWD=$PLAUSIBLE_SMTP_PW
+      - SMTP_HOST_SSL_ENABLED=true
+      - SMTP_RETRIES=5
+      - CRON_ENABLED=true
+      - VIRTUAL_HOST=$PLAUSIBLE_VIRT_HOST
+      - LETSENCRYPT_HOST=$PLAUSIBLE_VIRT_HOST
+      #- TRUSTED_PROXIES=$PLAUSIBLE_TRUSTED_PROXIES
+    volumes:
+      - $USERDIR/plausible/geoip:/geoip:ro
+    labels:
+      - autoheal:true
+    ports:
+      - ${PLAUSIBLE_PORT:-8000}:8000
+    networks:
+      - plausible
+      - docker
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+    depends_on:
+      - mail
+      - plausible_db
+      - plausible_events_db
+      - geoip
+
+#----------------- NETWORKING
+networks:
+  plausible:
+    name: $PLAUSIBLE_NET
+    external: true
+  docker:
+    name: $DOCKER_NET
+    external: true
