@@ -47,13 +47,13 @@ services:
 #          cpus: '0.05'
 #          memory: 30M
     volumes:
-      - $USERDIR/plausible/db:/var/lib/postgresql/data
+      - $USERDIR/plausible/db:/var/lib/postgresql/data:rw
     environment:
       - DATABASE_URL=postgres://${PG_USER}:${PG_PASSWORD}@plausible_db:5432/plausible_db
       - POSTGRES_USER=$PG_USER
-      - POSTGRES_PASSWORD=$PG_PASSWORD
-      - POSTGRES_DB=plausible
-      - POSTGRES_HOST_AUTH_METHOD=md5
+      - POSTGRES_PASSWORD=$PG_PWD
+      - POSTGRES_DB=$PG_DB
+      #- POSTGRES_HOST_AUTH_METHOD=md5
     labels:
       - autoheal:true
     networks:
@@ -87,7 +87,7 @@ services:
 #          cpus: '0.05'
 #          memory: 30M
     volumes:
-      - $USERDIR/plausible/clickhouse:/var/lib/clickhouse
+      - $USERDIR/plausible/clickhouse:/var/lib/clickhouse:rw
       - $USERDIR/plausible/clickhouse/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro
       - $USERDIR/plausible/clickhouse/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro
     environment:
@@ -133,7 +133,7 @@ services:
       - GEOIPUPDATE_HOST=updates.maxmind.com # optional
       - GEOIPUPDATE_FREQUENCY=168 # Optional. Updates every 7 day
     volumes:
-      - $USERDIR/plausible/geoip:/usr/share/GeoIP
+      - $USERDIR/plausible/geoip:/usr/share/GeoIP:rw
     labels:
       - autoheal:true
     networks:
@@ -195,7 +195,7 @@ services:
       - ${PLAUSIBLE_PORT:-8000}:8000
     networks:
       - plausible
-      - docker
+      - spa
     logging:
       options:
         #syslog-address: "tcp://192.168.68.62:514"
@@ -212,6 +212,6 @@ networks:
   plausible:
     name: $PLAUSIBLE_NET
     external: true
-  docker:
-    name: $DOCKER_NET
+  spa:
+    name: $SPA_NET
     external: true
