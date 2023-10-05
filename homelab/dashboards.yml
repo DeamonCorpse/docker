@@ -1,6 +1,6 @@
 services:
   dpm-dashboard:
-    image: ghcr.io/benphelps/homepage:${HOMEPAGE_TAG:-latest}
+    image: ghcr.io/gethomepage/homepage:${HOMEPAGE_TAG:-latest}
     container_name: DPM-Dashboard
     hostname: dpmdashboard
     restart: unless-stopped
@@ -11,10 +11,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5' 
+          cpus: "0.5"
           memory: 300M
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 80M
     volumes:
       - $USERDIR/dashboards/dpm:/app/config:rw
@@ -47,10 +47,10 @@ services:
         window: 120s
       resources:
         limits:
-          cpus: '0.05'
+          cpus: "0.05"
           memory: 12M
         reservations:
-          cpus: '0.01'
+          cpus: "0.01"
           memory: 8M
     environment:
       - UID=$UID
@@ -70,7 +70,7 @@ services:
         max-file: 10
 
   homelab-dashboard:
-    image: ghcr.io/benphelps/homepage:${HOMEPAGE_TAG:-latest}
+    image: ghcr.io/gethomepage/homepage:${HOMEPAGE_TAG:-latest}
     container_name: Homelab-Dashboard
     hostname: homelabdashboard
     #init: true
@@ -85,10 +85,10 @@ services:
         window: 120s
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 300M
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 80M
     volumes:
       - $USERDIR/dashboards/homelab:/app/config:rw
