@@ -116,12 +116,12 @@ services:
       - ${THEMPARK_HTTPS_PORT:-4443}:443
     networks:
       - docker
-    logging:
-      logging:
-      options:
-        #syslog-address: "udp://192.168.68.5:514"
-        max-size: 50m
-        max-file: 10
+#    logging:
+#      logging:
+#      options:
+#        #syslog-address: "udp://192.168.68.5:514"
+#        max-size: 50m
+#        max-file: 10
 
   watchtower:
     image: containrrr/watchtower:${WATCHTOWER_TAG:-latest}
@@ -163,7 +163,6 @@ services:
         #syslog-address: "udp://192.168.68.5:514"
         max-size: 50m
         max-file: 10
-
 
 #----------------- NETWORKING
 networks:
