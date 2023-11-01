@@ -72,7 +72,7 @@ services:
         max-size: 50m
 
   watchtower:
-    image: containrrr/watchtower:${WATCHTOWER_TAG:-latest}
+    image: ghcr.io/containrrr/watchtower:${WATCHTOWER_TAG:-latest}
     container_name: Watchtower
     hostname: watchtower
     restart: unless-stopped

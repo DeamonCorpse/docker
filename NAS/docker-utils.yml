@@ -124,7 +124,7 @@ services:
 #        max-file: 10
 
   watchtower:
-    image: containrrr/watchtower:${WATCHTOWER_TAG:-latest}
+    image: ghcr.io/containrrr/watchtower:${WATCHTOWER_TAG:-latest}
     container_name: Watchtower
     hostname: watchtower
     read_only: true
