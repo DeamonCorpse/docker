@@ -39,6 +39,52 @@ services:
       options:
         max-size: 50m
 
+  code-server:
+    image: lscr.io/linuxserver/code-server:${CODESERVER_TAG:-latest}
+    container_name: Code-Server
+    hostname: codeserver
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+        reservations:
+          cpus: '1.5'
+          memory: 1G
+    environment:
+      - PUID=$UID
+      - PGID=$GID
+      - TZ=$TZ
+      - DEFAULT_WORKSPACE=$WORKSPACE
+      - INSTALL_PACKAGES=make|wget|curl
+#      - INSTALL_PIP_PACKAGES=
+      - DOCKER_MODS=$CODESERVER_DOCKER_MODS
+      - VSCODE_EXTENSION_IDS=$CODESERVER_EXTENSIONS
+    volumes:
+      - $USERDIR/code-server/config:/config:rw
+      - $USERDIR:/data:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - autoheal:true
+    ports:
+      - ${CODE_SERVER_PORT:-8443}:8443
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+    depends_on:
+      theme-park:
+        condition: service_started
+
   theme-park:
     image: ghcr.io/gilbn/theme.park:${THEMEPARK_TAG:-latest}
     container_name: Theme-Park
@@ -54,11 +100,11 @@ services:
         window: 120s
       resources:
         limits:
-          cpus: '0.1'
-          memory: 50M
+#          cpus: '0.1'
+          memory: 96M
         reservations:
-          cpus: '0.05'
-          memory: 35M
+#          cpus: '0.05'
+          memory: 48M
     environment:
       - PUID=$UID
       - PGID=$GID
@@ -117,52 +163,6 @@ services:
     logging:
       options:
         max-size: 50m
-
-  code-server:
-    image: lscr.io/linuxserver/code-server:${CODESERVER_TAG:-latest}
-    container_name: Code-Server
-    hostname: codeserver
-    read_only: false
-    privileged: false
-    security_opt:
-      - no-new-privileges:true
-    deploy:
-      restart_policy:
-        condition: unless-stopped
-        delay: 5s
-        window: 120s
-      resources:
-        limits:
-          cpus: '4.0'
-          memory: 4G
-        reservations:
-          cpus: '1.5'
-          memory: 1G
-    environment:
-      - PUID=$UID
-      - PGID=$GID
-      - TZ=$TZ
-      - DEFAULT_WORKSPACE=$WORKSPACE
-      - INSTALL_PACKAGES=make|wget|curl
-#      - INSTALL_PIP_PACKAGES=
-      - DOCKER_MODS=$CODESERVER_DOCKER_MODS
-      - VSCODE_EXTENSION_IDS=$CODESERVER_EXTENSIONS
-    volumes:
-      - $USERDIR/code-server/config:/config:rw
-      - $USERDIR:/data:rw
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    labels:
-      - autoheal:true
-    ports:
-      - ${CODE_SERVER_PORT:-8443}:8443
-    networks:
-      - docker
-    logging:
-      options:
-        max-size: 50m
-    depends_on:
-      theme-park:
-        condition: service_started
 
 #----------------- NETWORKING
 networks:

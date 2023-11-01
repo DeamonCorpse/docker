@@ -83,11 +83,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.05'
-          memory: 20M
+#          cpus: '0.05'
+          memory: 96M
         reservations:
-          cpus: '0.02'
-          memory: 10M
+#          cpus: '0.02'
+          memory: 48M
     environment:
       - TZ=$TZ
       - WATCHTOWER_HTTP_API_METRICS=true
