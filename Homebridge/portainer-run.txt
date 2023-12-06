@@ -1,0 +1,14 @@
+sudo docker run -d \
+  --name Portainer \
+  --hostname=portainer \
+  --restart unless-stopped \
+  --security-opt="no-new-privileges:true" \
+  --network="homebridge" \
+  #--memory-reservation="24m" \
+  #--memory="64m" \
+  #--cpus=0.1 \
+  -p 9443:9443 \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  -v /home/deamon/docker/portainer-ce:/data:rw \
+  -l autoheal=true \
+  portainer/portainer-ce:latest

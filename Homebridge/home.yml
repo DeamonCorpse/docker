@@ -1,0 +1,54 @@
+services:
+#----- Scrypted
+  scrypted:
+    image: koush/scrypted:${SCRYPT_TAG:-latest}
+    container_name: Scrypted
+    hostname: scrypted
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+#      resources:
+#        limits:
+#          cpus: '0.5'
+#          memory: 400M
+#        reservations:
+#          cpus: '0.1'
+#          memory: 80M
+    environment:
+      - SCRYPTED_WEBHOOK_UPDATE_AUTHORIZATION=${SCRYPT_WH}
+      - SCRYPTED_WEBHOOK_UPDATE=http://${SCRYPT_HOST:-localhost}:10444/v1/update
+      - SCRYPTED_DOCKER_AVAHI=true
+#      - SCRYPTED_NVR_VOLUME=/nvr
+    volumes:
+      - ${USERDIR}/scrypted/volume:/server/volume
+#     nvr:
+#         driver_opts:
+#             type: cifs
+#             o: username=[username],password=[password],vers=3.0,file_mode=0777,dir_mode=0777
+#             device: //[ip-address]/[path-to-directory]
+#     nvr:
+#         driver_opts:
+#             type: "nfs"
+#             o: "addr=[ip-address],nolock,soft,rw"
+#             device: ":[path-to-directory]"
+    labels:
+      - autoheal:true
+    network_mode: host
+    logging:
+      #syslog-address: "tcp://192.168.68.62:514"
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: 10
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: false
