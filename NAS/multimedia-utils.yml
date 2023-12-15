@@ -1,4 +1,5 @@
 services:
+#----- FLARE SOLVER
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:${FS_TAG:-latest}
     container_name: Flaresolverr
@@ -27,7 +28,42 @@ services:
       - HEADLESS=true
       - TEST_URL=https://www.google.com
     ports:
-      - "${FS_PORT:-8191}:8191"
+      - ${FS_PORT:-8191}:8191
+    labels:
+      - autoheal:true
+    networks:
+      - arrs
+    logging:
+      options:
+        #syslog-address: "udp://192.168.68.5:514"
+        max-size: 50m
+        max-file: 10
+
+#----- REQUESTERR
+  requesterr:
+    image: darkalfx/requestrr:${REQ_TAG:-latest}
+    container_name: Requesterr
+    hostname: requesterr
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+#      resources:
+#        limits:
+#          #cpus: '0.75'
+#          memory: 250M
+#        reservations:
+#          #cpus: '0.05'
+#          memory: 50M
+    volumes:
+      - $USERDIR/requesterr:/root/config:rw
+    ports:
+      - ${REQ_PORT:-5055}:5055
     labels:
       - autoheal:true
     networks:
@@ -39,7 +75,7 @@ services:
         max-size: 50m
         max-file: 10
 
-
+#----- OVERSEER
   overseerr:
     image: lscr.io/linuxserver/overseerr:${OVERSEERR_TAG:-latest}
     container_name: Overseer
