@@ -1,45 +1,46 @@
 services:
-#----- DPM INC
-  kanboard:
-    image: ghcr.io/kanboard/kanboard:${KANBOARD_TAG:-latest}
-    container_name: Kanboard
-    hostname: kanboard
-    restart: unless-stopped
+  glances:
+    image: nicolargo/glances:${GLANCES_TAG:-alpine-latest}
+    container_name: Glances
+    hostname: glances
     read_only: false
     privileged: false
+    pid: host
     security_opt:
       - no-new-privileges:true
     deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
       resources:
         limits:
-          cpus: '0.1'
-          memory: 24M
+          cpus: '0.15'
+          memory: 50M
         reservations:
           cpus: '0.05'
-          memory: 6M
+          memory: 30M
     environment:
-      - PLUGIN_INSTALLER=true
+      - "GLANCES_OPT=-w"
     volumes:
-      - $USERDIR/dpm/kanboard:/var/www/app/data:rw
-      - $USERDIR/dpm/kanboard/plugins:/var/www/app/plugins:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/localtime:/etc/localtime:ro
+      - $USERDIR/glances/glances.conf:/glances/conf/glances.conf:rw
     labels:
       - autoheal:true
     ports:
-      - ${KANBOARD_PORT:-80}:80/tcp
+      - ${GLANCES_PORTS:-61208-61209}:61208-61209
     networks:
-      - dpm
+      - docker
     logging:
       options:
         #syslog-address: "tcp://192.168.68.62:514"
         max-size: 50m
         max-file: 10
 
+
 #----------------- NETWORKING
 networks:
   docker:
     name: $DOCKER_NET
-    external: true
-  dpm:
-    name: $DPM_NET
     external: true

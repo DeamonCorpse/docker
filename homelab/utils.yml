@@ -1,4 +1,93 @@
 services:
+#----- ANSIBLE SEMAPHORE
+  postgres:
+    image: postgres:${PG_TAG:-latest}
+    container_name: Semaphore-DB
+    hostname: semaphore-db
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+#      resources:
+#        limits:
+#          cpus: '1.0'
+#          memory: 512M
+#        reservations:
+#          cpus: '0.25'
+#          memory: 256M
+    volumes:
+      - $USERDIR/semaphore:/var/lib/postgresql/data:rw
+    environment:
+      - POSTGRES_USER=${PG_USER:-semaphore}
+      - POSTGRES_PASSWORD=${PG_PW}
+      - POSTGRES_DB=${PG_DB:-semaphore}
+    labels:
+      - autoheal:true
+    networks:
+      - databases
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
+  semaphore:
+    image: semaphoreui/semaphore:${SEM_TAG:-latest}
+    container_name: Semaphore
+    hostname: semaphore
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+#      resources:
+#        limits:
+#          cpus: '1.0'
+#          memory: 512M
+#        reservations:
+#          cpus: '0.25'
+#          memory: 256M
+    volumes:
+      - $USERDIR/cloudbeaver:/opt/cloudbeaver/workspace:rw
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - SEMAPHORE_DB_USER=${PG_USER:-semaphore}
+      - SEMAPHORE_DB_PASS=${PG_PW}
+      - SEMAPHORE_DB_HOST=postgres
+      - SEMAPHORE_DB_PORT=5432
+      - SEMAPHORE_DB_DIALECT=postgres
+      - SEMAPHORE_DB=${PG_DB:-semaphore}
+      - SEMAPHORE_PLAYBOOK_PATH=${SEM_PLAYBOOK:-/tmp/semaphore/}
+      - SEMAPHORE_ADMIN_PASSWORD=${SEM_ADMIN_PW}
+      - SEMAPHORE_ADMIN_NAME=${SEM_ADMIN_NAME:-admin}
+      - SEMAPHORE_ADMIN_EMAIL=${SEM_ADMIN_EMAIL}
+      - SEMAPHORE_ADMIN=${SEM_ADMIN:-admin}
+      - SEMAPHORE_ACCESS_KEY_ENCRYPTION=${SEM_KEY}
+    labels:
+      - autoheal:true
+    ports:
+      - ${SEM_PORT:-3000}:3000/tcp
+    networks:
+      - docker
+      - databases
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+    depends_on:
+      - postgres
+
+#----- CLOUDBEAVER
   cloudbeaver:
     image: dbeaver/cloudbeaver:${CLOUDBEAVER_TAG:-latest}
     container_name: Cloudbeaver
@@ -35,29 +124,99 @@ services:
         max-size: 50m
         max-file: 10
 
-#  phpmyadmin:
-#    image: phpmyadmin:${PHPMA_TAG:-latest}
-#    container_name: phpMyAdmin
-#    hostname: phpmyadmin
-#    restart: unless-stopped
-#    read_only: false
-#    privileged: false
-#    security_opt:
-#      - no-new-privileges:true
-#    environment:
-#      - PMA_ARBITRARY=1
-#    labels:
-#      - autoheal:true
-#    ports:
-#      - ${PHPMA_PORT:-8080}:80
-#    networks:
-#      - docker
-#    logging:
-#      options:
-#        #syslog-address: "tcp://192.168.68.62:514"
-#        max-size: 50m
-#        max-file: 1
+#----- DIAGRAMS.NET
+  diagrams:
+    image: jgraph/drawio:${DRAW_TAG:-latest}
+    container_name: Draw-io
+    hostname: draw-io
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+#      resources:
+#        limits:
+#          cpus: '1.0'
+#          memory: 512M
+#        reservations:
+#          cpus: '0.25'
+#          memory: 256M
+    labels:
+      - autoheal:true
+    ports:
+      - ${DRAW_PORT:-8443}:8443
+    networks:
+      - docker
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
 
+#----- IT TOOLS
+  ittools:
+    image: ghcr.io/corentinth/it-tools:${ITT_TAG:-latest}
+    container_name: IT-Tools
+    hostname: ittols
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    labels:
+      - autoheal:true
+    ports:
+      - ${ITT_PORT:-8080}:80
+    networks:
+      - docker
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
+#----- Stirling PDF
+  stirling:
+    image: frooodle/s-pdf:${STIR_TAG:-latest}
+    container_name: Stirling-PDF
+    hostname: stirling-pdg
+    restart: unless-stopped
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - autoheal:true
+    environment:
+      - DOCKER_ENABLE_SECURITY=false
+#    volumes:
+#      - /location/of/trainingData:/usr/share/tesseract-ocr/5/tessdata #Required for extra OCR languages
+#      - /location/of/extraConfigs:/configs
+#      - /location/of/customFiles:/customFiles/
+    ports:
+      - ${STIR_PORT:-8080}:8080
+    networks:
+      - docker
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 1
 
 #----------------- NETWORKING
 networks:
@@ -66,7 +225,4 @@ networks:
     external: true
   databases:
     name: $DB_NET
-    external: true
-  dpm:
-    name: $DPM_NET
     external: true
