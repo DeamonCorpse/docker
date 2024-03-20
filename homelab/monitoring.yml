@@ -1,4 +1,45 @@
 services:
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:${CADVISOR_TAG:-latest}
+    container_name: cAdvisor
+    hostname: cadvisor
+    read_only: true
+    privileged: true
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 50M
+        reservations:
+          cpus: '0.02'
+          memory: 20M
+    environment:
+      - TZ=$TZ
+      - HOST_CONTAINERNAME=cAdvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    labels:
+      - autoheal:true
+    ports:
+      - ${CADVISOR_UI_PORT:-8080}:8080
+    networks:
+      - docker
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
   glances:
     image: nicolargo/glances:${GLANCES_TAG:-alpine-latest}
     container_name: Glances
@@ -81,12 +122,14 @@ services:
         max-size: 50m
         max-file: 10
 
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:${CADVISOR_TAG:-latest}
-    container_name: cAdvisor
-    hostname: cadvisor
-    read_only: true
-    privileged: true
+#----- ZABBIX
+  zabbix-server:
+    image: zabbix/zabbix-server-mysql:${ZSERVER_TAG:-alpine-trunk}
+    container_name: Zabbix-Server
+    hostname: zabbix-server
+    init: true
+    read_only: false
+    privileged: false
     security_opt:
       - no-new-privileges:true
     deploy:
@@ -96,35 +139,178 @@ services:
         window: 120s
       resources:
         limits:
-          cpus: '0.2'
-          memory: 50M
+          cpus: '0.7'
+          memory: 1G
         reservations:
-          cpus: '0.02'
-          memory: 20M
+          cpus: '0.5'
+          memory: 512M
+    tmpfs: /tmp
     environment:
-      - TZ=$TZ
-      - HOST_CONTAINERNAME=cAdvisor
+      - DB_SERVER_HOST=zabbix_db
+      - DB_PORT=${DB_PORT:-3306}
+      - MYSQL_DATABASE=${DB:-zabbix}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PW}
+      - MYSQL_USER=${DB_UN:-zabbix}
+      - MYSQL_PW=${DB_PW}
+      - ZBX_LISTENPORT=${ZLISTEN_PORT-:10051}
     volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
-      - /dev/disk/:/dev/disk:ro
+      - /etc/localtime:/etc/localtime:ro
     labels:
       - autoheal:true
-    ports:
-      - ${CADVISOR_UI_PORT:-8080}:8080
     networks:
       - docker
+      - monitoring
+    ports:
+      - ${ZLISTEN_PORT-:10051}:10051
     logging:
       options:
         #syslog-address: "tcp://192.168.68.62:514"
         max-size: 50m
         max-file: 10
+    depends_on:
+      - zabbix-db
 
+  zabbix-proxy:
+    image: zabbix/zabbix-proxy-mysql:${ZPROXY_TAG:-alpine-trunk}
+    container_name: Zabbix-Proxy
+    hostname: zabbix-proxy
+    init: true
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.7'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    tmpfs: /tmp
+    environment:
+      - DB_SERVER_HOST=zabbix-db
+      - ZBX_SERVER_HOST=zabbix-server
+      - ZBX_HOSTNAME=zabbix
+      - MYSQL_DATABASE=${DB:-zabbix}
+      - MYSQL_USER=${DB_UN:-zabbix}
+      - MYSQL_PW=${DB_PW}
+      - ZBX_SERVER_PORT=${ZLISTEN_PORT-:10051}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+      - monitoring
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+    depends_on:
+      - zabbix_db
+
+  zabbix-db:
+    image: linuxserver/mariadb:${ZDB_TAG:-latest}
+    container_name: Zabbix-DB
+    hostname: zabbix-db
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      #resources:
+      #  limits:
+      #    cpus: '0.5'
+      #    memory: 400M
+      #  reservations:
+      #    cpus: '0.1'
+      #    memory: 80M
+    environment:
+      - PUID=$UID
+      - PGID=$GID
+      - TZ=$TZ
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PW}
+      - MYSQL_DATABASE=${DB}
+      - MYSQL_USER=${DB_UN}
+      - MYSQL_PASSWORD=${DB_PW}
+    volumes:
+      - $USERDIR/zabbix/db:/config:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${DB_PORT:-3306}:3306
+    networks:
+      - monitoring
+
+  zabbix-frontend:
+    image: zabbix/zabbix-web-nginx-mysql:${ZFRONT_TAG:-alpine-trunk}
+    container_name: Zabbix-Frontend
+    hostname: zabbix-frontend
+    read_only: false
+    privileged: false
+    sysctls:
+      - net.core.somaxconn=65535
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.7'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    tmpfs: /tmp
+    environment:
+      - DB_SERVER_HOST=zabbix_db
+      - DB_PORT=${DB_PORT:-3306}
+      - MYSQL_DATABASE=${DB:-zabbix}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PW}
+      - MYSQL_USER=${DB_UN:-zabbix}
+      - MYSQL_PW=${DB_PW}
+      - ZBX_SERVER_HOST=zabbix-server
+      - PHP_TZ=$TZ
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+      - monitoring
+    ports:
+      - ${ZFRONT_HTTP_PORT:-8080}:8080
+      - ${ZFRONT_HTTPS_PORT:-8443}:8443
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
 #----------------- NETWORKING
 networks:
   docker:
     name: $DOCKER_NET
+    external: true
+  monitoring:
+    name: $MONITOR_NET
     external: true

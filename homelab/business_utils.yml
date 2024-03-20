@@ -1,0 +1,116 @@
+services:
+#----- DOCUSEAL
+  docuseal:
+    image: docuseal/docuseal:${DS_TAG:-latest}
+    container_name: Docuseal
+    hostname: docuseal
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+    volumes:
+      - $USERDIR/docuseal:/data:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${DS_PORT:-3000}:3000
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
+#----- SITE INSPECTOR
+  inspector:
+    image: siteinspector/siteinspector:${SI_TAG:-latest}
+    container_name: SiteInspector
+    hostname: siteinspector
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+    command: bash -c "rake db:migrate && foreman start"
+    environment:
+      - SECRET_KEY_BASE=${SI_KEY}
+      - RAILS_LOG_TO_STDOUT=true
+      - DATABASE_URL=postgresql://${SI_DB_USER}:${SI_DB_PW}@postgres:5432/${SI_DB:-siteinspector}
+      - REDIS_URL=redis://redis:6379/0
+      - PORT=${SI_PORT:-808}
+      - SIDEKIQ_CONCURRENCY=10
+    volumes:
+      - $USERDIR/siteinspector:/app:rw
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+      - inspector
+    ports:
+      - ${SI_PORT:-808}:808
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:${SIDB_TAG:-12.2}
+    container_name: SiteInspector-DB
+    hostname: siteinspectordb
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+    volumes:
+      - ${USERDIR}/siteinspector/db:/var/lib/postgresql/data:rw
+    environment:
+      - POSTGRES_USER=${SI_DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${SI_DB_PW:-postgres}
+      - POSTGRES_DB=${SI_DB:-siteinspector}
+    labels:
+      - autoheal:true
+    networks:
+      - inspector
+
+  redis:
+    image: redis:${RED_TAG:-5.0}
+    container_name: SiteInspector-Redis
+    hostname: siteinspectorredis
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+    command: redis-server
+    volumes:
+      - ${USERDIR}/siteinspector/redis:/data:rw
+    labels:
+      - autoheal:true
+    networks:
+      - inspector
+
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true
+  inspector:
+    name: $INSPECTOR_NET
+    external: true

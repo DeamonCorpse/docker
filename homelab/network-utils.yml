@@ -1,4 +1,5 @@
 services:
+#----- CLOUDFLARED
   cloudflared:
     image: cloudflare/cloudflared:${CLOUDFLARED_TAG:-latest}
     container_name: Cloudflared
@@ -30,6 +31,33 @@ services:
       options:
         max-size: 50m
 
+#----- NETBOOT.XYZ
+  netbootxyz:
+    image: ghcr.io/netbootxyz/netbootxyz:${NETBOOT_TAG:-latest}
+    container_name: Netbootxyz
+    hostname: netbootxyz
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+    volumes:
+      - ${USERDIR}/netboot:/config:rw
+      - ${USERDIR}/netboot/assets:/assets:rw
+    labels:
+      - autoheal:true
+    networks:
+      - docker
+    ports:
+      - ${NETBOOT_HTTP_PORT:-8080}:80
+      - ${NETBOOT_UI_PORT:-3000}:3000
+      - ${NETBOOT_PORT:-69}:69/udp
+
+#----- OPENSPEEDTEST
   openspeedtest:
     image: openspeedtest/${OSPEEDTEST_TAG:-latest}
     container_name: Open-Speed-Test
@@ -58,6 +86,7 @@ services:
       - ${OSPEEDTEST_HTTP_PORT:-3000}:3000
       - ${OSPEEDTEST_HTTPS_PORT:-3001}:3001
 
+#----- SPEEDTEST TRACKER
   speedtest-tracker:
     image: ghcr.io/alexjustesen/speedtest-tracker:${SPEEDTEST_TAG:-latest}
     container_name: Speed-Test-Tracker
@@ -94,6 +123,7 @@ services:
       options:
         max-size: 50m
 
+#----- UPTIME KUMA
   uptime-kuma:
     image: louislam/uptime-kuma:${KUMA_TAG:-latest}
     container_name: UptimeKuma
@@ -135,7 +165,7 @@ services:
       options:
         max-size: 50m
 
-#----- NOT IN USE
+#----- DUCKDNS
 #  duckdns:
 #    image: lscr.io/linuxserver/duckdns:${DUCKDNS_TAG:-latest}
 #    container_name: DuckDNS

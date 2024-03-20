@@ -157,6 +157,70 @@ services:
         max-size: 50m
         max-file: 10
 
+#----- GOTIFY
+  gotify:
+    image: ghcr.io/gotify/server:${GOTIFY_TAG:-latest}
+    container_name: Gotify
+    hostname: gotify
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+#      resources:
+#        limits:
+#          cpus: '1.0'
+#          memory: 512M
+#        reservations:
+#          cpus: '0.25'
+#          memory: 256M
+    environment:
+      - TZ=$TZ
+      - GOTIFY_SERVER_KEEPALIVEPERIODSECONDS=0
+#      - GOTIFY_SERVER_LISTENADDR=
+      - GOTIFY_SERVER_SSL_ENABLED=false
+      - GOTIFY_SERVER_SSL_REDIRECTTOHTTPS=true
+#      - GOTIFY_SERVER_SSL_LISTENADDR=
+#      - GOTIFY_SERVER_SSL_PORT=443
+#      - GOTIFY_SERVER_SSL_CERTFILE=
+#      - GOTIFY_SERVER_SSL_CERTKEY=
+#      - GOTIFY_SERVER_SSL_LETSENCRYPT_ENABLED=false
+#      - GOTIFY_SERVER_SSL_LETSENCRYPT_ACCEPTTOS=false
+#      - GOTIFY_SERVER_SSL_LETSENCRYPT_CACHE=certs
+#      - GOTIFY_SERVER_SSL_LETSENCRYPT_HOSTS=[mydomain.tld, myotherdomain.tld]
+#      - GOTIFY_SERVER_RESPONSEHEADERS={X-Custom-Header: "custom value", x-other: value}
+#      - GOTIFY_SERVER_CORS_ALLOWORIGINS=[.+\.example\.com, otherdomain\.com]
+#      - GOTIFY_SERVER_CORS_ALLOWMETHODS=[GET, POST]
+#      - GOTIFY_SERVER_CORS_ALLOWHEADERS=[X-Gotify-Key, Authorization]
+#      - GOTIFY_SERVER_STREAM_ALLOWEDORIGINS=[.+.example\.com, otherdomain\.com]
+      - GOTIFY_SERVER_STREAM_PINGPERIODSECONDS=45
+      - GOTIFY_DATABASE_DIALECT=sqlite3
+      - GOTIFY_DATABASE_CONNECTION=data/gotify.db
+      - GOTIFY_DEFAULTUSER_NAME=${GOTIFY_UN}
+      - GOTIFY_DEFAULTUSER_PASS=${GOTIFY_PW}
+      - GOTIFY_PASSSTRENGTH=${GOTIFY_PW_STR:-10}
+      - GOTIFY_UPLOADEDIMAGESDIR=data/images
+      - GOTIFY_PLUGINSDIR=data/plugins
+      - GOTIFY_REGISTRATION=false
+    volumes:
+      - $USERDIR/gotify:/app/data
+    labels:
+      - autoheal:true
+    ports:
+      - ${GOTIFY_PORT:-80}:80
+    networks:
+      - docker
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
+
 #----- IT TOOLS
   ittools:
     image: ghcr.io/corentinth/it-tools:${ITT_TAG:-latest}
@@ -190,7 +254,7 @@ services:
         max-size: 50m
         max-file: 10
 
-#----- Stirling PDF
+#----- STIRLING PDF
   stirling:
     image: frooodle/s-pdf:${STIR_TAG:-latest}
     container_name: Stirling-PDF

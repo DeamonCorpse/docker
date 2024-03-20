@@ -19,7 +19,7 @@ services:
     volumes:
       - $USERDIR/dashboards/dpm:/app/config:rw
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /etc/localtime:/etc/locatime:ro
+      - /etc/localtime:/etc/localtime:ro
     labels:
       - autoheal:true
     ports:
@@ -106,6 +106,38 @@ services:
         max-size: 50m
         max-file: 10
 
+  sbs-dashboard:
+    image: ghcr.io/gethomepage/homepage:${HOMEPAGE_TAG:-latest}
+    container_name: SBS-Dashboard
+    hostname: sbsdashboard
+    restart: unless-stopped
+    read_only: true
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 300M
+        reservations:
+          cpus: "0.25"
+          memory: 80M
+    volumes:
+      - $USERDIR/dashboards/sbs:/app/config:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - autoheal:true
+    ports:
+      - ${SBS_PORT:-3000}:3000
+    networks:
+      - sbs
+    logging:
+      options:
+        max-size: 50m
+        max-file: 10
+
 #----------------- NETWORKING
 networks:
   docker:
@@ -113,4 +145,7 @@ networks:
     external: true
   dpm:
     name: $DPM_NET
+    external: true
+  sbs:
+    name: $SBS_NET
     external: true

@@ -85,6 +85,42 @@ services:
       theme-park:
         condition: service_started
 
+dockge:
+    image: louislam/dockge:${DOCKGE_TAG:-latest}
+    container_name: Dockge
+    hostname: dockge
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+#      resources:
+#        limits:
+#          cpus: '0.05'
+#          memory: 20M
+#        reservations:
+#          cpus: '0.02'
+#          memory: 10M
+    environment:
+      - DOCKGE_STACKS_DIR=$USERDIR
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - $USERDIR/dockge:/app/data:rw
+      - $USERDIR:USERDIR:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${DOCKGE_UI_PORT:-5001}:5001
+    networks:
+      - docker
+    logging:
+      options:
+        max-size: 50m
+
   theme-park:
     image: ghcr.io/gilbn/theme.park:${THEMEPARK_TAG:-latest}
     container_name: Theme-Park
