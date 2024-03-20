@@ -1,0 +1,142 @@
+services:
+#----- DOCUSEAL
+  docuseal:
+    image: docuseal/docuseal:${DS_TAG:-latest}
+    container_name: Docuseal
+    hostname: docuseal
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+    volumes:
+      - $USERDIR/docuseal:/data:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${DS_PORT:-3000}:3000
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+
+#----- NEXTCLOUD ALL-IN-ONE
+  NCDatabase:
+    image: lscr.io/linuxserver/mariadb:${NCDB_TAG:-latest}
+    container_name: NC-DB
+    hostname: ncdb
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-file-per-table=1 --skip-innodb-read-only-compressed
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TZ}
+      - MYSQL_ROOT_PASSWORD=$NCDB_ROOT_PW
+      - MYSQL_DATABASE=$NCDB
+      - MYSQL_USER=$NCDB_USER
+      - MYSQL_PASSWORD=$NCDB_PW
+      - REMOTE_SQL=https://ncdb/${NCDB_PORT:-3306}
+    volumes:
+      - $USERDIR/nextcloud/database:/var/lib/mysql:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${NCDB_PORT:-3306}:3306
+    networks:
+      - nextcloud
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+    healthcheck:
+      test: "/usr/bin/mysql --user=$NCDB_USER --password=$NCDB_PW --execute 'SELECT 1;'"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  NCRedis:
+    image: redis:${REDIS_TAG:-latest}
+    container_name: NC-Redis
+    hostname: ncredis
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+    labels:
+      - autoheal:true
+    expose:
+      - ${REDIS_PORT:-6379}
+    networks:
+      - nextcloud
+
+  nextcloud:
+    image: lscr.io/linuxserver/nextcloud:${NC_TAG:-latest}
+    container_name: Nextcloud
+    hostname: nextcloud
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - TZ=${TZ}
+      - REDIS_HOST=${NC_REDIS_HOST}
+      - MYSQL_DATABASE=${NCDB}
+      - MYSQL_USER=${NCDB_USER}
+      - MYSQL_PASSWORD=${NCDB_PW}
+      - MYSQL_HOST=${NC_DB_HOST}
+#      - NEXTCLOUD_TRUSTED_DOMAINS=${NC_DOMAINS}
+      - NEXTCLOUD_ADMIN_USER=${NC_ADMIN}
+      - NEXTCLOUD_ADMIN_PASSWORD=${NC_ADMIN_PW}
+    volumes:
+      - $USERDIR/nextcloud:/config:rw
+      - $USERDIR/nextcloud/data:/data:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${NC_UI_PORT:-443}:443
+    networks:
+      - docker
+      - nextcloud
+    logging:
+      options:
+        #syslog-address: "tcp://192.168.68.62:514"
+        max-size: 50m
+        max-file: 10
+    depends_on:
+        - NCDatabase
+        - NCRedis
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true
+  nextcloud:
+    name: $NC_NET
+    external: true
