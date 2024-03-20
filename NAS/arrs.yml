@@ -21,7 +21,7 @@ services:
           memory: 100M
     environment:
       - TZ=$TZ
-      - PID=$UID
+      - PUID=$UID
       - PGID=$GID
       - AUTO_UPDATE=true
       - DOCKER_MODS=${TP_MODS}:jackett
@@ -118,11 +118,12 @@ services:
     volumes:
       - $USERDIR/radarr:/config:rw
       - $USERDIR/radarr/recycle:/recycle:rw
-      - $MOVDIR:/movies:rw
+      - $MOVDIR:/nas-movies:rw
       - $BACKDIR/radarr:/backups:rw
     labels:
       - autoheal:true
     networks:
+      - docker
       - arrs
     logging:
       options:
@@ -161,11 +162,12 @@ services:
     volumes:
       - $USERDIR/sonarr:/config:rw
       - $USERDIR/sonarr/recycle:/recycle:rw
-      - $SERDIR:/tv_shows:rw
+      - $SERDIR:/nas-tv_shows:rw
       - $BACKDIR/sonarr:/backups:rw
     labels:
       - autoheal:true
     networks:
+      - docker
       - arrs
     logging:
       options:

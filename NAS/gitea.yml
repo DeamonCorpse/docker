@@ -1,0 +1,79 @@
+services:
+  database:
+    image: mariadb:${GITDB_TAG:-latest}
+    container_name: GiteaDB
+    hostname: giteadb
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+    environment:
+      - MARIADB_ROOT_PASSWORD=${GITDB_ROOT_PW}
+      - MARIADB_DATABASE=${GITDB_NAME}
+      - MARIADB_USER=${GITDB_USER}
+      - MARIADB_PASSWORD=${GITDB_PW}
+      - MARIADB_MYSQL_LOCALHOST_USER=true
+    volumes:
+      - $USERDIR/gitea-db:/var/lib/mysql:rw
+    labels:
+      - autoheal:true
+    ports:
+      - ${GITDB_PORT:-3306}:3306
+    networks:
+      - gitea
+    healthcheck:
+      test: "/usr/bin/mysql --user=$GITDB_USER --password=$GITDB_PW --execute 'SELECT 1;'"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  gitea:
+    image: gitea/gitea:${GIT_TAG:-latest}
+    container_name: Gitea
+    hostname: gitea
+    read_only: false
+    privileged: false
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+        delay: 5s
+        window: 120s
+    environment:
+      - USER_UID=${UID:-1000}
+      - USER_GID=${GID:-1000}
+      - GITEA__database__DB_TYPE=mysql
+      - GITEA__database__HOST=database:3306
+      - GITEA__database__NAME=${GITDB_NAME}
+      - GITEA__database__USER=${GITDB_USER}
+      - GITEA__database__PASSWD=${GITDB_PW}
+    volumes:
+      - ${GITDIR}/:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - docker
+      - gitea
+    ports:
+      - ${GIT_UI_PORT:-3000}:3000
+      - ${GIT_SSH_PORT:-2222}:2222
+    labels:
+      - autoheal:true
+    depends_on:
+      - database
+
+
+#----------------- NETWORKING
+networks:
+  docker:
+    name: $DOCKER_NET
+    external: true
+  gitea:
+    name: $GITEA_NET
+    external: true

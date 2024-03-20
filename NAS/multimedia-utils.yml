@@ -13,13 +13,13 @@ services:
         condition: unless-stopped
         delay: 5s
         window: 120s
-      #resources:
-      #  limits:
-      #    #cpus: '0.75'
-      #    memory: 250M
-      #  reservations:
-      #    #cpus: '0.05'
-      #    memory: 50M
+      resources:
+        limits:
+          #cpus: '0.75'
+          memory: 250M
+        reservations:
+          #cpus: '0.05'
+          memory: 50M
     environment:
       - TZ=$TZ
       - LOG_LEVEL=info
@@ -32,42 +32,6 @@ services:
     labels:
       - autoheal:true
     networks:
-      - arrs
-    logging:
-      options:
-        #syslog-address: "udp://192.168.68.5:514"
-        max-size: 50m
-        max-file: 10
-
-#----- REQUESTERR
-  requesterr:
-    image: darkalfx/requestrr:${REQ_TAG:-latest}
-    container_name: Requesterr
-    hostname: requesterr
-    read_only: false
-    privileged: false
-    security_opt:
-      - no-new-privileges:true
-    deploy:
-      restart_policy:
-        condition: unless-stopped
-        delay: 5s
-        window: 120s
-#      resources:
-#        limits:
-#          #cpus: '0.75'
-#          memory: 250M
-#        reservations:
-#          #cpus: '0.05'
-#          memory: 50M
-    volumes:
-      - $USERDIR/requesterr:/root/config:rw
-    ports:
-      - ${REQ_PORT:-5055}:5055
-    labels:
-      - autoheal:true
-    networks:
-      - docker
       - arrs
     logging:
       options:
@@ -119,6 +83,7 @@ services:
         max-size: 50m
         max-file: 10
 
+#----- TAUTULLI
   tautulli:
     image: lscr.io/linuxserver/tautulli:${TAUTULLI_TAG:-latest}
     container_name: Tautulli

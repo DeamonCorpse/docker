@@ -16,9 +16,11 @@ services:
       - "GLANCES_OPT=-w"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime:ro
       - $USERDIR/glances/glances.conf:/glances/conf/glances.conf:rw
     labels:
       - autoheal:true
+    network_mode: host
     ports:
       - ${GLANCES_PORTS:-61208-61209}:61208-61209
 
