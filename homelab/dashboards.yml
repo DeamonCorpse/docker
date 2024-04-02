@@ -16,9 +16,11 @@ services:
         reservations:
           cpus: "0.25"
           memory: 80M
+    environment:
+      - PUID=$UID
+      - PGID=$GID
     volumes:
       - $USERDIR/dashboards/dpm:/app/config:rw
-      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/localtime:/etc/localtime:ro
     labels:
       - autoheal:true
@@ -74,7 +76,7 @@ services:
     container_name: Homelab-Dashboard
     hostname: homelabdashboard
     #init: true
-    read_only: true
+    read_only: false
     privileged: false
     security_opt:
       - no-new-privileges:true
@@ -90,9 +92,19 @@ services:
         reservations:
           cpus: "0.25"
           memory: 80M
+    environment:
+      - PUID=$UID
+      - PGID=$GID
+      - HOMEPAGE_VAR_PORTAINER_KEY=$HPVAR_PORTAINER_KEY
+      - HOMEPAGE_VAR_WATCHTOWER_KEY=$HPVAR_WATCHTOWER_KEY
+      - HOMEPAGE_VAR_ARCHIVIST_KEY=$HPVAR_ARCHIVIST_KEY
+      - HOMEPAGE_VAR_GOTIFY_KEY=$HPVAR_GOTIFY_KEY
+      - HOMEPAGE_VAR_PROXMOX_UN=$HPVAR_PROXMOX_UN
+      - HOMEPAGE_VAR_PROXMOX_UN=$HPVAR_PROXMOX_PW
+      - HOMEPAGE_VAR_RS1221_UN=$HPVAR_RS1221_UN
+      - HOMEPAGE_VAR_RS1221_PW=$HPVAR_RS1221_PW
     volumes:
       - $USERDIR/dashboards/homelab:/app/config:rw
-      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/localtime:/etc/localtime:ro
     labels:
       - autoheal:true
@@ -123,9 +135,11 @@ services:
         reservations:
           cpus: "0.25"
           memory: 80M
+    environment:
+      - PUID=$UID
+      - PGID=$GID
     volumes:
       - $USERDIR/dashboards/sbs:/app/config:rw
-      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/localtime:/etc/localtime:ro
     labels:
       - autoheal:true
